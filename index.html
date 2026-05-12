@@ -1,0 +1,2171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ricardo Martínez — Product Designer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ── Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+  --color-lima:    #B8F300;
+  --color-forest:  #2D6A4F;
+  --color-dark:    #0F1A10;
+  --color-mid:     #3D5A40;
+  --color-neutral: #F5F5F0;
+  --color-mist:    #EEF3EB;
+  --color-sage:    #E2ECDF;
+  --color-gray:    #8A9B8E;
+  --color-border:  #D6E4D9;
+  --color-white:   #FFFFFF;
+
+  /* Surface aliases — semantic layer over base palette */
+  --surface-page:     var(--color-neutral); /* default canvas        */
+  --surface-mist:     var(--color-mist);    /* hover & alt rows      */
+  --surface-sage:     var(--color-sage);    /* nested panels         */
+  --surface-card:     var(--color-white);   /* elevated surface      */
+  --surface-emphasis: var(--color-forest);  /* inverted section      */
+
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  --radius-sm:   4px; --radius-md: 8px; --radius-lg: 12px; --radius-pill: 999px;
+  --shadow-sm: 0 2px 8px rgba(15,26,16,.06);
+  --shadow-md: 0 4px 24px rgba(15,26,16,.10);
+  --shadow-lg: 0 8px 32px rgba(15,26,16,.12);
+  --t-fast: 150ms ease-out; --t-base: 200ms ease-out;
+
+  --max-w: 1200px; --nav-h: 64px; --pad: 80px;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-neutral);
+  color: var(--color-dark);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+::selection { background: var(--color-lima); color: var(--color-dark); }
+:focus-visible { outline: 2px solid var(--color-lima); outline-offset: 2px; }
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 var(--pad); }
+@media (max-width: 800px) { .wrap { padding: 0 24px; } }
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+.t-display {
+  font-family: var(--font-sans); font-weight: 700;
+  font-size: clamp(44px, 6.4vw, 72px);
+  letter-spacing: -0.02em; line-height: 1.05; margin: 0;
+}
+.t-display em, .t-h1 em, .t-h2 em, .t-h3 em {
+  font-family: var(--font-serif); font-weight: 300; font-style: italic; letter-spacing: 0;
+}
+.t-h1 { font: 600 clamp(36px,4.4vw,52px) var(--font-sans); letter-spacing: -0.015em; line-height: 1.1; margin: 0; }
+.t-h2 { font: 600 clamp(26px,3vw,32px) var(--font-sans); letter-spacing: -0.01em; line-height: 1.2; margin: 0; }
+.t-h3 { font: 600 21px var(--font-sans); line-height: 1.3; margin: 0; }
+.t-lead { font: 400 19px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0; }
+.t-body { font: 400 16px var(--font-sans); line-height: 1.7; color: var(--color-dark); margin: 0; }
+.t-label { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); display: inline-block; }
+.t-label-dark { color: rgba(245,245,240,.65); }
+.on-dark { color: var(--color-white) !important; }
+.lead-dark { color: rgba(245,245,240,.82) !important; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+  font: 600 15px var(--font-sans); letter-spacing: .01em;
+  border: none; border-radius: var(--radius-pill);
+  padding: 14px 28px; display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap; will-change: transform;
+}
+.btn-sm { padding: 10px 20px; font-size: 14px; }
+.btn-primary { background: var(--color-lima); color: var(--color-dark); }
+.btn-ghost { background: transparent; color: var(--color-dark); border: 1.5px solid var(--color-dark); padding: 12.5px 26.5px; transition: background var(--t-base), color var(--t-base); }
+.btn-ghost.btn-sm { padding: 8.5px 18.5px; }
+.btn-ghost:hover { background: var(--color-dark); color: var(--color-white); }
+
+/* ── Link arrow ─────────────────────────────────────────────────────────── */
+.la { font: 500 14px var(--font-sans); color: var(--color-mid); display: inline-flex; align-items: center; gap: 8px; }
+.la-text { background-image: linear-gradient(var(--color-lima),var(--color-lima)); background-size: 0% 2px; background-repeat: no-repeat; background-position: 0 100%; padding-bottom: 2px; transition: background-size var(--t-base); }
+.la:hover .la-text { background-size: 100% 2px; }
+.la-icon { display: inline-block; }
+.la-lima { color: var(--color-lima); }
+
+/* ── Tag ─────────────────────────────────────────────────────────────────── */
+.tag { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; background: rgba(184,243,0,.15); color: var(--color-mid); border: 1px solid rgba(184,243,0,.4); padding: 4px 10px; border-radius: var(--radius-sm); display: inline-block; }
+.tag-dark { background: rgba(255,255,255,.12); color: var(--color-white); border-color: rgba(255,255,255,.2); }
+.tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+/* ── Nav (floating-pill design — pebblelife-inspired) ─────────────────────── */
+.nav {
+  position: fixed; top: 16px; left: 0; right: 0;
+  z-index: 50;
+  display: flex; align-items: stretch; justify-content: space-between;
+  padding: 0 24px;
+  pointer-events: none;
+}
+.nav > * { pointer-events: auto; }
+
+.nav-pill {
+  background: var(--color-white);
+  border-radius: var(--radius-pill);
+  box-shadow:
+    0 1px 2px rgba(15, 26, 16, .04),
+    0 6px 24px rgba(15, 26, 16, .07);
+  display: inline-flex; align-items: center;
+  padding: 8px;
+}
+
+/* Left pill — isologo + name + status dot */
+.nav-logo {
+  gap: 12px;
+  padding: 8px 22px 8px 24px;
+  color: var(--color-dark);
+  text-decoration: none;
+  cursor: pointer;
+}
+.nav-logo-mark { display: inline-flex; }
+.nav-logo-mark svg { display: block; width: 28px; height: 28px; }
+.nav-brand-text {
+  font: 600 16px var(--font-sans);
+  letter-spacing: -0.01em;
+  display: inline-flex; align-items: baseline; gap: 4px;
+}
+.nav-brand-text em {
+  font-family: var(--font-serif); font-weight: 300; font-style: italic;
+  letter-spacing: 0;
+  color: var(--color-mid);
+}
+.nav-dot {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--color-lima);
+  align-self: flex-start; margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* Right pill — burger / menu items + CTA */
+.nav-menu {
+  gap: 4px;
+  position: relative;
+}
+.nav-menu-trigger {
+  display: inline-flex; align-items: center;
+}
+.nav-burger {
+  background: transparent; border: none;
+  width: 44px; height: 44px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  transition: opacity 180ms ease, width 380ms cubic-bezier(.6,.05,.3,.95);
+  overflow: hidden;
+}
+.nav-burger span {
+  display: block; width: 18px; height: 1.6px;
+  background: var(--color-dark);
+  border-radius: 2px;
+}
+.nav-burger.is-hidden {
+  opacity: 0;
+  width: 0;
+  pointer-events: none;
+}
+
+/* Items wrap — width is driven by GSAP for cross-browser smoothness */
+.nav-items-wrap {
+  width: 0;
+  overflow: hidden;
+  display: flex; align-items: center;
+}
+.nav-items {
+  display: flex; align-items: center; gap: 2px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+.nav-item {
+  font: 500 15px var(--font-sans);
+  color: var(--color-dark);
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  transition: background-color 180ms ease;
+  display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+  opacity: 0; /* GSAP controls opacity + x */
+  will-change: opacity, transform;
+}
+.nav-item:hover { background: var(--surface-mist); }
+.nav-item.is-active { font-weight: 700; background: transparent; }
+.nav-item.is-active::before,
+.nav-item.is-active::after {
+  content: '';
+  width: 5px; height: 5px;
+  background: var(--color-lima);
+  border-radius: 999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* CTA — green pill with dark arrow circle */
+.nav-cta {
+  background: var(--color-lima);
+  color: var(--color-dark);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 4px 6px 4px 18px;
+  display: inline-flex; align-items: center; gap: 12px;
+  font: 600 14px var(--font-sans);
+  letter-spacing: .005em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nav-cta-arrow {
+  background: var(--color-dark);
+  color: var(--color-white);
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-cta-arrow svg { display: block; }
+
+/* Mobile: collapse name text, keep logo only */
+@media (max-width: 640px) {
+  .nav { top: 12px; padding: 0 16px; }
+  .nav-brand-text, .nav-dot { display: none; }
+  .nav-logo { padding: 6px; }
+  .nav-logo-mark svg { width: 32px; height: 32px; }
+  .nav-cta-arrow { width: 32px; height: 32px; }
+  .nav-items-wrap { display: none; }
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero { padding: clamp(64px,12vh,140px) var(--pad) clamp(56px,8vh,96px); max-width: var(--max-w); margin: 0 auto; }
+@media (max-width: 768px) { .hero { padding: 64px 24px 72px; } }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.hero-meta { margin-top: 48px; font: 500 13px var(--font-sans); letter-spacing: .04em; color: var(--color-gray); display: inline-flex; align-items: center; gap: 8px; }
+.hero-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-lima); box-shadow: 0 0 0 4px rgba(184,243,0,.25); flex-shrink: 0; }
+
+/* ── Word-mask reveal (hero h1 + lead paragraph) ─────────────────────────── */
+.wm   { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; }
+.wm-b { display: block;        overflow: hidden; line-height: inherit; }
+.wi   { display: inline-block; will-change: transform; }
+
+/* ── SplitType text reveal (Values section) ──────────────────────────────── */
+.text-reveal { font-kerning: none; }
+.text-reveal .line-wrapper { overflow: hidden; line-height: inherit; }
+.text-reveal .line { will-change: transform; }
+
+/* ── Section ─────────────────────────────────────────────────────────────── */
+.section { padding: 80px var(--pad) 96px; max-width: var(--max-w); margin: 0 auto; }
+@media (max-width: 800px) { .section { padding: 56px 24px 72px; } }
+.section-head { margin-bottom: 48px; }
+
+/* ── Project grid & card ─────────────────────────────────────────────────── */
+.proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+@media (max-width: 768px) { .proj-grid { grid-template-columns: 1fr; } }
+
+.card-wrap { perspective: 1000px; }
+.card {
+  background: var(--color-white); border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: var(--shadow-sm); cursor: pointer; display: block;
+  will-change: transform;
+  transition: box-shadow 250ms ease-out;
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+.card:hover .la-text { background-size: 100% 2px; }
+.card:hover .la-icon { transform: translateX(4px); }
+.la-icon { transition: transform var(--t-base); display: inline-block; }
+
+.card-thumb { aspect-ratio: 16/9; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
+.card-thumb-mark { font: 700 clamp(56px,10vw,88px) var(--font-sans); letter-spacing: -0.04em; opacity: .8; }
+.card-thumb-name { position: absolute; bottom: 14px; left: 16px; font: 600 11px var(--font-sans); text-transform: uppercase; letter-spacing: .1em; opacity: .65; }
+.card-label { margin-bottom: 8px; display: block; }
+.card-title { font: 600 21px var(--font-sans); color: var(--color-dark); margin: 0 0 8px; line-height: 1.3; }
+.card-desc { font: 400 15px var(--font-sans); color: var(--color-mid); line-height: 1.55; margin: 0 0 16px; }
+
+/* ── About (forest-green block, photo + quote + principles) ──────────────── */
+.about {
+  color: var(--color-neutral);
+  padding: clamp(96px, 14vh, 160px) var(--pad);
+  max-width: 1280px;
+  margin: 0 auto;
+}
+@media (max-width: 800px) { .about { padding: 80px 24px; } }
+
+.about-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 500 11px var(--font-mono); text-transform: uppercase;
+  letter-spacing: .12em;
+  color: rgba(245,245,240,.6);
+  margin-bottom: clamp(56px, 8vh, 88px);
+}
+.about-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--color-lima);
+  display: inline-block;
+}
+
+.about-row {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 12fr);
+  gap: clamp(40px, 6vw, 88px);
+  align-items: start;
+}
+
+.about-photo {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4/5;
+  background: rgba(245,245,240,.06);
+  box-shadow: 0 16px 48px rgba(0,0,0,.25);
+}
+.about-photo img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.about-photo-pill {
+  position: absolute; bottom: 16px; left: 16px;
+  background: var(--color-dark);
+  color: var(--color-neutral);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font: 500 11px var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.about-quote {
+  font: 700 clamp(30px, 3.6vw, 46px) var(--font-sans);
+  letter-spacing: -0.018em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--color-neutral);
+  text-wrap: pretty;
+}
+.about-quote em {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: 0;
+  /* SplitType bumps <em> to inline-block which makes it an atomic unit
+     for line-wrapping — words inside can't be split across lines.
+     Force it back to inline so the wrapper can break naturally. */
+  display: inline !important;
+}
+
+.about-divider {
+  border: none;
+  border-top: 1px solid rgba(245,245,240,.16);
+  margin: clamp(72px, 10vh, 112px) 0 clamp(48px, 6vh, 72px);
+}
+
+.about-principles-head {
+  display: block;
+  margin-bottom: 32px;
+  color: rgba(245,245,240,.6);
+}
+
+.about-principles-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.about-principle {
+  display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+}
+.about-principle-idx {
+  font: 500 11px var(--font-mono);
+  letter-spacing: .12em;
+  color: rgba(245,245,240,.5);
+  min-width: 24px;
+}
+.about-principle-word {
+  font: 600 clamp(20px, 2.2vw, 28px) var(--font-sans);
+  letter-spacing: -0.01em;
+  color: var(--color-neutral);
+}
+.about-principle-sub {
+  font: 500 12px var(--font-mono);
+  letter-spacing: .04em;
+  color: rgba(245,245,240,.55);
+  text-transform: capitalize;
+}
+
+.about-paragraphs p {
+  font: 400 16px var(--font-sans);
+  line-height: 1.65;
+  color: rgba(245,245,240,.82);
+  max-width: 56ch;
+  margin: 0 0 22px;
+}
+.about-paragraphs p:last-child { margin-bottom: 0; }
+.about-paragraphs em {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--color-neutral);
+}
+
+@media (max-width: 800px) {
+  .about-row { grid-template-columns: 1fr; gap: 40px; }
+  .about-quote { font-size: clamp(28px, 7vw, 40px); }
+  .about-principles-list { gap: 16px; }
+}
+
+/* ── Background / Timeline ───────────────────────────────────────────────── */
+.bg-section { background: var(--color-white); padding: 96px var(--pad); }
+@media (max-width: 800px) { .bg-section { padding: 64px 24px; } }
+.bg-inner { max-width: var(--max-w); margin: 0 auto; }
+.bg-group { margin-bottom: 64px; }
+.bg-group-title { font: 600 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); margin-bottom: 4px; }
+
+.tl-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 32px; align-items: flex-start; padding: 20px 0; border-top: 1px solid var(--color-border); cursor: pointer; }
+@media (max-width: 600px) { .tl-row { grid-template-columns: 1fr auto; } .tl-year { display: none; } }
+.tl-year { font: 500 11px var(--font-mono); color: var(--color-gray); padding-top: 5px; }
+.tl-title { font: 600 20px var(--font-sans); color: var(--color-dark); margin: 0 0 2px; }
+.tl-org { font-family: var(--font-serif); font-weight: 300; font-style: italic; font-size: 17px; color: var(--color-forest); }
+.tl-body { font: 400 15px var(--font-sans); line-height: 1.6; color: var(--color-mid); overflow: hidden; height: 0; opacity: 0; }
+.tl-toggle { width: 32px; height: 32px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background var(--t-base), border-color var(--t-base); }
+.tl-toggle:hover { background: var(--color-lima); border-color: var(--color-lima); }
+.tl-toggle svg { transition: transform .3s ease; }
+.tl-toggle.open svg { transform: rotate(45deg); }
+
+/* ── Testimonials ────────────────────────────────────────────────────────── */
+.quotes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+@media (max-width: 768px) { .quotes-grid { grid-template-columns: 1fr; } }
+.quote-text { font-family: var(--font-serif); font-weight: 300; font-style: italic; font-size: clamp(22px,2.6vw,30px); line-height: 1.45; color: var(--color-dark); margin-bottom: 24px; }
+.quote-text::before { content: '"'; color: var(--color-lima); font-size: 1.2em; margin-right: 3px; }
+.quote-cap { display: flex; align-items: center; gap: 16px; padding-top: 20px; border-top: 1px solid var(--color-border); }
+.quote-avatar { width: 44px; height: 44px; border-radius: 999px; background: var(--color-forest); color: var(--color-white); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-style: italic; font-size: 17px; flex-shrink: 0; }
+.quote-name { font: 600 14px var(--font-sans); color: var(--color-dark); }
+.quote-role { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--color-gray); margin-top: 2px; }
+
+/* ── Pinned split-screen (Selected work) ─────────────────────────────────── */
+.proj-arch { display: flex; position: relative; width: 100%; }
+
+.proj-left { width: 50%; flex-shrink: 0; padding: 0 48px 0 var(--pad); }
+@media (max-width: 1024px) and (min-width: 769px) {
+  .proj-left { padding: 0 24px 0 40px; }
+  .proj-img-wrap { right: 40px !important; }
+}
+.proj-panel { height: 150vh; display: flex; align-items: center; }
+.proj-panel-content { max-width: 480px; }
+.proj-panel-meta { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); margin-bottom: 16px; display: block; }
+.proj-panel-title { font: 600 clamp(22px,2.8vw,34px) var(--font-sans); letter-spacing: -0.01em; line-height: 1.2; color: var(--color-dark); margin: 0 0 16px; }
+.proj-panel-desc { font: 400 16px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0 0 24px; }
+
+.proj-right { width: 50%; flex-shrink: 0; height: 100vh; position: relative; align-self: flex-start; }
+.proj-img-wrap { position: absolute; top: 20px; right: var(--pad); bottom: 20px; left: 0; border-radius: var(--radius-lg); overflow: hidden; }
+.proj-visual { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; position: relative; }
+.proj-visual-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background-repeat: no-repeat; display: block; }
+.proj-visual-mark { font: 700 clamp(80px,10vw,160px) var(--font-sans); letter-spacing: -0.04em; opacity: 0.18; line-height: 1; }
+.proj-visual-name { font: 600 11px var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.5; }
+
+.proj-mobile-grid { display: none; padding: 0 24px 48px; }
+@media (max-width: 768px) {
+  .proj-arch { display: none; }
+  .proj-mobile-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* ── Side showcase (Things I build for myself) ───────────────────────────── */
+.side-showcase {
+  width: 100vw; height: 100vh;
+  overflow: hidden; position: relative;
+  background: var(--color-neutral);
+}
+/* centered H1 marquee — combined sans + italic serif (display typography) */
+.side-mq-wrap {
+  position: absolute; top: 50%; left: 0; right: 0;
+  transform: translateY(-50%);
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+.side-mq {
+  display: inline-flex; white-space: nowrap;
+  animation: sideMqL 35s linear infinite;
+}
+@keyframes sideMqL { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.side-mq-item {
+  font: 700 clamp(56px, 9vw, 128px) var(--font-sans);
+  letter-spacing: -0.02em; line-height: 1;
+  color: var(--color-dark);
+  padding: 0 0.25em;
+  flex-shrink: 0; white-space: nowrap;
+  display: inline-flex; align-items: baseline;
+}
+.side-mq-item em {
+  font-family: var(--font-serif);
+  font-weight: 300; font-style: italic;
+  letter-spacing: 0;
+  font-size: 1.05em;
+  margin: 0 0.08em;
+}
+.side-mq-dot { opacity: .35; margin: 0 0.35em; }
+/* stage + track */
+.side-stage {
+  position: absolute; inset: 0;
+  overflow: hidden; z-index: 3;
+  display: flex; align-items: center; justify-content: flex-start;
+}
+.side-track {
+  display: flex; height: 100%; align-items: center; will-change: transform;
+}
+.side-slot {
+  width: 100vw; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.side-card {
+  width: 95vw; height: 95vh;
+  border-radius: 32px; overflow: hidden;
+  position: relative; will-change: transform;
+  transform-origin: center center;
+}
+.side-card-cover {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  background-repeat: no-repeat;
+  display: block;
+  transition: transform 700ms cubic-bezier(.2,.6,.2,1);
+  will-change: transform;
+}
+.side-card:hover .side-card-cover { transform: scale(1.06); }
+
+/* Custom lime cursor for the shipped-recently cards. mix-blend-mode:difference
+   makes the colour invert against any backdrop (light or dark image regions),
+   so it's always legible. JS controls position + scale; CSS only paints. */
+.side-card { cursor: none; }
+.side-card * { cursor: none; }
+.card-cursor {
+  position: fixed; top: 0; left: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  /* mix-blend-mode:difference math —
+     white pill → inverts to “negative of backdrop” → cápsula siempre visible
+     black text → no se altera con difference → muestra el color real del fondo
+     Together: pill is always readable AND adaptive to the underlying image. */
+  background: #fff;
+  color: #000;
+  font: 400 16px var(--font-sans);
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+@media (max-width: 768px), (pointer: coarse) {
+  .card-cursor { display: none; }
+  .side-card, .side-card * { cursor: pointer; }
+}
+.side-visual {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.side-visual-mark {
+  font: 700 clamp(80px,12vw,180px) var(--font-sans);
+  letter-spacing: -0.04em; opacity: 0.15; line-height: 1;
+}
+/* overlay */
+.side-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: clamp(32px,4vw,56px);
+  background: linear-gradient(to top, rgba(0,0,0,.78) 0%, rgba(0,0,0,.25) 45%, transparent 70%);
+}
+.side-ov-label {
+  font: 500 11px var(--font-mono); text-transform: uppercase;
+  letter-spacing: .12em; color: rgba(245,245,240,.6);
+  margin-bottom: 14px; display: block;
+}
+.side-ov-title {
+  font: 600 clamp(28px,4vw,52px) var(--font-sans);
+  letter-spacing: -0.02em; line-height: 1.05;
+  color: var(--color-neutral); margin: 0 0 16px;
+}
+.side-ov-desc {
+  font: 400 16px var(--font-sans); line-height: 1.6;
+  color: rgba(245,245,240,.8); margin: 0; max-width: 44ch;
+}
+/* mobile */
+@media (max-width: 768px) {
+  .side-showcase { height: auto; overflow: visible; padding: 56px 0; }
+  .side-mq-wrap { display: none; }
+  .side-stage { position: relative; height: auto; overflow: visible; z-index: auto; }
+  .side-track { flex-direction: column; gap: 24px; }
+  .side-slot { width: calc(100vw - 48px); height: 70vw; margin: 0 24px; }
+  .side-card { width: 100%; height: 100%; transform: none !important; }
+}
+
+/* ── Smooth scroll wrapper ───────────────────────────────────────────────── */
+body { overflow-y: scroll; }
+#smooth-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; pointer-events: none; }
+#smooth-wrapper > #smooth-content { pointer-events: auto; will-change: transform; }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.footer { background: var(--color-forest); }
+.footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 120px var(--pad) 64px; }
+@media (max-width: 800px) { .footer-inner { padding: 64px 24px 48px; } }
+.footer-cta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 32px; }
+.footer-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 40px; margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,.12); }
+.footer-col-label { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: rgba(245,245,240,.55); margin-bottom: 12px; display: block; }
+.footer-col-link { font: 400 18px var(--font-sans); color: rgba(245,245,240,.85); display: inline-flex; align-items: center; gap: 8px; transition: color var(--t-base); }
+.footer-col-link:hover { color: var(--color-lima); }
+.footer-clock { font: 500 16px var(--font-mono); color: var(--color-white); }
+.status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-lima); box-shadow: 0 0 0 4px rgba(184,243,0,.2); display: inline-block; }
+.footer-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 80px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,.12); font: 500 13px var(--font-sans); color: rgba(245,245,240,.5); letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div id="smooth-wrapper">
+  <div id="smooth-content">
+    <div id="root"></div>
+  </div>
+</div>
+
+<!-- SplitType — splits text into lines for the scroll-reveal effect -->
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+
+<!-- GSAP — must load before React so gsap/ScrollTrigger are global -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/Observer.min.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useLayoutEffect, useRef, useCallback } = React;
+
+/* ── GSAP setup ──────────────────────────────────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
+gsap.defaults({ ease: 'power2.out' });
+
+/* ── Smooth scroll (native scroll + ticker lerp on content) ─────────────── */
+(function initSmoothScroll() {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  const content = document.getElementById('smooth-content');
+  const LERP = 0.09;
+  let currentY = 0;
+
+  // Body height must equal content height so the native scrollbar is correct
+  function syncBodyHeight() {
+    document.body.style.height = content.scrollHeight + 'px';
+  }
+  syncBodyHeight();
+  document.fonts.ready.then(syncBodyHeight);
+  window.addEventListener('resize', syncBodyHeight);
+  window._syncBodyHeight = syncBodyHeight;
+  window._smoothY = () => currentY;
+
+  // Ticker: lerp currentY → window.scrollY, apply to content
+  gsap.ticker.add(() => {
+    currentY += (window.scrollY - currentY) * LERP;
+    gsap.set(content, { y: -currentY });
+    ScrollTrigger.update();              // drive ST from the smoothed position
+  });
+
+  gsap.ticker.lagSmoothing(0);
+
+  // Expose API for React anchor navigation
+  window.smoothScrollTo = function(y, duration) {
+    const obj = { v: window.scrollY };
+    gsap.to(obj, {
+      v: y,
+      duration: duration || 1,
+      ease: 'power3.inOut',
+      onUpdate() { window.scrollTo(0, obj.v); },
+    });
+  };
+})();
+
+/* ── ScrollTrigger proxy: sync trigger math with smooth-scroll currentY ─── */
+/* Without this, pinType:'transform' offsets are calculated with window.scrollY
+   but #smooth-content is transformed by currentY (LERP'd), causing jitter.   */
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  ScrollTrigger.scrollerProxy(document.body, {
+    scrollTop(value) {
+      if (arguments.length) window.scrollTo(0, value);
+      return window._smoothY ? window._smoothY() : 0;
+    },
+    getBoundingClientRect() {
+      return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+    },
+    pinType: 'transform',
+  });
+}
+
+/* ── Arrow icon ──────────────────────────────────────────────────────────── */
+const ArrowRight = ({ cls = 'la-icon' }) => (
+  <svg className={cls} width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <path d="M3 8H13M13 8L8.5 3.5M13 8L8.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const PlusIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+
+/* ── Isologo (inline SVG) ─────────────────────────────────────────────────── */
+function Isologo() {
+  return (
+    <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="96" height="96" rx="24" fill="#02734A" />
+      <path d="M56.1656 24C59.6261 24 62.5589 24.6172 64.9633 25.8531C67.3902 27.0666 69.1428 28.8087 70.2215 31.0783C71.3226 33.3255 71.5698 36.0109 70.9631 39.1345C70.4687 41.7861 69.3229 44.1349 67.5251 46.1798C65.7499 48.2247 63.4237 49.8309 60.5475 50.9994C59.5677 51.3929 58.5354 51.7194 57.4523 51.9831L61.0529 63.1683C61.4349 64.4267 61.8058 65.4043 62.1653 66.1009C62.5248 66.775 62.8958 67.2468 63.2777 67.5164C63.6597 67.7635 64.0754 67.8872 64.5247 67.8872C64.974 67.8872 65.3784 67.7749 65.7379 67.5503C66.1198 67.3031 66.4908 66.9321 66.8503 66.4379C66.9626 66.2806 67.1091 66.1798 67.2889 66.1348C67.4685 66.0674 67.6256 66.0561 67.7604 66.1009C67.9625 66.1683 68.0862 66.3141 68.1312 66.5385C68.1986 66.7408 68.1653 66.9776 68.0305 67.2472C67.4462 68.6403 66.4686 69.7864 65.0979 70.6852C63.7271 71.5616 62.1762 72 60.4458 72C59.5021 72 58.6594 71.7974 57.9179 71.393C57.1989 70.9885 56.5589 70.3028 55.9971 69.3366C55.4353 68.3478 54.9066 66.9994 54.4122 65.2915L50.9258 52.7799C50.8412 52.7815 50.7563 52.7846 50.6712 52.7857C48.7027 52.7857 46.9844 52.596 45.5157 52.2212L45.9484 50.6073C45.9721 50.614 45.9954 50.622 46.0191 50.6286C47.2326 50.9657 48.5477 51.134 49.9635 51.134C52.6149 51.1339 54.9069 50.6176 56.8394 49.5839C58.7945 48.5502 60.3901 47.0782 61.626 45.1681C62.8619 43.258 63.7273 41.0109 64.2217 38.4267C64.761 35.5503 64.7154 33.1683 64.0862 31.2806C63.457 29.3705 62.3672 27.9432 60.8167 26.9994C59.2661 26.0557 57.367 25.5839 55.1199 25.5839C54.0904 25.584 53.2394 25.6911 52.5669 25.9054L53.079 24H56.1656Z" fill="white" />
+      <path d="M47.4646 27.7497C47.3469 27.9855 47.2436 28.2405 47.1577 28.5165C46.9105 29.5052 46.5615 30.8196 46.1121 32.4599C45.6627 34.0777 45.1577 35.9095 44.5959 37.9543C44.0566 39.9767 43.4717 42.123 42.8426 44.3926C42.3357 46.2697 41.8293 48.1549 41.3225 50.0477C41.3307 50.051 41.3395 50.0531 41.3477 50.0564L40.8985 51.6945C40.8941 51.6929 40.8893 51.6923 40.8849 51.6907C40.3494 53.7484 39.8341 55.7205 39.3368 57.6062C38.7975 59.6286 38.3144 61.4601 37.8874 63.1006C37.483 64.7185 37.1796 66.0108 36.9774 66.9771C36.8201 67.5837 36.8316 68.0555 37.0113 68.3926C37.191 68.7297 37.4944 68.9436 37.9213 69.0335L40.5838 69.4382C40.8984 69.5281 41.1352 69.6403 41.2925 69.7751C41.4496 69.9099 41.5278 70.0899 41.5278 70.3144C41.5277 70.584 41.4155 70.7971 41.1909 70.9544C40.9886 71.1117 40.6853 71.1906 40.2808 71.1906H25.0447C24.6629 71.1906 24.3935 71.123 24.2362 70.9883C24.0789 70.831 24 70.6398 24 70.4151C24.0001 70.1457 24.1011 69.9324 24.303 69.7751C24.5053 69.6178 24.7754 69.5056 25.1124 69.4382L27.5726 69.0674C28.1568 68.9775 28.618 68.775 28.9551 68.4604C29.3146 68.1233 29.5952 67.6401 29.7974 67.011C30.0671 66.0672 30.4266 64.7862 30.876 63.1683C31.3254 61.5279 31.8313 59.6736 32.3931 57.6062C32.9773 55.5389 33.5841 53.3592 34.2132 51.0672C34.8425 48.775 35.4605 46.4824 36.0673 44.1902C36.674 41.8982 37.2475 39.7185 37.7868 37.6512C38.3485 35.5839 38.8316 33.7295 39.2361 32.0891C39.663 30.4489 39.9778 29.1458 40.1801 28.1796C40.3149 27.5504 40.3035 27.0892 40.1462 26.797C40.0113 26.4826 39.6851 26.2694 39.1683 26.1571L36.5398 25.7185C36.2027 25.6286 35.9659 25.5164 35.8311 25.3816C35.6964 25.2468 35.6297 25.0783 35.6297 24.8762C35.6297 24.6065 35.7419 24.3926 35.9666 24.2353C36.1913 24.0781 36.4949 24 36.8767 24H48.4928L47.4646 27.7497Z" fill="white" />
+    </svg>
+  );
+}
+
+/* ── Nav (floating pills, hover-expand menu) ──────────────────────────────── */
+const NAV_ITEMS = [
+  { label: 'Work',            type: 'scroll',   target: 'work'  },
+  { label: 'About',           type: 'scroll',   target: 'about' },
+  { label: 'Download resume', type: 'download', href: 'resume.pdf' },
+];
+
+function Nav({ active, onNavigate, onCta }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navRef     = useRef(null);
+  const wrapRef    = useRef(null);
+  const itemsRef   = useRef(null);
+  const burgerRef  = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(navRef.current, { autoAlpha: 0, y: -8, duration: 0.5, delay: 0.8, ease: 'power2.out' });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  /* Animate the items wrap width + burger fade in lock-step with menuOpen.
+     Measuring scrollWidth each toggle keeps the layout responsive to font
+     loads / window resize / language changes. */
+  useEffect(() => {
+    const wrap   = wrapRef.current;
+    const items  = itemsRef.current;
+    const burger = burgerRef.current;
+    if (!wrap || !items || !burger) return;
+
+    const targetW = menuOpen ? items.scrollWidth : 0;
+    gsap.to(wrap, {
+      width:    targetW,
+      duration: 0.45,
+      ease:     'power3.inOut',
+      overwrite: true,
+    });
+    gsap.to(burger, {
+      opacity: menuOpen ? 0 : 1,
+      width:   menuOpen ? 0  : 44,
+      duration: menuOpen ? 0.25 : 0.30,
+      ease:    'power2.inOut',
+      overwrite: true,
+    });
+    // Stagger the items themselves
+    const itemEls = items.querySelectorAll('.nav-item');
+    gsap.to(itemEls, {
+      opacity:   menuOpen ? 1 : 0,
+      x:         menuOpen ? 0 : 10,
+      duration:  0.30,
+      ease:      'power2.out',
+      stagger:   menuOpen ? 0.04 : { each: 0.02, from: 'end' },
+      delay:     menuOpen ? 0.10 : 0,
+      overwrite: true,
+    });
+  }, [menuOpen]);
+
+  const scrollToId = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (window.smoothScrollTo) {
+      const content = document.getElementById('smooth-content');
+      const offsetTop = el.getBoundingClientRect().top - (content ? content.getBoundingClientRect().top : 0);
+      window.smoothScrollTo(offsetTop);
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleItem = (item) => {
+    onNavigate(item.label);
+    if (item.type === 'download') {
+      // Placeholder: PDF not yet supplied — the link's `download` attr handles it.
+      return;
+    }
+    scrollToId(item.target);
+    setMenuOpen(false);
+  };
+
+  return ReactDOM.createPortal(
+    <nav ref={navRef} className="nav" aria-label="Primary">
+      {/* Left pill: isologo + name + status dot */}
+      <a className="nav-pill nav-logo" href="#top"
+         onClick={e => { e.preventDefault(); scrollToId('top'); }}>
+        <span className="nav-logo-mark"><Isologo /></span>
+        <span className="nav-brand-text">Ricardo<em>Martínez</em></span>
+        <span className="nav-dot" />
+      </a>
+
+      {/* Right pill: burger expands into items + CTA. Hover handlers
+          are scoped to the burger+items trigger so the CTA never
+          opens the menu. */}
+      <div className="nav-pill nav-menu">
+        <div className="nav-menu-trigger"
+             onMouseEnter={() => setMenuOpen(true)}
+             onMouseLeave={() => setMenuOpen(false)}>
+          <button ref={burgerRef}
+                  className="nav-burger"
+                  aria-label="Open menu"
+                  onClick={() => setMenuOpen(o => !o)}>
+            <span /><span />
+          </button>
+          <div ref={wrapRef} className="nav-items-wrap">
+            <div ref={itemsRef} className="nav-items">
+              {NAV_ITEMS.map((item, i) => {
+                const cls = `nav-item${active === item.label ? ' is-active' : ''}`;
+                const style = { '--i': i };
+                if (item.type === 'download') {
+                  return (
+                    <a key={item.label} className={cls} style={style}
+                       href={item.href} download
+                       onClick={() => handleItem(item)}>
+                      <span>{item.label}</span>
+                    </a>
+                  );
+                }
+                return (
+                  <a key={item.label} className={cls} style={style}
+                     href={`#${item.target}`}
+                     onClick={e => { e.preventDefault(); handleItem(item); }}>
+                    <span>{item.label}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <a className="nav-cta" href="mailto:ricardomartinezing1@gmail.com">
+          <span>Let's talk</span>
+          <span className="nav-cta-arrow"><ArrowRight /></span>
+        </a>
+      </div>
+    </nav>,
+    document.body
+  );
+}
+
+/* ── [HeroCard removed] ── */
+function HeroCard({ variant, style }) { return null; }
+function _HeroCardOld({ variant, style }) {
+  if (variant === 'tinsa-filled') return (
+    <div className="hero-card" style={style}>
+      <div className="hc" style={{ background: '#f0f6fb' }}>
+        <div className="hc-topbar" style={{ background: '#1a82b8', color: '#fff' }}>
+          <span className="hc-brand">Tinsa · Optimus</span>
+          <div className="hc-pills">
+            <span className="hc-pill" style={{ background: 'rgba(255,255,255,.25)' }}>AAA</span>
+            <span className="hc-pill" style={{ background: 'rgba(255,255,255,.18)' }}>95020967</span>
+          </div>
+        </div>
+        <div className="hc-body">
+          <div className="hc-sidebar" style={{ background: '#1263a0' }}>
+            {[...Array(7)].map((_,i) => <div key={i} className="hc-icon" style={{ background: 'rgba(255,255,255,.45)' }} />)}
+          </div>
+          <div className="hc-main">
+            <div style={{ display:'flex', gap:6, marginBottom:8 }}>
+              <span style={{ fontSize:8, fontWeight:700, background:'#1a82b8', color:'#fff', padding:'3px 8px', borderRadius:3 }}>Mapa de testigos</span>
+              <span style={{ fontSize:8, fontWeight:500, color:'#1a82b8', padding:'3px 8px', borderRadius:3, border:'1px solid #1a82b8' }}>Gestor de testigos</span>
+            </div>
+            <div className="hc-section-title" style={{ color:'#0f4c7a' }}>Análisis de producto · Vivienda</div>
+            {[['Tamaño','Situación','Distribución'],['Construida','Nº viviendas','Expectativas']].map((row,ri) => (
+              <div key={ri} className="hc-row">
+                {row.map(f => (
+                  <div key={f} className="hc-field">
+                    <div className="hc-label" style={{ color:'#555' }}>{f}</div>
+                    <div className="hc-select" style={{ borderColor:'#b0cce0', color:'#333', background:'#fff' }}>Adecuado ▾</div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div className="hc-label" style={{ color:'#555', marginTop:6 }}>Observaciones del producto vivienda</div>
+            <div className="hc-textarea" style={{ borderColor:'#b0cce0', color:'#444', background:'#fff', marginBottom:6 }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, posuere rutrum...</div>
+            <div className="hc-section-title" style={{ color:'#0f4c7a' }}>Información general sobre oferta y demanda</div>
+            {[['Intensidad demanda','Nivel de renta','Exceso de oferta']].map((row,ri) => (
+              <div key={ri} className="hc-row">
+                {row.map(f => (
+                  <div key={f} className="hc-field">
+                    <div className="hc-label" style={{ color:'#555' }}>{f}</div>
+                    <div className="hc-select" style={{ borderColor:'#b0cce0', color:'#333', background:'#fff' }}>Equilibrada ▾</div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hc-bottombar" style={{ background:'#1263a0' }}>
+          <span className="hc-metric" style={{ color:'#fff' }}>Total: 92.841,85 €</span>
+          <div style={{ display:'flex', gap:6 }}>
+            {['Fincas','Elementos','Configurar'].map(t => (
+              <span key={t} style={{ fontSize:7, color:'rgba(255,255,255,.75)', padding:'2px 6px', border:'1px solid rgba(255,255,255,.3)', borderRadius:3 }}>{t}</span>
+            ))}
+            <span style={{ fontSize:7, background:'#1a82b8', color:'#fff', padding:'2px 8px', borderRadius:3, fontWeight:700 }}>Enviar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (variant === 'tinsa-redesign') return (
+    <div className="hero-card" style={style}>
+      <div className="hc" style={{ background: '#f8f8f5' }}>
+        <div className="hc-topbar" style={{ background: '#fff', borderBottom:'1px solid #e8ede9' }}>
+          <span className="hc-brand" style={{ color:'#2D6A4F' }}>Tinsa · Optimus <span style={{ fontWeight:400, opacity:.5 }}>redesign</span></span>
+          <div className="hc-pills">
+            {['ENTIDAD','TASADOR','EXPEDIENTE'].map(p => <span key={p} className="hc-pill" style={{ background:'#eaf2ee', color:'#2D6A4F' }}>{p}</span>)}
+          </div>
+        </div>
+        <div className="hc-body">
+          <div className="hc-sidebar" style={{ background:'#f0f5f1' }}>
+            {[...Array(7)].map((_,i) => <div key={i} className="hc-icon" style={{ background:'#2D6A4F', opacity:.25 }} />)}
+          </div>
+          <div className="hc-main">
+            <div className="hc-section-title" style={{ color:'#2D6A4F' }}>Análisis del producto (Usos)</div>
+            {['Detalle de uso 1 (VIV EJEMPLO)','Detalle de uso 2 (GRJ EJEMPLO)'].map((uso, ui) => (
+              <div key={ui} style={{ background:'#fff', borderRadius:4, padding:'8px 10px', marginBottom:6, border:'1px solid #e0eae3' }}>
+                <div style={{ fontSize:8, fontWeight:700, color:'#2D6A4F', textAlign:'center', marginBottom:6 }}>{uso}</div>
+                <div className="hc-row">
+                  {['TAMAÑO','SITUACIÓN','DISTRIBUCIÓN','CONSTRUIDA','Nº VIVIENDAS'].map(h => (
+                    <div key={h} style={{ flex:1, height:12, background:'#eaf2ee', borderRadius:2, minWidth:30 }} />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="hc-section-title" style={{ color:'#2D6A4F', marginTop:8 }}>Información sobre oferta y demanda</div>
+            {[['ED. TERMINADOS (STR 500)'],['ED. CONSTRUCCIÓN (STR 500)'],['PLAZOS','2ª MANO','REVAL.'],['CARACT. DEMANDAS (STR 500)'],['INTENSIDAD','NIV.RENTA','EXCESO. DEM']].map((row,ri) => (
+              <div key={ri} className="hc-row" style={{ marginBottom:3 }}>
+                {row.map(f => <div key={f} style={{ flex:1, height:13, background:ri%2===0?'#eaf2ee':'#f5f8f5', borderRadius:2, border:'1px dashed #c8ddd1', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontSize:6, color:'#3D5A40', fontWeight:600 }}>{f}</span></div>)}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hc-bottombar" style={{ background:'#f0f5f1', borderTop:'1px solid #e0eae3' }}>
+          <span className="hc-metric" style={{ color:'#2D6A4F' }}>Total: 92.841,85 €</span>
+          <span style={{ fontSize:8, color:'#B8F300', background:'#2D6A4F', padding:'3px 10px', borderRadius:3, fontWeight:700 }}>Enviar</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (variant === 'ux-research') return (
+    <div className="hero-card" style={style}>
+      <div className="hc-poster" style={{ background:'#fff', color:'#0F1A10' }}>
+        <div className="hc-qs" style={{ top:14, left:14, fontSize:9 }}>¿Existe la necesidad?</div>
+        <div className="hc-qs" style={{ top:14, right:14, fontSize:7, textAlign:'right', whiteSpace:'normal', maxWidth:80 }}>¿La propuesta tiene sentido?</div>
+        <div className="hc-qs" style={{ top:38, left:14, fontSize:7 }}>¿Qué hacen hoy sin la solución?</div>
+        <div className="hc-qs" style={{ top:58, left:14, fontSize:8, fontWeight:700 }}>¿Qué razonamiento siguen?</div>
+        <div className="hc-qs" style={{ top:80, left:14, fontSize:6 }}>¿Cuáles son mis sesgos?</div>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flex:1 }}>
+          <div className="hc-poster-word" style={{ fontSize:52, color:'#0F1A10', opacity:.08, letterSpacing:'-4px', lineHeight:1 }}>USER</div>
+          <div className="hc-poster-word" style={{ fontSize:38, color:'#2D6A4F', letterSpacing:'-3px', lineHeight:1, marginTop:-8 }}>USER</div>
+          <div className="hc-poster-word" style={{ fontSize:46, color:'#2D6A4F', letterSpacing:'-4px', lineHeight:1 }}>EXPERIENCE</div>
+        </div>
+        <div className="hc-qs" style={{ bottom:50, left:14 }}>¿Con qué frecuencia tienes esta necesidad?</div>
+        <div className="hc-qs" style={{ bottom:34, left:14, fontSize:10, fontWeight:700 }}>¿Resuelve su necesidad?</div>
+        <div className="hc-qs" style={{ bottom:18, left:14, fontSize:7 }}>¿Cuáles son mis sesgos? <span style={{ fontStyle:'italic' }}>Sesgos</span></div>
+        <div className="hc-qs" style={{ bottom:8, left:14, fontSize:7 }}>¿Hay algo importante que no te he preguntado?</div>
+        <div className="hc-qs" style={{ bottom:26, right:14, fontSize:9, fontWeight:700 }}>¿Por qué?</div>
+        <div className="hc-qs" style={{ bottom:14, right:14, fontSize:8 }}>¿Cuántas veces?</div>
+      </div>
+    </div>
+  );
+
+  /* variant === 'business' */
+  return (
+    <div className="hero-card" style={style}>
+      <div className="hc-biz" style={{ background:'#2D6A4F', color:'#fff' }}>
+        <div style={{ fontSize:9, fontWeight:600, opacity:.6, letterSpacing:'.1em', marginBottom:8 }}>¿Tiene sentido la propuesta?</div>
+        <div className="hc-biz-q">¿Qué necesita tu negocio?</div>
+        <div className="hc-biz-word" style={{ fontSize:32, color:'rgba(184,243,0,.9)', marginTop:4 }}>BUSINESS</div>
+        <div className="hc-biz-word" style={{ fontSize:38, color:'#fff', marginTop:-2 }}>NEEDS</div>
+        <div style={{ display:'flex', flexDirection:'column', gap:4, marginTop:10 }}>
+          {['¿Conoces a tu target?','¿Cómo crece tu negocio?','¿Hacia dónde va el producto?','¿Hablas el mismo idioma?'].map(q => (
+            <div key={q} style={{ fontSize:8, opacity:.8, borderLeft:'2px solid rgba(184,243,0,.5)', paddingLeft:6 }}>{q}</div>
+          ))}
+        </div>
+        <div style={{ display:'flex', gap:4, marginTop:10, flexWrap:'wrap' }}>
+          {['NPS','Analytics','¿Cómo es el mercado?'].map(t => (
+            <span key={t} style={{ fontSize:8, fontWeight:700, color:'#2D6A4F', background:'rgba(184,243,0,.8)', padding:'2px 6px', borderRadius:3 }}>{t}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+function Hero({ onPrimary, onGhost }) {
+  const sectionRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        /* collect all masked word-inner spans */
+        const heroWis = gsap.utils.toArray('.hero-wi', sectionRef.current);
+        const leadWis = gsap.utils.toArray('.lead-wi', sectionRef.current);
+
+        /* start below clip */
+        gsap.set(heroWis, { y: '110%' });
+        gsap.set(leadWis, { y: '110%' });
+
+        /* other elements: fade + slide */
+        const others = sectionRef.current.querySelectorAll('[data-hi]');
+        gsap.set(others, { autoAlpha: 0 });
+        gsap.set('[data-hi="eyebrow"]', { y: 10 });
+        gsap.set('[data-hi="cta"]',     { y: 14 });
+        gsap.set('[data-hi="meta"]',    { y: 8  });
+
+        const tl = gsap.timeline({ delay: 0.2 });
+        tl.to('[data-hi="eyebrow"]', { autoAlpha:1, y:0, duration:0.45, ease:'power2.out' })
+          /* h1 words slide up one by one */
+          .to(heroWis, { y:'0%', duration:0.9, stagger:0.08, ease:'power3.out' }, '-=0.1')
+          /* lead words follow, tighter stagger */
+          .to(leadWis, { y:'0%', duration:0.65, stagger:0.04, ease:'power3.out' }, '-=0.5')
+          .to('[data-hi="cta"]',  { autoAlpha:1, y:0, duration:0.5, ease:'power2.out' }, '-=0.3')
+          .to('[data-hi="meta"]', { autoAlpha:1, y:0, duration:0.4, ease:'power2.out' }, '-=0.3');
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="top" ref={sectionRef} className="hero">
+      <div data-hi="eyebrow" className="hero-eyebrow">
+        <span className="t-label">Senior Product Designer · Madrid</span>
+      </div>
+
+      <h1 className="t-display" style={{ margin:'0 0 20px' }}>
+        <span className="wm"><span className="wi hero-wi">Hello,</span></span>
+        {' '}
+        <span className="wm"><span className="wi hero-wi">I'm</span></span>
+        <br />
+        <span className="wm-b" style={{ marginTop:'0.04em' }}>
+          <span className="wi hero-wi"><em>Ricardo.</em></span>
+        </span>
+      </h1>
+
+      <p className="t-lead" style={{ maxWidth:'52ch', marginBottom:0 }}>
+        {['I','love','solving','problems','and','creating','meaningful',
+          'products','with','a','holistic','approach.','Currently','designing','at'].map((w, i) => (
+          <React.Fragment key={i}>
+            <span className="wm"><span className="wi lead-wi">{w}</span></span>{' '}
+          </React.Fragment>
+        ))}
+        <span className="wm"><span className="wi lead-wi">
+          <em style={{ fontFamily:'var(--font-serif)', fontWeight:300 }}>Icarus HS</em>.
+        </span></span>
+      </p>
+      <div data-hi="cta" className="hero-cta">
+        <button className="btn btn-primary" onClick={onPrimary}>Let's talk</button>
+        <button className="btn btn-ghost" onClick={onGhost}>View work</button>
+      </div>
+      <div data-hi="meta" className="hero-meta">
+        <span className="hero-status-dot" /> Available for new projects · 2026
+      </div>
+    </section>
+  );
+}
+
+/* ── Project card with 3-D tilt ─────────────────────────────────────────── */
+function ProjectCard({ project, onClick }) {
+  const wrapRef = useRef(null);
+  const cardRef = useRef(null);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const card = cardRef.current;
+    if (!wrap || !card) return;
+
+    const mm = gsap.matchMedia();
+    let xTo, yTo, sTo, cleanupFns = [];
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      xTo = gsap.quickTo(card, 'rotationY', { duration: 0.5, ease: 'power3.out' });
+      yTo = gsap.quickTo(card, 'rotationX', { duration: 0.5, ease: 'power3.out' });
+      sTo = gsap.quickTo(card, 'scale',     { duration: 0.35, ease: 'power2.out' });
+
+      const onMove = (e) => {
+        const r = wrap.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        xTo(x * 12);
+        yTo(-y * 10);
+        sTo(1.02);
+      };
+      const onLeave = () => { xTo(0); yTo(0); sTo(1); };
+
+      wrap.addEventListener('mousemove', onMove);
+      wrap.addEventListener('mouseleave', onLeave);
+      cleanupFns.push(() => {
+        wrap.removeEventListener('mousemove', onMove);
+        wrap.removeEventListener('mouseleave', onLeave);
+      });
+    });
+
+    return () => {
+      mm.revert();
+      cleanupFns.forEach(fn => fn());
+    };
+  }, []);
+
+  return (
+    <div ref={wrapRef} className="card-wrap gf">
+      <div ref={cardRef} className="card" role="button" tabIndex={0}
+        onClick={() => onClick && onClick(project)}
+        onKeyDown={e => e.key === 'Enter' && onClick && onClick(project)}>
+        <div className="card-thumb" style={{ background: project.bg, color: project.fg }}>
+          <span className="card-thumb-mark">{project.mark}</span>
+          <span className="card-thumb-name">{project.name}</span>
+        </div>
+        <div>
+          <span className="t-label card-label">{project.meta}</span>
+          <h3 className="card-title">{project.title}</h3>
+          <p className="card-desc">{project.desc}</p>
+          <span className="la">
+            <span className="la-text">{project.cta || 'Read case study'}</span>
+            <ArrowRight />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Work section ────────────────────────────────────────────────────────── */
+const SELECTED_PROJECTS = [
+  {
+    id: 'vernum', name: 'Vernum', mark: 'Vn',
+    title: 'Designing a fintech product from zero to one',
+    meta: 'Product Design Lead · 2025',
+    desc: 'Full product design ownership — from early discovery and IA to a complete design system and shipped product.',
+    bg: '#1C1C2E', fg: '#B8F300',
+    cover: 'assets/caratulas/caratula-vernum.png',
+    tags: ['Fintech', 'Design System', 'Zero to One'],
+    details: 'Led the full design process: user research, information architecture, component library, and iterative delivery with the engineering team.',
+  },
+  {
+    id: 'vega', name: 'Vega Research', mark: 'V',
+    title: 'Rebuilding a research platform from the ground up',
+    meta: 'Product Design Lead · 2024',
+    desc: 'Three-phase migration driven by deep user research. Phase one — migration, restyling, minor updates — shipped. Phase two in progress.',
+    bg: '#2D6A4F', fg: '#F5F5F0',
+    cover: 'assets/caratulas/cover-vega.png',
+    tags: ['Research', 'Migration', 'Design System'],
+    details: 'We launched the project with research to identify needs, constraints, and usability improvements. A three-phase plan was set: phase one (migration, restyling, minor updates) is complete, and we\'re preparing for phase two.',
+  },
+  {
+    id: 'radar', name: 'Radar', mark: 'R',
+    title: 'Redesigning the future of market research',
+    meta: 'Product Designer · 2022',
+    desc: 'End-to-end redesign of Radar by Tinsa — Spain\'s leading property valuation company with 30+ years of experience. +720 valuations/day across +20 countries.',
+    bg: '#0F1A10', fg: '#B8F300',
+    cover: 'assets/caratulas/cover-radar.png',
+    tags: ['Real Estate', 'Data Viz', 'Redesign'],
+    details: 'Radar faced rapid-development debt: bulky IA, excessive data in sections, unclear infographics, and repeated layout problems. I led a systematic redesign restructuring information into Supply, Demand, and Market Indicators — making a complex tool feel calm and fast.',
+    metrics: ['+720 valuations/day', '+20 countries'],
+  },
+];
+
+const SIDE_PROJECTS = [
+  {
+    id: 'storytelling', name: 'Visual Storytelling', mark: 'VS',
+    title: 'Crafting presentations that persuade and stick',
+    meta: 'Side project',
+    desc: 'Exploring how narrative structure and visual design combine to create presentations that communicate with impact.',
+    bg: '#E2ECDF', fg: '#0F1A10',
+    cover: 'assets/caratulas/cover-comunicacion-efectiva.png',
+    cta: 'Read story',
+    tags: ['Presentations', 'Narrative Design'],
+  },
+  {
+    id: 'depot', name: 'Central Depot', mark: 'CD',
+    title: 'Innovating the sale of construction materials',
+    meta: 'Side project',
+    desc: 'A fresh approach to an unsexy category — making it easier for professionals to find, compare, and order construction materials online.',
+    bg: '#FCEFD6', fg: '#0F1A10',
+    cover: 'assets/caratulas/cover-central-depot.png',
+    cta: 'Read story',
+    tags: ['E-commerce', 'B2B'],
+  },
+];
+
+function WorkSection({ onOpen }) {
+  const archRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 769px) and (prefers-reduced-motion: no-preference)', () => {
+        const right    = archRef.current.querySelector('.proj-right');
+        const imgWraps = gsap.utils.toArray('.proj-img-wrap', archRef.current);
+
+        /* Stack: first image has highest z-index (sits on top) */
+        imgWraps.forEach((wrap, i) => {
+          gsap.set(wrap, { zIndex: imgWraps.length - i });
+        });
+
+        /* Initialise all clip-paths so GSAP can interpolate from them */
+        gsap.set(imgWraps, { clipPath: 'inset(0 0 0% 0 round 12px)' });
+
+        /* Manual ticker-based pin — reads the smooth scroll's own currentY so the
+           right column transform always cancels the parent lerp exactly.
+           This eliminates the bounce caused by window.scrollY vs lerped currentY. */
+        const vh = window.innerHeight;
+
+        /* Stable DOM offset: walk offsetParent chain once */
+        const getArchTop = () => {
+          let top = 0, el = archRef.current;
+          while (el) { top += el.offsetTop; el = el.offsetParent; }
+          return top;
+        };
+        let archTop    = getArchTop();
+        let archHeight = archRef.current.offsetHeight;
+
+        const onResize = () => {
+          archTop    = getArchTop();
+          archHeight = archRef.current.offsetHeight;
+          if (window._syncBodyHeight) window._syncBodyHeight();
+        };
+        window.addEventListener('resize', onResize);
+        document.fonts.ready.then(onResize);
+
+        const tick = () => {
+          const cy   = window._smoothY ? window._smoothY() : window.scrollY;
+          const pinY = Math.max(0, Math.min(cy - archTop, archHeight - vh));
+          gsap.set(right, { y: pinY, force3D: true });
+        };
+        gsap.ticker.add(tick);
+
+        /* Clip per-panel triggers */
+        const panels = gsap.utils.toArray('.proj-panel', archRef.current);
+        imgWraps.slice(0, -1).forEach((wrap, i) => {
+          gsap.fromTo(wrap,
+            { clipPath: 'inset(0 0 0% 0 round 12px)' },
+            {
+              clipPath: 'inset(0 0 100% 0 round 12px)',
+              ease: 'none',
+              scrollTrigger: {
+                trigger: panels[i + 1],
+                start:   'top bottom',
+                end:     'top top',
+                scrub:   1,
+              },
+            }
+          );
+        });
+
+        /* Body background colour zones — the two light-green surface tokens
+           (sage + mist). Callback-based with `overwrite: 'auto'` so writers
+           don't fight per frame, and triggers don't overlap with the About
+           section's forest trigger. */
+        const cssRoot = getComputedStyle(document.documentElement);
+        const COL = {
+          neutral: cssRoot.getPropertyValue('--surface-page').trim() || '#F5F5F0',
+          sage:    cssRoot.getPropertyValue('--surface-sage').trim() || '#E2ECDF',
+          mist:    cssRoot.getPropertyValue('--surface-mist').trim() || '#EEF3EB',
+        };
+        const toBg = (c) => gsap.to(document.body, {
+          backgroundColor: c, duration: 0.55, ease: 'power2.inOut', overwrite: 'auto',
+        });
+        // Enter side projects → sage
+        ScrollTrigger.create({
+          trigger: archRef.current,
+          start:   'top 70%',
+          onEnter:     () => toBg(COL.sage),
+          onLeaveBack: () => toBg(COL.neutral),
+        });
+        // Second panel enters → mist
+        ScrollTrigger.create({
+          trigger: panels[1],
+          start:   'top 60%',
+          onEnter:     () => toBg(COL.mist),
+          onLeaveBack: () => toBg(COL.sage),
+        });
+        // Section leaving → neutral (leaves a clean gap before the About
+        // section takes over with forest)
+        ScrollTrigger.create({
+          trigger: archRef.current,
+          start:   'bottom 90%',
+          onEnter:     () => toBg(COL.neutral),
+          onLeaveBack: () => toBg(COL.mist),
+        });
+
+        if (window._syncBodyHeight) window._syncBodyHeight();
+
+        /* Return cleanup for ticker + resize listener */
+        return () => {
+          gsap.ticker.remove(tick);
+          window.removeEventListener('resize', onResize);
+          gsap.set(right, { clearProps: 'transform' });
+        };
+      });
+    }, archRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <>
+      {/* ── Section header ────────────────────────────────────────────────── */}
+      <section id="side" style={{ padding: '80px var(--pad) 48px', maxWidth: 'var(--max-w)', margin: '0 auto' }}>
+        <div className="section-head gf">
+          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>Side projects</span>
+          <h2 className="t-h2">Things I build <em>for myself.</em></h2>
+        </div>
+      </section>
+
+      {/* ── Desktop: pinned split-screen ──────────────────────────────────── */}
+      <div ref={archRef} className="proj-arch">
+
+        {/* Left: info panels, one per project (each 100vh) */}
+        <div className="proj-left">
+          {SIDE_PROJECTS.map((p) => (
+            <div key={p.id} className="proj-panel">
+              <div className="proj-panel-content gf">
+                <span className="proj-panel-meta">{p.meta}</span>
+                <h3 className="proj-panel-title">{p.title}</h3>
+                <p className="proj-panel-desc">{p.desc}</p>
+                <div className="tags-row" style={{ marginTop: 0 }}>
+                  {(p.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
+                </div>
+                <div style={{ marginTop: 24 }}>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    onClick={() => onOpen && onOpen(p)}>
+                    {p.cta || 'Read case study'} <ArrowRight />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Right: stacked visuals, pinned by ScrollTrigger */}
+        <div className="proj-right">
+          {SIDE_PROJECTS.map((p) => (
+            <div key={p.id} className="proj-img-wrap">
+              <div className="proj-visual" style={{ background: p.bg, color: p.fg }}>
+                {p.cover ? (
+                  <img className="proj-visual-cover" src={p.cover} alt={p.name} />
+                ) : (
+                  <>
+                    <span className="proj-visual-mark">{p.mark}</span>
+                    <span className="proj-visual-name">{p.name}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Mobile fallback: regular card grid ────────────────────────────── */}
+      <div className="proj-mobile-grid">
+        {SIDE_PROJECTS.map(p => <ProjectCard key={p.id} project={p} onClick={onOpen} />)}
+      </div>
+
+    </>
+  );
+}
+
+/* ── Side Showcase section ───────────────────────────────────────────────── */
+function SideShowcaseSection() {
+  const showcaseRef = useRef(null);
+  const trackRef    = useRef(null);
+  const cursorRef   = useRef(null);
+  const INITIAL_SCALE = 0.35;
+  const MARQUEE_REPS  = 10;
+
+  /* Custom lime cursor — appears over .side-card hovers. Hover state is
+     derived from elementFromPoint, polled every ticker frame, so the
+     cards' CSS transforms (scale + horizontal track movement + smooth
+     scroll translateY) don't confuse the detection. */
+  useEffect(() => {
+    if (window.matchMedia('(max-width: 768px), (pointer: coarse)').matches) return;
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+
+    const xTo = gsap.quickTo(cursor, 'x', { duration: 0.25, ease: 'power3.out' });
+    const yTo = gsap.quickTo(cursor, 'y', { duration: 0.25, ease: 'power3.out' });
+    gsap.set(cursor, { xPercent: -50, yPercent: -50, scale: 0 });
+
+    let lastX = -1, lastY = -1, active = false;
+
+    const setActive = (next) => {
+      if (next === active) return;
+      active = next;
+      gsap.to(cursor, {
+        scale:    next ? 1 : 0,
+        duration: next ? 0.30 : 0.20,
+        ease:     next ? 'back.out(1.7)' : 'power2.in',
+        overwrite: 'auto',  // only kills conflicting `scale` tweens —
+                            // leaves the quickTo x/y tweens alone so the
+                            // cursor keeps tracking the mouse
+      });
+    };
+
+    const checkHover = () => {
+      if (lastX < 0) return;
+      const el = document.elementFromPoint(lastX, lastY);
+      setActive(!!el?.closest('.side-card'));
+    };
+
+    const onMove = (e) => {
+      lastX = e.clientX; lastY = e.clientY;
+      xTo(lastX); yTo(lastY);
+      checkHover();
+    };
+
+    gsap.ticker.add(checkHover);
+    window.addEventListener('mousemove', onMove);
+
+    return () => {
+      gsap.ticker.remove(checkHover);
+      window.removeEventListener('mousemove', onMove);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 769px) and (prefers-reduced-motion: no-preference)', () => {
+        const vh = window.innerHeight;
+        const vw = window.innerWidth;
+        const scaleH = vh;
+        const horizH = (SELECTED_PROJECTS.length - 1) * vw;
+        const totalScroll = scaleH + horizH;
+
+        const cards    = gsap.utils.toArray('.side-card',    showcaseRef.current);
+        const overlays = gsap.utils.toArray('.side-overlay', showcaseRef.current);
+
+        gsap.set(cards[0], { scale: INITIAL_SCALE });
+        gsap.set(overlays, { autoAlpha: 0 });
+
+        // Title liquid-fill clip + description word-stagger setup
+        const titles = gsap.utils.toArray('.sc-title', showcaseRef.current);
+        const descs  = gsap.utils.toArray('.sc-desc',  showcaseRef.current);
+
+        gsap.set(titles, { clipPath: 'inset(100% 0 0 0)' });
+
+        const descSplits = descs.map(el => new SplitType(el, { types: 'words' }));
+        descSplits.forEach(s => gsap.set(s.words, { opacity: 0, y: 15 }));
+
+        const tl = gsap.timeline();
+
+        // Phase 1 – scale card 0 up to fill screen
+        tl.to(cards[0], { scale: 1, ease: 'power2.inOut', duration: scaleH }, 0);
+
+        // Overlay 0 fade-in at 75% of scale phase
+        tl.to(overlays[0], { autoAlpha: 1, duration: scaleH * 0.08 }, scaleH * 0.72);
+
+        // Title liquid fill (card 0)
+        tl.to(titles[0], {
+          clipPath: 'inset(0% 0 0 0)',
+          ease: 'power2.out',
+          duration: scaleH * 0.18,
+        }, scaleH * 0.78);
+
+        // Description word stagger (card 0)
+        if (descSplits[0]?.words?.length) {
+          tl.to(descSplits[0].words, {
+            opacity: 1, y: 0,
+            ease: 'power2.out',
+            stagger: scaleH * 0.006,
+            duration: scaleH * 0.08,
+          }, scaleH * 0.86);
+        }
+
+        // Phase 2 – horizontal scroll through remaining cards
+        if (horizH > 0) {
+          tl.to(trackRef.current, { x: -horizH, ease: 'none', duration: horizH }, scaleH);
+
+          SELECTED_PROJECTS.forEach((_, i) => {
+            if (i === 0) return;
+            const perCard   = horizH / (SELECTED_PROJECTS.length - 1);
+            const cardStart = scaleH + (i - 1) * perCard;
+
+            tl.to(overlays[i], { autoAlpha: 1, duration: perCard * 0.08 }, cardStart + perCard * 0.55);
+
+            tl.to(titles[i], {
+              clipPath: 'inset(0% 0 0 0)',
+              ease: 'power2.out',
+              duration: perCard * 0.18,
+            }, cardStart + perCard * 0.62);
+
+            if (descSplits[i]?.words?.length) {
+              tl.to(descSplits[i].words, {
+                opacity: 1, y: 0,
+                ease: 'power2.out',
+                stagger: perCard * 0.006,
+                duration: perCard * 0.08,
+              }, cardStart + perCard * 0.72);
+            }
+          });
+        }
+
+        ScrollTrigger.create({
+          trigger:   showcaseRef.current,
+          start:     'top top',
+          end:       `+=${totalScroll}`,
+          scrub:     1,
+          pin:       true,
+          pinType:   'transform',
+          animation: tl,
+          invalidateOnRefresh: true,
+          onRefresh: () => { if (window._syncBodyHeight) window._syncBodyHeight(); },
+        });
+
+        ScrollTrigger.refresh();
+        requestAnimationFrame(() => { if (window._syncBodyHeight) window._syncBodyHeight(); });
+      });
+    }, showcaseRef);
+    return () => ctx.revert();
+  }, []);
+
+  const marqItems = Array.from({ length: MARQUEE_REPS }, (_, i) => (
+    <span key={i} className="side-mq-item">
+      Things I've shipped <em>recently</em>
+      <span className="side-mq-dot" aria-hidden="true">·</span>
+    </span>
+  ));
+
+  return (
+    <section id="work" ref={showcaseRef} className="side-showcase" aria-label="Things I've shipped recently">
+      {/* Custom hover cursor — portalled to body to escape #smooth-content's
+          transform so position:fixed stays viewport-locked */}
+      {ReactDOM.createPortal(
+        <div ref={cursorRef} className="card-cursor" aria-hidden="true">Read case study</div>,
+        document.body
+      )}
+
+      {/* Centered display H1 marquee — sits behind card */}
+      <div className="side-mq-wrap">
+        <div className="side-mq">{marqItems}{marqItems}</div>
+      </div>
+
+      {/* Card stage — centered on top of marquee */}
+      <div className="side-stage">
+        <div ref={trackRef} className="side-track">
+          {SELECTED_PROJECTS.map((p) => (
+            <div key={p.id} className="side-slot">
+              <div className="side-card" style={{ background: p.bg }}>
+                {p.cover ? (
+                  <img className="side-card-cover" src={p.cover} alt={p.name} />
+                ) : (
+                  <div className="side-visual" style={{ color: p.fg }}>
+                    <span className="side-visual-mark">{p.mark}</span>
+                  </div>
+                )}
+                <div className="side-overlay">
+                  <span className="side-ov-label">{p.meta}</span>
+                  <h3 className="side-ov-title sc-title">{p.name}</h3>
+                  <p className="side-ov-desc sc-desc">{p.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── About section (forest-green block, photo + quote + principles) ──────── */
+const PRINCIPLES = [
+  { idx: '01', word: 'Holistic',    sub: 'People-first thinking'    },
+  { idx: '02', word: 'Useful',      sub: 'Problem-led, not feature-led' },
+  { idx: '03', word: 'Sustainable', sub: 'Consistent, long-lasting' },
+];
+
+function AboutSection() {
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        /* Body background → forest when the section enters, back to neutral
+           when it leaves. Callback-based so it cooperates with the side
+           projects bg zones (which switch back to neutral just before this
+           section starts) without scroll-position overlap conflicts. */
+        const cssRoot = getComputedStyle(document.documentElement);
+        const COL = {
+          neutral: cssRoot.getPropertyValue('--surface-page').trim()     || '#F5F5F0',
+          forest:  cssRoot.getPropertyValue('--surface-emphasis').trim() || '#2D6A4F',
+        };
+        const toBg = (c) => gsap.to(document.body, {
+          backgroundColor: c, duration: 0.55, ease: 'power2.inOut', overwrite: 'auto',
+        });
+        // Section enters → forest. Fires later than WorkSection's "neutral
+        // handoff" (arch bottom 90%) so the two never race on the same frame.
+        ScrollTrigger.create({
+          trigger: ref.current,
+          start:   'top 50%',
+          onEnter:     () => toBg(COL.forest),
+          onLeaveBack: () => toBg(COL.neutral),
+        });
+        // Section leaving → neutral
+        ScrollTrigger.create({
+          trigger: ref.current,
+          start:   'bottom 60%',
+          onEnter:     () => toBg(COL.neutral),
+          onLeaveBack: () => toBg(COL.forest),
+        });
+
+        /* Word-by-word colour reveal on the H1 quote — words start faded and
+           light up to full neutral as the user scrolls the quote past viewport
+           center. */
+        const quote = ref.current.querySelector('.about-quote');
+        if (quote) {
+          const quoteSplit = new SplitType(quote, { types: 'words' });
+          const FADED = 'rgba(245,245,240,0.18)';
+          const FULL  = 'rgba(245,245,240,1)';
+          gsap.set(quoteSplit.words, { color: FADED });
+          gsap.to(quoteSplit.words, {
+            color: FULL,
+            stagger: 0.1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: quote,
+              start:   'top center',
+              end:     'bottom center',
+              scrub:   true,
+            },
+          });
+        }
+      });
+    }, ref);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="about" ref={ref} className="about">
+      <span className="about-eyebrow gf">§ About</span>
+
+      {/* ── Top row: portrait + H1 quote ──────────────────────────────────── */}
+      <div className="about-row">
+        <div className="about-photo gf">
+          <img src="assets/img-encuadrada-2.jpg" alt="Ricardo Martínez in the mountains" />
+          <span className="about-photo-pill">Madrid, ES</span>
+        </div>
+        <h1 className="about-quote">
+          I believe the best products are built by putting <em>people first</em> and
+          carefully balancing user needs, business goals and technical realities to
+          create experiences that are <em>useful, consistent and sustainable</em> over time.
+        </h1>
+      </div>
+
+      <hr className="about-divider" />
+
+      {/* ── Bottom row: principles + paragraphs ───────────────────────────── */}
+      <div className="about-row">
+        <div className="gf">
+          <span className="t-label about-principles-head">Principles</span>
+          <ol className="about-principles-list">
+            {PRINCIPLES.map(p => (
+              <li key={p.idx} className="about-principle">
+                <span className="about-principle-idx">{p.idx}</span>
+                <span className="about-principle-word">{p.word}</span>
+                <span className="about-principle-sub">— {p.sub}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="about-paragraphs gf">
+          <p>
+            Driven by curiosity, I ask a lot of questions to deeply understand challenges
+            and uncover opportunities. I hold myself to high standards and thrive where I
+            can learn and grow alongside others.
+          </p>
+          <p>
+            I focus on the balance between user needs, business goals and development
+            realities — making sure the products I design are <em>consistent</em>, useful
+            and sustainable over time.
+          </p>
+          <p>
+            Outside of work I climb, run trails and learn from friends who do things very
+            differently to me. It tends to make the work better too.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Timeline row with GSAP accordion ───────────────────────────────────── */
+function TimelineRow({ year, title, org, text, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const bodyRef = useRef(null);
+  const isFirst = useRef(true);
+
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    if (!defaultOpen) gsap.set(el, { height: 0, autoAlpha: 0 });
+  }, []);
+
+  useEffect(() => {
+    if (isFirst.current) { isFirst.current = false; return; }
+    const el = bodyRef.current;
+    if (!el) return;
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      if (open) {
+        gsap.to(el, { height: 'auto', autoAlpha: 1, duration: 0.45, ease: 'power2.out', marginTop: 10 });
+      } else {
+        gsap.to(el, { height: 0, autoAlpha: 0, duration: 0.32, ease: 'power2.inOut', marginTop: 0 });
+      }
+    });
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+      gsap.set(el, open ? { height: 'auto', autoAlpha: 1, marginTop: 10 } : { height: 0, autoAlpha: 0, marginTop: 0 });
+    });
+    return () => mm.revert();
+  }, [open]);
+
+  return (
+    <div className="tl-row" onClick={() => setOpen(o => !o)}>
+      <span className="tl-year">{year}</span>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+          <p className="tl-title">{title}</p>
+          <span className="tl-org">{org}</span>
+        </div>
+        <div ref={bodyRef} className="tl-body">
+          <p style={{ margin: 0, paddingBottom: 4 }}>{text}</p>
+        </div>
+      </div>
+      <button className={`tl-toggle${open ? ' open' : ''}`} aria-label="Toggle" onClick={e => e.stopPropagation()}>
+        <PlusIcon />
+      </button>
+    </div>
+  );
+}
+
+/* ── Background section ──────────────────────────────────────────────────── */
+const CAREER = [
+  { role: 'Product Designer', org: 'Icarus HS', range: '2020 — Present', text: "Over five years I've evolved from junior UX designer to a versatile product designer with a strategic mindset. My first and current role — where I've learned immensely from my manager Óscar and the team." },
+];
+const EDUCATION = [
+  { title: 'Advanced Product Design', org: 'Mr Marcell School', year: '2024', text: "While the technical knowledge was invaluable, what I value most wasn't in any slide or PDF. As the motto says, 'Always with cariño' — it's about focusing on the human factor." },
+  { title: "Master's in Graphic Design", org: 'Labasad', year: '2022', text: "I learned the fundamentals of graphic design that helped me create more attractive and coherent interfaces." },
+  { title: 'UX/UI Bootcamp', org: 'IronHack Madrid', year: '2019', text: "Almost by accident, I discovered my passion at IronHack: human-centred design. A challenging stage where I took my first steps in the world of design." },
+  { title: 'Cross-platform App Dev', org: 'European University', year: '2017 — 2019', text: "I gained a deep understanding of how everyday applications work and built an app for managing shared flats." },
+];
+
+function BackgroundSection() {
+  return (
+    <div className="bg-section" id="background">
+      <div className="bg-inner">
+        <div className="gf">
+          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>§ Background</span>
+          <h2 className="t-h1" style={{ marginBottom: 64 }}>A few stops <em>along the way.</em></h2>
+        </div>
+        <div className="bg-group gf">
+          <p className="bg-group-title">Career</p>
+          {CAREER.map((c, i) => (
+            <TimelineRow key={c.role} year={c.range} title={c.role} org={c.org} text={c.text} defaultOpen={i === 0} />
+          ))}
+        </div>
+        <div className="bg-group gf">
+          <p className="bg-group-title">Education</p>
+          {EDUCATION.map(e => (
+            <TimelineRow key={e.title} year={e.year} title={e.title} org={e.org} text={e.text} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Testimonials ────────────────────────────────────────────────────────── */
+const QUOTES = [
+  { text: 'Ricardo is one of those people who leave a mark — a true top-notch professional.', author: 'Esteban Diaz', role: 'Design Manager' },
+  { text: 'If I ever become the CEO of a big company, Ricardo would be in my top five product designers.', author: 'Javier N. Roy', role: 'Design School Director' },
+];
+
+function TestimonialsSection() {
+  return (
+    <section className="section">
+      <div className="gf">
+        <span className="t-label" style={{ display: 'block', marginBottom: 0 }}>§ Kind words</span>
+      </div>
+      <div className="quotes-grid">
+        {QUOTES.map((q) => (
+          <figure key={q.author} className="gf" style={{ margin: 0 }}>
+            <p className="quote-text">{q.text}</p>
+            <figcaption className="quote-cap">
+              <div className="quote-avatar">{q.author.split(' ').map(s => s[0]).join('').slice(0, 2)}</div>
+              <div>
+                <p className="quote-name">{q.author}</p>
+                <p className="quote-role">{q.role}</p>
+              </div>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ── Footer with magnetic CTA ────────────────────────────────────────────── */
+function Footer() {
+  const [time, setTime] = useState('');
+  const btnRef = useRef(null);
+
+  useEffect(() => {
+    const tick = () => setTime(
+      new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    );
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  /* magnetic CTA */
+  useEffect(() => {
+    const btn = btnRef.current;
+    if (!btn) return;
+    let xTo, yTo, cleanup = () => {};
+
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      xTo = gsap.quickTo(btn, 'x', { duration: 0.5, ease: 'power3.out' });
+      yTo = gsap.quickTo(btn, 'y', { duration: 0.5, ease: 'power3.out' });
+
+      const RADIUS = 90;
+      const onMove = (e) => {
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top  + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.hypot(dx, dy);
+        if (dist < RADIUS) {
+          xTo(dx * 0.4);
+          yTo(dy * 0.4);
+        } else {
+          xTo(0); yTo(0);
+        }
+      };
+      const onLeave = () => { xTo(0); yTo(0); };
+
+      window.addEventListener('mousemove', onMove);
+      btn.addEventListener('mouseleave', onLeave);
+      cleanup = () => {
+        window.removeEventListener('mousemove', onMove);
+        btn.removeEventListener('mouseleave', onLeave);
+        gsap.set(btn, { x: 0, y: 0 });
+      };
+    });
+
+    return () => { mm.revert(); cleanup(); };
+  }, []);
+
+  return (
+    <footer className="footer" id="contact">
+      <div className="footer-inner">
+        <div className="gf">
+          <span className="t-label t-label-dark" style={{ marginBottom: 24, display: 'block' }}>§ Let's talk</span>
+          <h2 className="t-h1 on-dark">Have something <em>complex</em> to ship?</h2>
+          <p className="t-lead lead-dark" style={{ marginTop: 12, maxWidth: '50ch' }}>
+            I take on a few engagements at a time. Tell me about the problem — I'll reply within a working day.
+          </p>
+          <div className="footer-cta">
+            <a ref={btnRef} className="btn btn-primary" href="mailto:ricardomartinezing1@gmail.com"
+               style={{ display: 'inline-flex', willChange: 'transform' }}>
+              Start a conversation
+            </a>
+            <a className="la la-lima" href="mailto:ricardomartinezing1@gmail.com">
+              <span className="la-text">ricardomartinezing1@gmail.com</span>
+              <ArrowRight />
+            </a>
+          </div>
+        </div>
+        <div className="footer-grid gf">
+          <div>
+            <span className="footer-col-label">Location</span>
+            <p style={{ font: '400 16px var(--font-sans)', color: 'var(--color-white)', margin: '0 0 4px' }}>Madrid, ES</p>
+            <p style={{ font: '400 13px var(--font-sans)', color: 'rgba(245,245,240,.5)', margin: 0 }}>Open to remote</p>
+          </div>
+          <div>
+            <span className="footer-col-label">Local time</span>
+            <p className="footer-clock">{time}</p>
+            <p style={{ font: '400 12px var(--font-mono)', color: 'rgba(245,245,240,.4)', margin: '4px 0 0' }}>Europe/Madrid</p>
+          </div>
+          <div>
+            <span className="footer-col-label">Find me</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <a href="https://www.linkedin.com/in/ricardomartinezing/" className="footer-col-link">LinkedIn <ArrowRight /></a>
+              <a href="#" className="footer-col-link">Resume PDF <ArrowRight /></a>
+            </div>
+          </div>
+          <div>
+            <span className="footer-col-label">Status</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <span className="status-dot" />
+              <span style={{ font: '500 15px var(--font-sans)', color: 'var(--color-white)' }}>Available · 2026</span>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom gf">
+          <span>© 2026 Ricardo Martínez</span>
+          <span>Designed & built with care</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ── Project modal ───────────────────────────────────────────────────────── */
+function Modal({ project, onClose }) {
+  const overlayRef = useRef(null);
+  const boxRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(overlayRef.current, { autoAlpha: 0, duration: 0.2 });
+      gsap.from(boxRef.current, { autoAlpha: 0, y: 20, duration: 0.3, ease: 'power2.out' });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  const close = useCallback(() => {
+    gsap.to(boxRef.current, { autoAlpha: 0, y: 12, duration: 0.2, ease: 'power2.in' });
+    gsap.to(overlayRef.current, { autoAlpha: 0, duration: 0.25, delay: 0.05, onComplete: onClose });
+  }, [onClose]);
+
+  useEffect(() => {
+    const h = (e) => e.key === 'Escape' && close();
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
+  }, [close]);
+
+  return (
+    <div ref={overlayRef} onClick={close}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,26,16,.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 80, padding: 24 }}>
+      <div ref={boxRef} onClick={e => e.stopPropagation()}
+        style={{ background: 'var(--color-white)', borderRadius: 12, padding: 32, maxWidth: 540, width: '100%', boxShadow: 'var(--shadow-lg)' }}>
+        <span className="t-label" style={{ marginBottom: 8, display: 'block' }}>{project.meta}</span>
+        <h3 style={{ font: '600 22px var(--font-sans)', margin: '0 0 8px' }}>{project.title}</h3>
+        {project.metrics && (
+          <div style={{ display: 'flex', gap: 16, margin: '12px 0', flexWrap: 'wrap' }}>
+            {project.metrics.map(m => (
+              <span key={m} style={{ font: '700 15px var(--font-sans)', color: 'var(--color-forest)', background: 'rgba(45,106,79,.08)', padding: '6px 12px', borderRadius: 6 }}>{m}</span>
+            ))}
+          </div>
+        )}
+        <p style={{ font: '400 15px var(--font-sans)', color: 'var(--color-mid)', lineHeight: 1.6, margin: '0 0 16px' }}>{project.details || project.desc}</p>
+        <div className="tags-row" style={{ marginTop: 0, marginBottom: 24 }}>
+          {(project.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={close}>Close</button>
+          <a className="btn btn-primary btn-sm" href="mailto:ricardomartinezing1@gmail.com">Get in touch</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── App ─────────────────────────────────────────────────────────────────── */
+function App() {
+  const [active, setActive]       = useState(null);
+  const [openProject, setOpenProject] = useState(null);
+
+  /* Global scroll-reveal setup */
+  useLayoutEffect(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      /* initial state for all scroll-triggered elements */
+      gsap.set('.gf', { autoAlpha: 0, y: 28 });
+
+      /* standard batch: sections, cards, quotes, footer blocks */
+      ScrollTrigger.batch('.gf', {
+        onEnter: (els) => gsap.to(els, { autoAlpha: 1, y: 0, stagger: 0.08, duration: 0.7, ease: 'power2.out', clearProps: 'transform' }),
+        once: true,
+        start: 'top 88%',
+      });
+
+      /* refresh after fonts are loaded so trigger positions are correct */
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+        if (window._syncBodyHeight) window._syncBodyHeight();
+      });
+    });
+    return () => mm.revert();
+  }, []);
+
+  /* Flip-board text-hover animation — applied to every CTA, menu item, .btn
+     and link-arrow in the page. SplitType is run once per element; gsap.from
+     is fired on the nearest interactive ancestor's mouseenter.
+
+     SplitType only wraps text nodes, so SVG icons / arrow circles inside the
+     same button are NOT in split.chars and remain untouched. */
+  useEffect(() => {
+    if (typeof SplitType === 'undefined' || !document.body) return;
+    const SELECTORS = [
+      '.btn',          // primary / ghost / small variants
+      '.nav-item',     // menu items
+      '.nav-cta',      // "Let's talk" pill
+      '.la-text',      // link-arrow text  (inside .la)
+    ].join(',');
+
+    const cleanups = [];
+
+    document.querySelectorAll(SELECTORS).forEach((trigger) => {
+      // Pick the smallest text-only target so SplitType never touches
+      // sibling icons / arrow circles. Three cases:
+      //   a) trigger has a text-only child element (e.g. nav-cta's
+      //      "Let's talk" span)  →  split that child
+      //   b) trigger is a flex/grid container with column gap AND has a
+      //      direct text node child (e.g. .btn "Let's talk") → wrap the
+      //      text node in a span so chars stay nested (gap won't push
+      //      them apart) and split that wrap
+      //   c) otherwise split the trigger directly
+      let target = trigger;
+      const textOnlyChild = Array.from(trigger.children).find(
+        (c) => c.children.length === 0 && c.textContent.trim()
+      );
+      if (textOnlyChild) {
+        target = textOnlyChild;
+      } else {
+        const cs = window.getComputedStyle(trigger);
+        const flexish = cs.display.includes('flex') || cs.display.includes('grid');
+        const colGap = parseFloat(cs.columnGap || '0') || parseFloat(cs.gap || '0') || 0;
+        if (flexish && colGap > 0) {
+          const textNode = Array.from(trigger.childNodes)
+            .find((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+          if (textNode) {
+            const wrap = document.createElement('span');
+            wrap.className = 'flip-text-wrap';
+            wrap.style.display = 'inline-block';
+            trigger.insertBefore(wrap, textNode);
+            wrap.appendChild(textNode);
+            target = wrap;
+          }
+        }
+      }
+
+      if (!target.textContent.trim()) return;
+
+      let split;
+      try { split = new SplitType(target, { types: 'chars' }); }
+      catch (e) { return; }
+      const chars = split.chars;
+      if (!chars || !chars.length) return;
+
+      gsap.set(chars, { display: 'inline-block', backfaceVisibility: 'hidden' });
+
+      // Hover trigger: prefer .la wrapper for .la-text, else the element itself.
+      const hoverEl = trigger.classList.contains('la-text')
+        ? (trigger.closest('.la') || trigger)
+        : trigger;
+
+      const onEnter = () => {
+        gsap.from(chars, {
+          rotationX: -90,
+          transformOrigin: '50% 0%',
+          opacity: 0,
+          stagger: { each: 0.04, from: 'start' },
+          duration: 0.5,
+          ease: 'power2.out',
+          overwrite: true,
+        });
+      };
+      hoverEl.addEventListener('mouseenter', onEnter);
+      cleanups.push(() => {
+        hoverEl.removeEventListener('mouseenter', onEnter);
+        if (split.revert) split.revert();
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+  }, []);
+
+  /* Active nav-item follows the section in view. Triggers on each section's
+     mid-viewport crossing so hero stays "none active" until Work scrolls in. */
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const watch = (id, label) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        ScrollTrigger.create({
+          trigger: el,
+          start:   'top 55%',
+          end:     'bottom 45%',
+          onToggle: (self) => { if (self.isActive) setActive(label); },
+          onLeave:     () => setActive(null),
+          onLeaveBack: () => setActive(null),
+        });
+      };
+      watch('work',  'Work');
+      watch('about', 'About');
+    });
+    return () => ctx.revert();
+  }, []);
+
+  const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (window.smoothScrollTo) {
+      const content = document.getElementById('smooth-content');
+      const offsetTop = el.getBoundingClientRect().top - content.getBoundingClientRect().top;
+      window.smoothScrollTo(offsetTop);
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  return (
+    <>
+      <Nav active={active} onNavigate={setActive} onCta={() => scrollTo('contact')} />
+      <Hero onPrimary={() => scrollTo('contact')} onGhost={() => { setActive('Work'); scrollTo('work'); }} />
+      <SideShowcaseSection />
+      <WorkSection onOpen={setOpenProject} />
+      <AboutSection />
+      <BackgroundSection />
+      <TestimonialsSection />
+      <Footer />
+      {openProject && <Modal project={openProject} onClose={() => setOpenProject(null)} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
