@@ -34,7 +34,7 @@
   --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-mono:  'JetBrains Mono', ui-monospace, Menlo, monospace;
 
-  --radius-sm:   4px; --radius-md: 8px; --radius-lg: 12px; --radius-pill: 999px;
+  --radius-sm:   4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 32px; --radius-pill: 999px;
   --shadow-sm: 0 2px 8px rgba(15,26,16,.06);
   --shadow-md: 0 4px 24px rgba(15,26,16,.10);
   --shadow-lg: 0 8px 32px rgba(15,26,16,.12);
@@ -123,8 +123,11 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--color-white);
   border-radius: var(--radius-pill);
   box-shadow:
-    0 1px 2px rgba(15, 26, 16, .04),
-    0 6px 24px rgba(15, 26, 16, .07);
+    0 194px 54px 0 rgba(0,0,0,.00),
+    0 124px 50px 0 rgba(0,0,0,.01),
+    0  70px 42px 0 rgba(0,0,0,.05),
+    0  31px 31px 0 rgba(0,0,0,.09),
+    0   8px 17px 0 rgba(0,0,0,.10);
   display: inline-flex; align-items: center;
   padding: 8px;
 }
@@ -255,12 +258,67 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
-.hero { padding: clamp(64px,12vh,140px) var(--pad) clamp(56px,8vh,96px); max-width: var(--max-w); margin: 0 auto; }
-@media (max-width: 768px) { .hero { padding: 64px 24px 72px; } }
-.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; }
-.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
-.hero-meta { margin-top: 48px; font: 500 13px var(--font-sans); letter-spacing: .04em; color: var(--color-gray); display: inline-flex; align-items: center; gap: 8px; }
+/* ── Hero layout ────────────────────────────────────────────────────────── */
+/* ── Hero: 100vh, 2 equal rows (image top / content bottom) ─────────────── */
+.hero {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  position: relative;           /* anchor for absolute tabs */
+  /* full viewport width — no max-width here */
+}
+
+/* Image — 24px margin top + sides, flush at bottom of its row */
+.hero-img {
+  margin: 24px 24px 0;
+  border-radius: var(--radius-xl); overflow: hidden;
+  position: relative;
+  background-color: var(--_bg, #BFA98D);
+}
+.hero-img-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* Tab selector — absolute, centred at the row boundary (50% of hero height) */
+.hero-tabs {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex; align-items: center; gap: 4px;
+  background: var(--color-white); border-radius: var(--radius-pill);
+  padding: 6px; width: fit-content;
+  box-shadow:
+    0 194px 54px 0 rgba(0,0,0,.00), 0 124px 50px 0 rgba(0,0,0,.01),
+    0  70px 42px 0 rgba(0,0,0,.05), 0  31px 31px 0 rgba(0,0,0,.09),
+    0   8px 17px 0 rgba(0,0,0,.10);
+}
+.hero-tab-btn {
+  padding: 10px 22px; border-radius: var(--radius-pill); border: none;
+  background: transparent; font: 500 14px var(--font-sans);
+  color: var(--color-mid); cursor: pointer; white-space: nowrap;
+  transition: background var(--t-base), color var(--t-base);
+}
+.hero-tab-btn.active { background: var(--color-dark); color: var(--color-white); }
+
+/* Content row — centred within its row, respects max-width */
+.hero-body {
+  display: grid; grid-template-columns: 8fr 4fr;
+  gap: clamp(40px,6vw,88px); align-items: center;
+  max-width: var(--max-w); width: 100%;
+  margin: 0 auto; padding: 0 var(--pad);
+  align-self: center;
+}
+.hero-lead { padding-top: 4px; }
+
+/* Status meta (eyebrow in left col) */
+.hero-meta { font: 500 13px var(--font-sans); letter-spacing: .04em; color: var(--color-gray); display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 .hero-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-lima); box-shadow: 0 0 0 4px rgba(184,243,0,.25); flex-shrink: 0; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero { height: auto; grid-template-rows: auto auto; }
+  .hero-img { margin: 80px 16px 0; }
+  .hero-tabs { position: static; transform: none; margin: 20px auto; }
+  .hero-body { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
+}
 
 /* ── Word-mask reveal (hero h1 + lead paragraph) ─────────────────────────── */
 .wm   { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; }
@@ -457,9 +515,10 @@ button { font-family: inherit; cursor: pointer; }
 .quote-role { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--color-gray); margin-top: 2px; }
 
 /* ── Pinned split-screen (Selected work) ─────────────────────────────────── */
-.proj-arch { display: flex; position: relative; width: 100%; }
+/* 6-col text / 5-col image grid */
+.proj-arch { display: grid; grid-template-columns: 6fr 5fr; position: relative; width: 100%; }
 
-.proj-left { width: 50%; flex-shrink: 0; padding: 0 48px 0 var(--pad); }
+.proj-left { padding: 0 48px 0 var(--pad); }
 @media (max-width: 1024px) and (min-width: 769px) {
   .proj-left { padding: 0 24px 0 40px; }
   .proj-img-wrap { right: 40px !important; }
@@ -467,11 +526,28 @@ button { font-family: inherit; cursor: pointer; }
 .proj-panel { height: 150vh; display: flex; align-items: center; }
 .proj-panel-content { max-width: 480px; }
 .proj-panel-meta { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); margin-bottom: 16px; display: block; }
-.proj-panel-title { font: 600 clamp(22px,2.8vw,34px) var(--font-sans); letter-spacing: -0.01em; line-height: 1.2; color: var(--color-dark); margin: 0 0 16px; }
+.proj-panel-title { font: 600 clamp(24px,2.8vw,38px) var(--font-sans); letter-spacing: -0.02em; line-height: 1.15; color: var(--color-dark); margin: 0 0 20px; }
+.proj-panel-title em { font-family: var(--font-serif); font-weight: 300; font-style: italic; letter-spacing: 0; font-size: 1.05em; }
+/* Dark pill CTA — mirrors .nav-cta shape, dark colourway */
+.btn-cta-dark {
+  background: var(--color-dark);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 12px 20px;
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 600 14px var(--font-sans);
+  letter-spacing: .005em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity var(--t-base);
+}
+.btn-cta-dark:hover { opacity: 0.8; }
 .proj-panel-desc { font: 400 16px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0 0 24px; }
 
-.proj-right { width: 50%; flex-shrink: 0; height: 100vh; position: relative; align-self: flex-start; }
-.proj-img-wrap { position: absolute; top: 20px; right: var(--pad); bottom: 20px; left: 0; border-radius: var(--radius-lg); overflow: hidden; }
+.proj-right { height: 100vh; position: relative; align-self: start; }
+/* Image: 4/6 of viewport height, vertically centred within the sticky panel */
+.proj-img-wrap { position: absolute; left: 0; right: var(--pad); height: 67vh; top: 50%; transform: translateY(-50%); border-radius: var(--radius-xl); overflow: hidden; }
 .proj-visual { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; position: relative; }
 .proj-visual-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background-repeat: no-repeat; display: block; }
 .proj-visual-mark { font: 700 clamp(80px,10vw,160px) var(--font-sans); letter-spacing: -0.04em; opacity: 0.18; line-height: 1; }
@@ -1026,76 +1102,267 @@ function _HeroCardOld({ variant, style }) {
   );
 }
 
+/* ── Hero persona data ───────────────────────────────────────────────────── */
+const N_BLINDS   = 8;
+const HERO_DEFAULT = 1; // "For everyone"
+
+const HERO_TABS = [
+  {
+    id: 'developers', label: 'Developers',
+    heroBg: '#1C2B3A', image: 'assets/hero/code.jpg',
+    titleWords: ['Design', 'that', { em: 'speaks' }, 'your', 'language'],
+    bodyWords:  ['I', 'think', 'in', 'components,', 'write', 'in', 'tokens,', 'and',
+                 'hand', 'off', 'specs', 'that', 'map', 'directly', 'to', 'your',
+                 'stack.', 'Less', 'interpretation,', 'fewer', 'surprises.'],
+    cta: 'See how I work', ctaAction: 'work',
+  },
+  {
+    id: 'everyone', label: 'For everyone',
+    heroBg: '#BFA98D', image: 'assets/hero/everyone.png',
+    titleWords: ['Designing', 'products', { em: 'people' }, 'understand'],
+    bodyWords:  ["I'm", 'a', 'senior', 'product', 'designer', 'with', '6+', 'years',
+                 'on', 'complex', 'B2B', 'tools.', 'Currently', 'at',
+                 { em: 'Icarus HS,' }, 'helping', 'teams', 'ship', 'clearer',
+                 'interfaces', 'with', 'a', 'holistic', 'approach.'],
+    cta: 'View work', ctaAction: 'work',
+  },
+  {
+    id: 'recruiters', label: 'Recruiters',
+    heroBg: '#B8C5CE', image: 'assets/hero/recruiters.jpg',
+    titleWords: ['6', 'years', { em: 'shipping' }, 'real', 'products'],
+    bodyWords:  ['Senior', 'product', 'designer,', 'available', 'in', '2026.', 'Led',
+                 'design', 'at', 'B2B', 'SaaS', 'startups,', 'built', 'systems',
+                 'from', 'scratch,', 'and', 'shipped', 'products', 'used', 'daily',
+                 'by', 'thousands.'],
+    cta: 'Download resume', ctaAction: 'resume',
+  },
+];
+
+/* Renders a word array — supports strings and { em: '...' } objects */
+function HeroWords({ words, cls }) {
+  return words.map((w, i) => (
+    <React.Fragment key={i}>
+      <span className="wm">
+        <span className={`wi ${cls}`}>
+          {typeof w === 'string'
+            ? w
+            : <em style={{ fontFamily: 'var(--font-serif)', fontWeight: 300 }}>{w.em}</em>}
+        </span>
+      </span>{' '}
+    </React.Fragment>
+  ));
+}
+
+/* Vertical Blinds — SVG mask technique from Hiro-kiii/Scroll-Transition.
+   Each blind = 2 SVG <rect>s that start collapsed at the strip's centre-line
+   and expand symmetrically outward (left rect shifts left, right rect shifts
+   right), revealing the new image through the SVG mask underneath.
+   Left→right stagger creates the sequential "venetian blind" open.           */
+function runBlindsTransition(container, tab, onSwap) {
+  const BLIND_COUNT = 40;
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  const W = container.offsetWidth  || window.innerWidth;
+  const H = container.offsetHeight || window.innerHeight * 0.5;
+
+  /* viewBox height = 100 units; width scaled to match aspect ratio */
+  const vbH = 100;
+  const vbW = (W / H) * 100;
+  const blindW = vbW / BLIND_COUNT;   /* width of one strip in viewBox units */
+
+  /* ── SVG overlay (sits on top of existing img) ─────────────────────────── */
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+  Object.assign(svg.style, {
+    position: 'absolute', inset: '0',
+    width: '100%', height: '100%',
+    zIndex: '5', pointerEvents: 'none',
+    overflow: 'hidden',
+  });
+
+  /* ── <defs> + <mask> ────────────────────────────────────────────────────── */
+  const defs = document.createElementNS(svgNS, 'defs');
+  const mask = document.createElementNS(svgNS, 'mask');
+  const maskId = `hb-mask-${Date.now()}`;   /* unique id avoids collisions    */
+  mask.setAttribute('id', maskId);
+
+  /* Black base = new image is fully hidden until rects open */
+  const baseRect = document.createElementNS(svgNS, 'rect');
+  baseRect.setAttribute('x', '0'); baseRect.setAttribute('y', '0');
+  baseRect.setAttribute('width', vbW); baseRect.setAttribute('height', vbH);
+  baseRect.setAttribute('fill', 'black');
+  mask.appendChild(baseRect);
+
+  /* ── Build blind pairs ──────────────────────────────────────────────────── */
+  const blindPairs = [];   /* { left, right, centerX, halfW } */
+
+  for (let i = 0; i < BLIND_COUNT; i++) {
+    const centerX = i * blindW + blindW / 2;
+    const halfW   = blindW / 2;
+
+    const rectLeft  = document.createElementNS(svgNS, 'rect');
+    const rectRight = document.createElementNS(svgNS, 'rect');
+
+    [rectLeft, rectRight].forEach(r => {
+      r.setAttribute('y', '0');
+      r.setAttribute('height', String(vbH));
+      r.setAttribute('width', '0');          /* collapsed at start            */
+      r.setAttribute('fill', 'white');
+      r.setAttribute('shape-rendering', 'crispEdges');
+      r.setAttribute('x', String(centerX));  /* both start at centre-line     */
+    });
+
+    mask.appendChild(rectLeft);
+    mask.appendChild(rectRight);
+    blindPairs.push({ left: rectLeft, right: rectRight, centerX, halfW });
+  }
+
+  defs.appendChild(mask);
+  svg.appendChild(defs);
+
+  /* ── New image + bg colour, both masked ────────────────────────────────── */
+  const bgRect = document.createElementNS(svgNS, 'rect');
+  bgRect.setAttribute('x', '0'); bgRect.setAttribute('y', '0');
+  bgRect.setAttribute('width', String(vbW)); bgRect.setAttribute('height', String(vbH));
+  bgRect.setAttribute('fill', tab.heroBg);
+  bgRect.setAttribute('mask', `url(#${maskId})`);
+  svg.appendChild(bgRect);
+
+  if (tab.image) {
+    const imgEl = document.createElementNS(svgNS, 'image');
+    imgEl.setAttribute('href', tab.image);
+    imgEl.setAttribute('x', '0'); imgEl.setAttribute('y', '0');
+    imgEl.setAttribute('width', String(vbW)); imgEl.setAttribute('height', String(vbH));
+    imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    imgEl.setAttribute('mask', `url(#${maskId})`);
+    svg.appendChild(imgEl);
+  }
+
+  container.appendChild(svg);
+
+  /* ── GSAP: open each blind (centre → edges) left-to-right ──────────────── */
+  const allRects = blindPairs.flatMap(b => [b.left, b.right]);
+  const cleanup  = () => svg.parentNode && svg.parentNode.removeChild(svg);
+
+  gsap.to(allRects, {
+    attr: {
+      x:     (i) => { const b = blindPairs[Math.floor(i / 2)]; return i % 2 === 0 ? b.centerX - b.halfW : b.centerX; },
+      width: (i) => { const b = blindPairs[Math.floor(i / 2)]; return b.halfW + 0.05; },
+    },
+    ease: 'power2.inOut',
+    duration: 0.45,
+    stagger: { each: 0.018, from: 'start' },
+    onComplete:  () => { cleanup(); onSwap(); },
+    onInterrupt: () => { cleanup(); onSwap(); },
+  });
+}
+
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 function Hero({ onPrimary, onGhost }) {
-  const sectionRef = useRef(null);
+  const [activeTab,  setActiveTab]  = useState(HERO_DEFAULT);
+  const [displayTab, setDisplayTab] = useState(HERO_DEFAULT);
+  const sectionRef  = useRef(null);
+  const imgRef      = useRef(null);
+  const isAnimating = useRef(false);
 
+  /* ── Initial entrance ── */
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add('(prefers-reduced-motion: no-preference)', () => {
-        /* collect all masked word-inner spans */
         const heroWis = gsap.utils.toArray('.hero-wi', sectionRef.current);
         const leadWis = gsap.utils.toArray('.lead-wi', sectionRef.current);
-
-        /* start below clip */
         gsap.set(heroWis, { y: '110%' });
         gsap.set(leadWis, { y: '110%' });
+        gsap.set(imgRef.current,   { autoAlpha: 0, y: 16 });
+        gsap.set('[data-hi="tabs"]', { autoAlpha: 0, y: 10 });
+        gsap.set('[data-hi="meta"]', { autoAlpha: 0, y: 8  });
 
-        /* other elements: fade + slide */
-        const others = sectionRef.current.querySelectorAll('[data-hi]');
-        gsap.set(others, { autoAlpha: 0 });
-        gsap.set('[data-hi="eyebrow"]', { y: 10 });
-        gsap.set('[data-hi="cta"]',     { y: 14 });
-        gsap.set('[data-hi="meta"]',    { y: 8  });
-
-        const tl = gsap.timeline({ delay: 0.2 });
-        tl.to('[data-hi="eyebrow"]', { autoAlpha:1, y:0, duration:0.45, ease:'power2.out' })
-          /* h1 words slide up one by one */
-          .to(heroWis, { y:'0%', duration:0.9, stagger:0.08, ease:'power3.out' }, '-=0.1')
-          /* lead words follow, tighter stagger */
-          .to(leadWis, { y:'0%', duration:0.65, stagger:0.04, ease:'power3.out' }, '-=0.5')
-          .to('[data-hi="cta"]',  { autoAlpha:1, y:0, duration:0.5, ease:'power2.out' }, '-=0.3')
-          .to('[data-hi="meta"]', { autoAlpha:1, y:0, duration:0.4, ease:'power2.out' }, '-=0.3');
+        const tl = gsap.timeline({ delay: 0.15 });
+        tl.to(imgRef.current, { autoAlpha: 1, y: 0, duration: 0.65, ease: 'power3.out' })
+          .to(heroWis, { y: '0%', duration: 0.85, stagger: 0.07, ease: 'power3.out' }, '-=0.35')
+          .to(leadWis, { y: '0%', duration: 0.6,  stagger: 0.03, ease: 'power3.out' }, '-=0.5')
+          .to('[data-hi="tabs"]', { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power2.out' }, '-=0.45')
+          .to('[data-hi="meta"]', { autoAlpha: 1, y: 0, duration: 0.4,  ease: 'power2.out' }, '-=0.3');
       });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
 
+  /* ── Tab switch ── */
+  const handleTab = (idx) => {
+    if (idx === activeTab || isAnimating.current) return;
+    isAnimating.current = true;
+    setActiveTab(idx);
+
+    const allWis = gsap.utils.toArray('.hero-wi, .lead-wi', sectionRef.current);
+
+    /* Text exits simultaneously with strips starting */
+    gsap.to(allWis, { y: '110%', duration: 0.32, stagger: 0.018, ease: 'power2.in' });
+
+    runBlindsTransition(imgRef.current, HERO_TABS[idx], () => {
+      setDisplayTab(idx);
+      /* Wait one double-RAF for React to flush the new words into the DOM */
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const newHero = gsap.utils.toArray('.hero-wi', sectionRef.current);
+        const newLead = gsap.utils.toArray('.lead-wi', sectionRef.current);
+        gsap.set([...newHero, ...newLead], { y: '110%' });
+        gsap.to(newHero, { y: '0%', duration: 0.75, stagger: 0.07, ease: 'power3.out' });
+        gsap.to(newLead, { y: '0%', duration: 0.55, stagger: 0.03, ease: 'power3.out', delay: 0.22,
+          onComplete: () => { isAnimating.current = false; }
+        });
+      }));
+    });
+  };
+
+  const tab = HERO_TABS[displayTab];
+
+  const handleCta = () => {
+    if (tab.ctaAction === 'resume') { /* user can wire download link here */ }
+    else onGhost && onGhost();
+  };
+
   return (
     <section id="top" ref={sectionRef} className="hero">
-      <div data-hi="eyebrow" className="hero-eyebrow">
-        <span className="t-label">Senior Product Designer · Madrid</span>
+
+      {/* ── Hero image (row 1) ─────────────────────────────────────────────── */}
+      <div ref={imgRef} className="hero-img" style={{ '--_bg': tab.heroBg }}>
+        {tab.image && <img className="hero-img-media" src={tab.image} alt={tab.id} />}
       </div>
 
-      <h1 className="t-display" style={{ margin:'0 0 20px' }}>
-        <span className="wm"><span className="wi hero-wi">Hello,</span></span>
-        {' '}
-        <span className="wm"><span className="wi hero-wi">I'm</span></span>
-        <br />
-        <span className="wm-b" style={{ marginTop:'0.04em' }}>
-          <span className="wi hero-wi"><em>Ricardo.</em></span>
-        </span>
-      </h1>
-
-      <p className="t-lead" style={{ maxWidth:'52ch', marginBottom:0 }}>
-        {['I','love','solving','problems','and','creating','meaningful',
-          'products','with','a','holistic','approach.','Currently','designing','at'].map((w, i) => (
-          <React.Fragment key={i}>
-            <span className="wm"><span className="wi lead-wi">{w}</span></span>{' '}
-          </React.Fragment>
+      {/* ── Tab selector — absolute, centred at row boundary ──────────────── */}
+      <div data-hi="tabs" className="hero-tabs">
+        {HERO_TABS.map((t, i) => (
+          <button key={t.id}
+            className={`hero-tab-btn${activeTab === i ? ' active' : ''}`}
+            onClick={() => handleTab(i)}>
+            {t.label}
+          </button>
         ))}
-        <span className="wm"><span className="wi lead-wi">
-          <em style={{ fontFamily:'var(--font-serif)', fontWeight:300 }}>Icarus HS</em>.
-        </span></span>
-      </p>
-      <div data-hi="cta" className="hero-cta">
-        <button className="btn btn-primary" onClick={onPrimary}>Let's talk</button>
-        <button className="btn btn-ghost" onClick={onGhost}>View work</button>
       </div>
-      <div data-hi="meta" className="hero-meta">
-        <span className="hero-status-dot" /> Available for new projects · 2026
+
+      {/* ── Content (row 2): left col = meta + title / right col = lead + CTA  */}
+      <div className="hero-body">
+        {/* Left column */}
+        <div>
+          <div data-hi="meta" className="hero-meta">
+            <span className="hero-status-dot" />
+            Ricardo Martínez · Product Designer / Available · 2026
+          </div>
+          <h1 className="t-display" style={{ margin: 0 }}>
+            <HeroWords words={tab.titleWords} cls="hero-wi" />
+          </h1>
+        </div>
+        {/* Right column */}
+        <div className="hero-lead">
+          <p style={{ font: '400 16px var(--font-sans)', lineHeight: 1.65, color: 'var(--color-mid)', margin: '0 0 28px' }}>
+            <HeroWords words={tab.bodyWords} cls="lead-wi" />
+          </p>
+          <button className="btn btn-primary" onClick={handleCta}>{tab.cta}</button>
+        </div>
       </div>
+
+
     </section>
   );
 }
@@ -1203,7 +1470,8 @@ const SELECTED_PROJECTS = [
 const SIDE_PROJECTS = [
   {
     id: 'storytelling', name: 'Visual Storytelling', mark: 'VS',
-    title: 'Crafting presentations that persuade and stick',
+    keyword: 'Crafting',
+    title: 'presentations that persuade and stick',
     meta: 'Side project',
     desc: 'Exploring how narrative structure and visual design combine to create presentations that communicate with impact.',
     bg: '#E2ECDF', fg: '#0F1A10',
@@ -1213,15 +1481,31 @@ const SIDE_PROJECTS = [
   },
   {
     id: 'depot', name: 'Central Depot', mark: 'CD',
-    title: 'Innovating the sale of construction materials',
+    keyword: 'Innovating',
+    title: 'the sale of construction materials',
     meta: 'Side project',
     desc: 'A fresh approach to an unsexy category — making it easier for professionals to find, compare, and order construction materials online.',
     bg: '#FCEFD6', fg: '#0F1A10',
-    cover: 'assets/caratulas/cover-central-depot.png',
+    cover: 'assets/caratulas/Central-depot-cover.gif',
     cta: 'Read story',
     tags: ['E-commerce', 'B2B'],
   },
 ];
+
+function ProjImage({ project }) {
+  return (
+    <div className="proj-visual" style={{ background: project.bg, color: project.fg }}>
+      {project.cover ? (
+        <img className="proj-visual-cover" src={project.cover} alt={project.name} />
+      ) : (
+        <>
+          <span className="proj-visual-mark">{project.mark}</span>
+          <span className="proj-visual-name">{project.name}</span>
+        </>
+      )}
+    </div>
+  );
+}
 
 function WorkSection({ onOpen }) {
   const archRef = useRef(null);
@@ -1239,7 +1523,7 @@ function WorkSection({ onOpen }) {
         });
 
         /* Initialise all clip-paths so GSAP can interpolate from them */
-        gsap.set(imgWraps, { clipPath: 'inset(0 0 0% 0 round 12px)' });
+        gsap.set(imgWraps, { clipPath: 'inset(0 0 0% 0 round 32px)' });
 
         /* Manual ticker-based pin — reads the smooth scroll's own currentY so the
            right column transform always cancels the parent lerp exactly.
@@ -1274,9 +1558,9 @@ function WorkSection({ onOpen }) {
         const panels = gsap.utils.toArray('.proj-panel', archRef.current);
         imgWraps.slice(0, -1).forEach((wrap, i) => {
           gsap.fromTo(wrap,
-            { clipPath: 'inset(0 0 0% 0 round 12px)' },
+            { clipPath: 'inset(0 0 0% 0 round 32px)' },
             {
-              clipPath: 'inset(0 0 100% 0 round 12px)',
+              clipPath: 'inset(0 0 100% 0 round 32px)',
               ease: 'none',
               scrollTrigger: {
                 trigger: panels[i + 1],
@@ -1288,41 +1572,6 @@ function WorkSection({ onOpen }) {
           );
         });
 
-        /* Body background colour zones — the two light-green surface tokens
-           (sage + mist). Callback-based with `overwrite: 'auto'` so writers
-           don't fight per frame, and triggers don't overlap with the About
-           section's forest trigger. */
-        const cssRoot = getComputedStyle(document.documentElement);
-        const COL = {
-          neutral: cssRoot.getPropertyValue('--surface-page').trim() || '#F5F5F0',
-          sage:    cssRoot.getPropertyValue('--surface-sage').trim() || '#E2ECDF',
-          mist:    cssRoot.getPropertyValue('--surface-mist').trim() || '#EEF3EB',
-        };
-        const toBg = (c) => gsap.to(document.body, {
-          backgroundColor: c, duration: 0.55, ease: 'power2.inOut', overwrite: 'auto',
-        });
-        // Enter side projects → sage
-        ScrollTrigger.create({
-          trigger: archRef.current,
-          start:   'top 70%',
-          onEnter:     () => toBg(COL.sage),
-          onLeaveBack: () => toBg(COL.neutral),
-        });
-        // Second panel enters → mist
-        ScrollTrigger.create({
-          trigger: panels[1],
-          start:   'top 60%',
-          onEnter:     () => toBg(COL.mist),
-          onLeaveBack: () => toBg(COL.sage),
-        });
-        // Section leaving → neutral (leaves a clean gap before the About
-        // section takes over with forest)
-        ScrollTrigger.create({
-          trigger: archRef.current,
-          start:   'bottom 90%',
-          onEnter:     () => toBg(COL.neutral),
-          onLeaveBack: () => toBg(COL.mist),
-        });
 
         if (window._syncBodyHeight) window._syncBodyHeight();
 
@@ -1340,10 +1589,10 @@ function WorkSection({ onOpen }) {
   return (
     <>
       {/* ── Section header ────────────────────────────────────────────────── */}
-      <section id="side" style={{ padding: '80px var(--pad) 48px', maxWidth: 'var(--max-w)', margin: '0 auto' }}>
+      <section id="side" style={{ padding: '160px var(--pad) 48px', maxWidth: 'var(--max-w)', margin: '0 auto' }}>
         <div className="section-head gf">
           <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>Side projects</span>
-          <h2 className="t-h2">Things I build <em>for myself.</em></h2>
+          <h2 className="t-display">Things I build <em>for myself.</em></h2>
         </div>
       </section>
 
@@ -1356,17 +1605,18 @@ function WorkSection({ onOpen }) {
             <div key={p.id} className="proj-panel">
               <div className="proj-panel-content gf">
                 <span className="proj-panel-meta">{p.meta}</span>
-                <h3 className="proj-panel-title">{p.title}</h3>
+                <h3 className="proj-panel-title">
+                  {p.keyword && <><em>{p.keyword}</em>{' '}</>}{p.title}
+                </h3>
                 <p className="proj-panel-desc">{p.desc}</p>
                 <div className="tags-row" style={{ marginTop: 0 }}>
                   {(p.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
                 </div>
-                <div style={{ marginTop: 24 }}>
+                <div style={{ marginTop: 28 }}>
                   <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    className="btn-cta-dark"
                     onClick={() => onOpen && onOpen(p)}>
-                    {p.cta || 'Read case study'} <ArrowRight />
+                    {p.cta || 'Read story'} <ArrowRight />
                   </button>
                 </div>
               </div>
@@ -1378,16 +1628,7 @@ function WorkSection({ onOpen }) {
         <div className="proj-right">
           {SIDE_PROJECTS.map((p) => (
             <div key={p.id} className="proj-img-wrap">
-              <div className="proj-visual" style={{ background: p.bg, color: p.fg }}>
-                {p.cover ? (
-                  <img className="proj-visual-cover" src={p.cover} alt={p.name} />
-                ) : (
-                  <>
-                    <span className="proj-visual-mark">{p.mark}</span>
-                    <span className="proj-visual-name">{p.name}</span>
-                  </>
-                )}
-              </div>
+              <ProjImage project={p} />
             </div>
           ))}
         </div>
