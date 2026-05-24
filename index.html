@@ -111,12 +111,14 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ── Nav (floating-pill design — pebblelife-inspired) ─────────────────────── */
 .nav {
-  position: fixed; top: 16px; left: 0; right: 0;
+  position: fixed; top: 3rem; left: 0; right: 0;
   z-index: 50;
   display: flex; align-items: stretch; justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 3.5rem;
   pointer-events: none;
+  transition: top 0.35s ease, padding 0.35s ease;
 }
+.nav.is-scrolled { top: 16px; padding: 0 24px; }
 .nav > * { pointer-events: auto; }
 
 .nav-pill {
@@ -277,33 +279,47 @@ button { font-family: inherit; cursor: pointer; }
 }
 .hero-img-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-/* Tab selector — absolute, centred at the row boundary (50% of hero height) */
+/* Tab selector — inside .hero-img, bottom-centre with 1.5rem padding */
 .hero-tabs {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
   display: flex; align-items: center; gap: 4px;
-  background: var(--color-white); border-radius: var(--radius-pill);
+  background: rgba(255,255,255,0.6);
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+  border-radius: var(--radius-pill);
   padding: 6px; width: fit-content;
   box-shadow:
     0 194px 54px 0 rgba(0,0,0,.00), 0 124px 50px 0 rgba(0,0,0,.01),
     0  70px 42px 0 rgba(0,0,0,.05), 0  31px 31px 0 rgba(0,0,0,.09),
     0   8px 17px 0 rgba(0,0,0,.10);
 }
+/* Sliding pill indicator — animated via GSAP on tab change */
+.hero-tab-pill {
+  position: absolute; top: 6px; bottom: 6px;
+  left: 0; width: 0;                     /* JS sets these on mount */
+  background: var(--color-dark);
+  border-radius: var(--radius-pill);
+  pointer-events: none; z-index: 0;
+  will-change: transform, width;
+}
 .hero-tab-btn {
+  position: relative; z-index: 1;
   padding: 10px 22px; border-radius: var(--radius-pill); border: none;
   background: transparent; font: 500 14px var(--font-sans);
   color: var(--color-mid); cursor: pointer; white-space: nowrap;
-  transition: background var(--t-base), color var(--t-base);
+  transition: color var(--t-base), background-color var(--t-base);
 }
-.hero-tab-btn.active { background: var(--color-dark); color: var(--color-white); }
+.hero-tab-btn:not(.active):hover { background-color: rgba(15,26,16,0.1); }
+.hero-tab-btn.active { color: var(--color-white); }
 
-/* Content row — centred within its row, respects max-width */
+/* Content row — centred within its row, with reduced side padding */
 .hero-body {
-  display: grid; grid-template-columns: 8fr 4fr;
+  display: grid; grid-template-columns: 7fr 5fr;
   gap: clamp(40px,6vw,88px); align-items: center;
-  max-width: var(--max-w); width: 100%;
-  margin: 0 auto; padding: 0 var(--pad);
+  max-width: 1440px; width: 100%;
+  margin: 0 auto; padding: 0 40px;
   align-self: center;
 }
 .hero-lead { padding-top: 4px; }
@@ -316,7 +332,7 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 768px) {
   .hero { height: auto; grid-template-rows: auto auto; }
   .hero-img { margin: 80px 16px 0; }
-  .hero-tabs { position: static; transform: none; margin: 20px auto; }
+  .hero-tabs { bottom: 1rem; }
   .hero-body { grid-template-columns: 1fr; gap: 24px; padding: 24px; }
 }
 
@@ -826,6 +842,7 @@ const NAV_ITEMS = [
 
 function Nav({ active, onNavigate, onCta }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navRef     = useRef(null);
   const wrapRef    = useRef(null);
   const itemsRef   = useRef(null);
@@ -836,6 +853,14 @@ function Nav({ active, onNavigate, onCta }) {
       gsap.from(navRef.current, { autoAlpha: 0, y: -8, duration: 0.5, delay: 0.8, ease: 'power2.out' });
     });
     return () => ctx.revert();
+  }, []);
+
+  /* Collapse nav padding once user scrolls past ~24px */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   /* Animate the items wrap width + burger fade in lock-step with menuOpen.
@@ -897,7 +922,7 @@ function Nav({ active, onNavigate, onCta }) {
   };
 
   return ReactDOM.createPortal(
-    <nav ref={navRef} className="nav" aria-label="Primary">
+    <nav ref={navRef} className={`nav${scrolled ? ' is-scrolled' : ''}`} aria-label="Primary">
       {/* Left pill: isologo + name + status dot */}
       <a className="nav-pill nav-logo" href="#top"
          onClick={e => { e.preventDefault(); scrollToId('top'); }}>
@@ -1244,26 +1269,60 @@ function runBlindsTransition(container, tab, onSwap) {
   const allRects = blindPairs.flatMap(b => [b.left, b.right]);
   const cleanup  = () => svg.parentNode && svg.parentNode.removeChild(svg);
 
+  /* On complete: swap state FIRST, wait two frames for React to commit the
+     new <img src> underneath, THEN remove the SVG overlay. This prevents a
+     1-frame flash of the OLD image when the overlay is removed too early. */
+  const onFinish = () => {
+    onSwap();
+    requestAnimationFrame(() => requestAnimationFrame(cleanup));
+  };
+
   gsap.to(allRects, {
     attr: {
       x:     (i) => { const b = blindPairs[Math.floor(i / 2)]; return i % 2 === 0 ? b.centerX - b.halfW : b.centerX; },
       width: (i) => { const b = blindPairs[Math.floor(i / 2)]; return b.halfW + 0.05; },
     },
     ease: 'power2.inOut',
-    duration: 0.45,
-    stagger: { each: 0.018, from: 'start' },
-    onComplete:  () => { cleanup(); onSwap(); },
+    duration: 0.4,
+    stagger: { each: 0.010, from: 'start' },
+    onComplete:  onFinish,
     onInterrupt: () => { cleanup(); onSwap(); },
   });
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 function Hero({ onPrimary, onGhost }) {
-  const [activeTab,  setActiveTab]  = useState(HERO_DEFAULT);
-  const [displayTab, setDisplayTab] = useState(HERO_DEFAULT);
+  const [activeTab,  setActiveTab]  = useState(HERO_DEFAULT);  /* pill        */
+  const [textTab,    setTextTab]    = useState(HERO_DEFAULT);  /* text content */
+  const [imgTab,     setImgTab]     = useState(HERO_DEFAULT);  /* <img src>    */
   const sectionRef  = useRef(null);
   const imgRef      = useRef(null);
+  const tabsRef     = useRef(null);
+  const pillRef     = useRef(null);
+  const btnRefs     = useRef([]);
   const isAnimating = useRef(false);
+
+  /* Move pill to the active button. instant=true on first paint (no tween).  */
+  const movePill = (idx, instant = false) => {
+    const btn  = btnRefs.current[idx];
+    const pill = pillRef.current;
+    if (!btn || !pill) return;
+    const x = btn.offsetLeft;
+    const w = btn.offsetWidth;
+    if (instant) gsap.set(pill, { x, width: w });
+    else         gsap.to (pill, { x, width: w, duration: 0.45, ease: 'power3.out' });
+  };
+
+  /* Position pill on mount + on resize */
+  useLayoutEffect(() => {
+    movePill(activeTab, true);
+    const onResize = () => movePill(activeTab, true);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  /* Slide pill whenever activeTab changes */
+  useEffect(() => { movePill(activeTab); }, [activeTab]);
 
   /* ── Initial entrance ── */
   useLayoutEffect(() => {
@@ -1289,33 +1348,41 @@ function Hero({ onPrimary, onGhost }) {
     return () => ctx.revert();
   }, []);
 
-  /* ── Tab switch ── */
+  /* ── Tab switch ── Choreographed so text-in overlaps with blinds sweep,
+     making the whole transition feel like one event (~1.4s total).         */
   const handleTab = (idx) => {
     if (idx === activeTab || isAnimating.current) return;
     isAnimating.current = true;
-    setActiveTab(idx);
+    setActiveTab(idx);                            /* pill slides immediately */
 
     const allWis = gsap.utils.toArray('.hero-wi, .lead-wi', sectionRef.current);
 
-    /* Text exits simultaneously with strips starting */
-    gsap.to(allWis, { y: '110%', duration: 0.32, stagger: 0.018, ease: 'power2.in' });
-
-    runBlindsTransition(imgRef.current, HERO_TABS[idx], () => {
-      setDisplayTab(idx);
-      /* Wait one double-RAF for React to flush the new words into the DOM */
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        const newHero = gsap.utils.toArray('.hero-wi', sectionRef.current);
-        const newLead = gsap.utils.toArray('.lead-wi', sectionRef.current);
-        gsap.set([...newHero, ...newLead], { y: '110%' });
-        gsap.to(newHero, { y: '0%', duration: 0.75, stagger: 0.07, ease: 'power3.out' });
-        gsap.to(newLead, { y: '0%', duration: 0.55, stagger: 0.03, ease: 'power3.out', delay: 0.22,
-          onComplete: () => { isAnimating.current = false; }
-        });
-      }));
+    /* (1) Text exits — snappy, ~0.3s total */
+    gsap.to(allWis, {
+      y: '110%', duration: 0.28, stagger: 0.008, ease: 'power2.in',
+      onComplete: () => {
+        /* (3) Swap TEXT only (not img — that swaps when blinds finish).  */
+        setTextTab(idx);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          const newHero = gsap.utils.toArray('.hero-wi', sectionRef.current);
+          const newLead = gsap.utils.toArray('.lead-wi', sectionRef.current);
+          gsap.set([...newHero, ...newLead], { y: '110%' });
+          gsap.to(newHero, { y: '0%', duration: 0.6, stagger: 0.045, ease: 'power3.out' });
+          gsap.to(newLead, { y: '0%', duration: 0.45, stagger: 0.018, ease: 'power3.out',
+            delay: 0.1,
+            onComplete: () => { isAnimating.current = false; }
+          });
+        }));
+      },
     });
+
+    /* (2) Blinds in parallel. The underlying <img> only swaps when blinds
+       complete — keeps the SVG reveal visually meaningful all the way    */
+    runBlindsTransition(imgRef.current, HERO_TABS[idx], () => setImgTab(idx));
   };
 
-  const tab = HERO_TABS[displayTab];
+  const tab    = HERO_TABS[textTab];   /* drives text, meta, CTA */
+  const imgRow = HERO_TABS[imgTab];    /* drives <img> + bg colour */
 
   const handleCta = () => {
     if (tab.ctaAction === 'resume') { /* user can wire download link here */ }
@@ -1325,20 +1392,21 @@ function Hero({ onPrimary, onGhost }) {
   return (
     <section id="top" ref={sectionRef} className="hero">
 
-      {/* ── Hero image (row 1) ─────────────────────────────────────────────── */}
-      <div ref={imgRef} className="hero-img" style={{ '--_bg': tab.heroBg }}>
-        {tab.image && <img className="hero-img-media" src={tab.image} alt={tab.id} />}
-      </div>
+      {/* ── Hero image (row 1) + tab selector inside ──────────────────────── */}
+      <div ref={imgRef} className="hero-img" style={{ '--_bg': imgRow.heroBg }}>
+        {imgRow.image && <img className="hero-img-media" src={imgRow.image} alt={imgRow.id} />}
 
-      {/* ── Tab selector — absolute, centred at row boundary ──────────────── */}
-      <div data-hi="tabs" className="hero-tabs">
-        {HERO_TABS.map((t, i) => (
-          <button key={t.id}
-            className={`hero-tab-btn${activeTab === i ? ' active' : ''}`}
-            onClick={() => handleTab(i)}>
-            {t.label}
-          </button>
-        ))}
+        <div ref={tabsRef} data-hi="tabs" className="hero-tabs">
+          <span ref={pillRef} className="hero-tab-pill" />
+          {HERO_TABS.map((t, i) => (
+            <button key={t.id}
+              ref={el => btnRefs.current[i] = el}
+              className={`hero-tab-btn${activeTab === i ? ' active' : ''}`}
+              onClick={() => handleTab(i)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── Content (row 2): left col = meta + title / right col = lead + CTA  */}
@@ -1486,17 +1554,20 @@ const SIDE_PROJECTS = [
     meta: 'Side project',
     desc: 'A fresh approach to an unsexy category — making it easier for professionals to find, compare, and order construction materials online.',
     bg: '#FCEFD6', fg: '#0F1A10',
-    cover: 'assets/caratulas/Central-depot-cover.gif',
+    cover: 'assets/caratulas/Central-depot-cover.mp4',
     cta: 'Read story',
     tags: ['E-commerce', 'B2B'],
   },
 ];
 
 function ProjImage({ project }) {
+  const isVideo = project.cover && /\.(mp4|webm|ogg)$/i.test(project.cover);
   return (
     <div className="proj-visual" style={{ background: project.bg, color: project.fg }}>
       {project.cover ? (
-        <img className="proj-visual-cover" src={project.cover} alt={project.name} />
+        isVideo
+          ? <video className="proj-visual-cover" src={project.cover} autoPlay loop muted playsInline />
+          : <img   className="proj-visual-cover" src={project.cover} alt={project.name} />
       ) : (
         <>
           <span className="proj-visual-mark">{project.mark}</span>
