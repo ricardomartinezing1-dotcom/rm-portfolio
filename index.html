@@ -93,6 +93,21 @@ button { font-family: inherit; cursor: pointer; }
 }
 .btn-sm { padding: 10px 20px; font-size: 14px; }
 .btn-primary { background: var(--color-lima); color: var(--color-dark); }
+.btn-dark    { background: var(--color-dark); color: var(--color-white); transition: opacity var(--t-base); }
+.btn-dark:hover { opacity: 0.85; }
+
+/* ── Custom cursor dot ───────────────────────────────────────────────────── */
+.cursor-dot {
+  position: fixed; top: 0; left: 0;
+  width: 8px; height: 8px;
+  margin: -4px 0 0 -4px;          /* centre on cursor position */
+  border-radius: 999px;
+  background: var(--color-lima);
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+@media (pointer: coarse) { .cursor-dot { display: none; } }
 .btn-ghost { background: transparent; color: var(--color-dark); border: 1.5px solid var(--color-dark); padding: 12.5px 26.5px; transition: background var(--t-base), color var(--t-base); }
 .btn-ghost.btn-sm { padding: 8.5px 18.5px; }
 .btn-ghost:hover { background: var(--color-dark); color: var(--color-white); }
@@ -277,7 +292,7 @@ button { font-family: inherit; cursor: pointer; }
   position: relative;
   background-color: var(--_bg, #BFA98D);
 }
-.hero-img-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-img-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center; }
 
 /* Tab selector — inside .hero-img, bottom-centre with 1.5rem padding */
 .hero-tabs {
@@ -531,13 +546,13 @@ button { font-family: inherit; cursor: pointer; }
 .quote-role { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--color-gray); margin-top: 2px; }
 
 /* ── Pinned split-screen (Selected work) ─────────────────────────────────── */
-/* 6-col text / 5-col image grid */
-.proj-arch { display: grid; grid-template-columns: 6fr 5fr; position: relative; width: 100%; }
+/* 5fr content / 1fr gap / 6fr image. Image frame is full-height and touches
+   the right edge of the viewport.                                          */
+.proj-arch { display: grid; grid-template-columns: 5fr 1fr 6fr; position: relative; width: 100%; }
 
-.proj-left { padding: 0 48px 0 var(--pad); }
+.proj-left  { grid-column: 1; padding: 0 0 0 var(--pad); }
 @media (max-width: 1024px) and (min-width: 769px) {
-  .proj-left { padding: 0 24px 0 40px; }
-  .proj-img-wrap { right: 40px !important; }
+  .proj-left { padding: 0 0 0 40px; }
 }
 .proj-panel { height: 150vh; display: flex; align-items: center; }
 .proj-panel-content { max-width: 480px; }
@@ -561,9 +576,23 @@ button { font-family: inherit; cursor: pointer; }
 .btn-cta-dark:hover { opacity: 0.8; }
 .proj-panel-desc { font: 400 16px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0 0 24px; }
 
-.proj-right { height: 100vh; position: relative; align-self: start; }
-/* Image: 4/6 of viewport height, vertically centred within the sticky panel */
-.proj-img-wrap { position: absolute; left: 0; right: var(--pad); height: 67vh; top: 50%; transform: translateY(-50%); border-radius: var(--radius-xl); overflow: hidden; }
+.proj-right { grid-column: 3; height: 100vh; position: relative; align-self: start; }
+/* Image: fills the right column edge-to-edge, full viewport height */
+/* Default (pre/post pin): 95vh frame centred vertically, right margin +
+   rounded corners. Pinned state collapses to full-bleed.                  */
+.proj-img-wrap {
+  position: absolute;
+  top: 2.5vh; bottom: 2.5vh; left: 0; right: 24px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: top .45s ease, bottom .45s ease, right .45s ease, border-radius .45s ease;
+}
+.proj-right.is-pinned .proj-img-wrap {
+  top: 0; bottom: 0; right: 0;
+  border-radius: 0;
+}
+.proj-blinds-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.proj-blinds-svg foreignObject { overflow: hidden; }
 .proj-visual { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; position: relative; }
 .proj-visual-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background-repeat: no-repeat; display: block; }
 .proj-visual-mark { font: 700 clamp(80px,10vw,160px) var(--font-sans); letter-spacing: -0.04em; opacity: 0.18; line-height: 1; }
@@ -641,29 +670,27 @@ button { font-family: inherit; cursor: pointer; }
 }
 .side-card:hover .side-card-cover { transform: scale(1.06); }
 
-/* Custom lime cursor for the shipped-recently cards. mix-blend-mode:difference
-   makes the colour invert against any backdrop (light or dark image regions),
-   so it's always legible. JS controls position + scale; CSS only paints. */
+/* Custom cursor pill for the shipped-recently cards. Dark glass over a
+   backdrop-blur. JS controls position + scale; CSS only paints.            */
 .side-card { cursor: none; }
 .side-card * { cursor: none; }
 .card-cursor {
   position: fixed; top: 0; left: 0;
   padding: 0.5rem 1rem;
   border-radius: 999px;
-  /* mix-blend-mode:difference math —
-     white pill → inverts to “negative of backdrop” → cápsula siempre visible
-     black text → no se altera con difference → muestra el color real del fondo
-     Together: pill is always readable AND adaptive to the underlying image. */
-  background: #fff;
-  color: #000;
-  font: 400 16px var(--font-sans);
+  background: rgba(15, 26, 16, 0.6);     /* --color-dark @ 60% */
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  color: var(--color-white);
   line-height: 1.5;
   white-space: nowrap;
   pointer-events: none;
   z-index: 9999;
-  mix-blend-mode: difference;
   will-change: transform;
+  display: inline-flex; align-items: baseline; gap: 6px;
 }
+.card-cursor .cc-read { font: 600 16px var(--font-sans); }
+.card-cursor .cc-cs   { font: 300 16px var(--font-serif); font-style: italic; }
 @media (max-width: 768px), (pointer: coarse) {
   .card-cursor { display: none; }
   .side-card, .side-card * { cursor: pointer; }
@@ -1134,7 +1161,7 @@ const HERO_DEFAULT = 1; // "For everyone"
 const HERO_TABS = [
   {
     id: 'developers', label: 'Developers',
-    heroBg: '#1C2B3A', image: 'assets/hero/code.jpg',
+    heroBg: '#1C2B3A', image: 'assets/hero/developers.png',
     titleWords: ['Design', 'that', { em: 'speaks' }, 'your', 'language'],
     bodyWords:  ['I', 'think', 'in', 'components,', 'write', 'in', 'tokens,', 'and',
                  'hand', 'off', 'specs', 'that', 'map', 'directly', 'to', 'your',
@@ -1143,7 +1170,7 @@ const HERO_TABS = [
   },
   {
     id: 'everyone', label: 'For everyone',
-    heroBg: '#BFA98D', image: 'assets/hero/everyone.png',
+    heroBg: '#BFA98D', image: 'assets/hero/everyone-2.jpg',
     titleWords: ['Designing', 'products', { em: 'people' }, 'understand'],
     bodyWords:  ["I'm", 'a', 'senior', 'product', 'designer', 'with', '6+', 'years',
                  'on', 'complex', 'B2B', 'tools.', 'Currently', 'at',
@@ -1153,7 +1180,7 @@ const HERO_TABS = [
   },
   {
     id: 'recruiters', label: 'Recruiters',
-    heroBg: '#B8C5CE', image: 'assets/hero/recruiters.jpg',
+    heroBg: '#B8C5CE', image: 'assets/hero/Recruiters-1.jpg',
     titleWords: ['6', 'years', { em: 'shipping' }, 'real', 'products'],
     bodyWords:  ['Senior', 'product', 'designer,', 'available', 'in', '2026.', 'Led',
                  'design', 'at', 'B2B', 'SaaS', 'startups,', 'built', 'systems',
@@ -1253,21 +1280,39 @@ function runBlindsTransition(container, tab, onSwap) {
   bgRect.setAttribute('mask', `url(#${maskId})`);
   svg.appendChild(bgRect);
 
+  /* Mirror the parallax transform of the underlying <img> so there's no
+     "snap" when the SVG overlay is removed. Read yPercent via GSAP and
+     apply via GSAP — that way SVG user-unit math is handled correctly.   */
+  const media = container.querySelector('.hero-img-media');
+  let imgEl   = null;
+  let syncTransform = null;
   if (tab.image) {
-    const imgEl = document.createElementNS(svgNS, 'image');
+    imgEl = document.createElementNS(svgNS, 'image');
     imgEl.setAttribute('href', tab.image);
     imgEl.setAttribute('x', '0'); imgEl.setAttribute('y', '0');
     imgEl.setAttribute('width', String(vbW)); imgEl.setAttribute('height', String(vbH));
     imgEl.setAttribute('preserveAspectRatio', 'xMidYMid slice');
     imgEl.setAttribute('mask', `url(#${maskId})`);
     svg.appendChild(imgEl);
+
+    if (media) {
+      syncTransform = () => {
+        const yp = gsap.getProperty(media, 'yPercent');
+        gsap.set(imgEl, { scale: 1.35, yPercent: yp, transformOrigin: 'center center' });
+      };
+      syncTransform();
+      gsap.ticker.add(syncTransform);
+    }
   }
 
   container.appendChild(svg);
 
   /* ── GSAP: open each blind (centre → edges) left-to-right ──────────────── */
   const allRects = blindPairs.flatMap(b => [b.left, b.right]);
-  const cleanup  = () => svg.parentNode && svg.parentNode.removeChild(svg);
+  const cleanup  = () => {
+    if (syncTransform) gsap.ticker.remove(syncTransform);
+    if (svg.parentNode) svg.parentNode.removeChild(svg);
+  };
 
   /* On complete: swap state FIRST, wait two frames for React to commit the
      new <img src> underneath, THEN remove the SVG overlay. This prevents a
@@ -1323,6 +1368,28 @@ function Hero({ onPrimary, onGhost }) {
 
   /* Slide pill whenever activeTab changes */
   useEffect(() => { movePill(activeTab); }, [activeTab]);
+
+  /* ── Parallax on hero image ─────────────────────────────────────────────
+     Inner <img> is scaled up so there's room to translate vertically with
+     scroll without exposing the frame edges. Tied to ScrollTrigger scrub.  */
+  useLayoutEffect(() => {
+    const media = imgRef.current && imgRef.current.querySelector('.hero-img-media');
+    if (!media) return;
+    gsap.set(media, { scale: 1.35, transformOrigin: 'center center' });
+    const tween = gsap.fromTo(media,
+      { yPercent: 0 },
+      {
+        yPercent: 18, ease: 'none',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top top',
+          end:   'bottom top',
+          scrub: 0.6,
+        },
+      }
+    );
+    return () => { tween.scrollTrigger && tween.scrollTrigger.kill(); tween.kill(); };
+  }, []);
 
   /* ── Initial entrance ── */
   useLayoutEffect(() => {
@@ -1426,7 +1493,7 @@ function Hero({ onPrimary, onGhost }) {
           <p style={{ font: '400 16px var(--font-sans)', lineHeight: 1.65, color: 'var(--color-mid)', margin: '0 0 28px' }}>
             <HeroWords words={tab.bodyWords} cls="lead-wi" />
           </p>
-          <button className="btn btn-primary" onClick={handleCta}>{tab.cta}</button>
+          <button className="btn btn-dark" onClick={handleCta}>{tab.cta}</button>
         </div>
       </div>
 
@@ -1503,14 +1570,14 @@ function ProjectCard({ project, onClick }) {
 /* ── Work section ────────────────────────────────────────────────────────── */
 const SELECTED_PROJECTS = [
   {
-    id: 'vernum', name: 'Vernum', mark: 'Vn',
-    title: 'Designing a fintech product from zero to one',
-    meta: 'Product Design Lead · 2025',
-    desc: 'Full product design ownership — from early discovery and IA to a complete design system and shipped product.',
+    id: 'homecheck', name: 'HomeCheck', mark: 'Hc',
+    title: 'A partial home inspection report that helps buyers decide',
+    meta: 'Product Design Lead · 2026',
+    desc: 'A B2C product that adds value during the property appraisal process — surfacing the condition of the home so buyers can make better decisions.',
     bg: '#1C1C2E', fg: '#B8F300',
-    cover: 'assets/caratulas/caratula-vernum.png',
-    tags: ['Fintech', 'Design System', 'Zero to One'],
-    details: 'Led the full design process: user research, information architecture, component library, and iterative delivery with the engineering team.',
+    cover: 'assets/caratulas/Caratula-homecheck-1.jpg',
+    tags: ['B2C', 'PropTech', 'Real Estate'],
+    details: 'A partial inspection report designed to give homebuyers clarity during the appraisal stage — turning an opaque, professional-only step into something actionable for end users.',
   },
   {
     id: 'vega', name: 'Vega Research', mark: 'V',
@@ -1518,7 +1585,7 @@ const SELECTED_PROJECTS = [
     meta: 'Product Design Lead · 2024',
     desc: 'Three-phase migration driven by deep user research. Phase one — migration, restyling, minor updates — shipped. Phase two in progress.',
     bg: '#2D6A4F', fg: '#F5F5F0',
-    cover: 'assets/caratulas/cover-vega.png',
+    cover: 'assets/caratulas/caratula-vega.jpg',
     tags: ['Research', 'Migration', 'Design System'],
     details: 'We launched the project with research to identify needs, constraints, and usability improvements. A three-phase plan was set: phase one (migration, restyling, minor updates) is complete, and we\'re preparing for phase two.',
   },
@@ -1528,7 +1595,7 @@ const SELECTED_PROJECTS = [
     meta: 'Product Designer · 2022',
     desc: 'End-to-end redesign of Radar by Tinsa — Spain\'s leading property valuation company with 30+ years of experience. +720 valuations/day across +20 countries.',
     bg: '#0F1A10', fg: '#B8F300',
-    cover: 'assets/caratulas/cover-radar.png',
+    cover: 'assets/caratulas/caratula-radar-1.jpg',
     tags: ['Real Estate', 'Data Viz', 'Redesign'],
     details: 'Radar faced rapid-development debt: bulky IA, excessive data in sections, unclear infographics, and repeated layout problems. I led a systematic redesign restructuring information into Supply, Demand, and Market Indicators — making a complex tool feel calm and fast.',
     metrics: ['+720 valuations/day', '+20 countries'],
@@ -1543,7 +1610,7 @@ const SIDE_PROJECTS = [
     meta: 'Side project',
     desc: 'Exploring how narrative structure and visual design combine to create presentations that communicate with impact.',
     bg: '#E2ECDF', fg: '#0F1A10',
-    cover: 'assets/caratulas/cover-comunicacion-efectiva.png',
+    cover: 'assets/caratulas/cover-comunicacion-efectiva.mp4',
     cta: 'Read story',
     tags: ['Presentations', 'Narrative Design'],
   },
@@ -1554,7 +1621,7 @@ const SIDE_PROJECTS = [
     meta: 'Side project',
     desc: 'A fresh approach to an unsexy category — making it easier for professionals to find, compare, and order construction materials online.',
     bg: '#FCEFD6', fg: '#0F1A10',
-    cover: 'assets/caratulas/Central-depot-cover.mp4',
+    cover: 'assets/caratulas/central-depot-cover-1.mp4',
     cta: 'Read story',
     tags: ['E-commerce', 'B2B'],
   },
@@ -1588,13 +1655,53 @@ function WorkSection({ onOpen }) {
         const right    = archRef.current.querySelector('.proj-right');
         const imgWraps = gsap.utils.toArray('.proj-img-wrap', archRef.current);
 
-        /* Stack: first image has highest z-index (sits on top) */
+        /* Stack: LATER wraps sit ON TOP. As you scroll forward, the next
+           layer's blinds open and cover the previous one.                */
         imgWraps.forEach((wrap, i) => {
-          gsap.set(wrap, { zIndex: imgWraps.length - i });
+          gsap.set(wrap, { zIndex: i + 1 });
         });
 
-        /* Initialise all clip-paths so GSAP can interpolate from them */
-        gsap.set(imgWraps, { clipPath: 'inset(0 0 0% 0 round 32px)' });
+        /* Build horizontal-blinds rects for each wrap (30 strips × 2 rects).
+           First wrap starts fully open (image visible); others start closed
+           (height=0 at strip centre — mask black → foreignObject transparent
+           → layer below shows through).                                   */
+        const SVG_NS     = 'http://www.w3.org/2000/svg';
+        const BLIND_N    = 30;
+        const VB         = 100;
+        const STRIP_H    = VB / BLIND_N;
+        const HALF_H     = STRIP_H / 2;
+
+        const blindSets = imgWraps.map((wrap) => {
+          const g = wrap.querySelector('.blinds-g');
+          g.innerHTML = '';
+          const arr = [];
+          for (let k = 0; k < BLIND_N; k++) {
+            const centerY = (k + 0.5) * STRIP_H;
+            const top = document.createElementNS(SVG_NS, 'rect');
+            const bot = document.createElementNS(SVG_NS, 'rect');
+            [top, bot].forEach((r) => {
+              r.setAttribute('x', '0');
+              r.setAttribute('width', String(VB));
+              r.setAttribute('height', '0');
+              r.setAttribute('fill', 'white');
+              r.setAttribute('shape-rendering', 'crispEdges');
+              r.setAttribute('y', String(centerY));
+            });
+            g.appendChild(top);
+            g.appendChild(bot);
+            arr.push({ top, bot, y: centerY, h: HALF_H });
+          }
+          return arr;
+        });
+
+        /* First wrap: open immediately so the first project is fully visible. */
+        const openBlind = (b) => {
+          b.top.setAttribute('y',      String(b.y - b.h));
+          b.top.setAttribute('height', String(b.h + 0.01));
+          b.bot.setAttribute('y',      String(b.y));
+          b.bot.setAttribute('height', String(b.h + 0.01));
+        };
+        blindSets[0].forEach(openBlind);
 
         /* Manual ticker-based pin — reads the smooth scroll's own currentY so the
            right column transform always cancels the parent lerp exactly.
@@ -1625,23 +1732,42 @@ function WorkSection({ onOpen }) {
         };
         gsap.ticker.add(tick);
 
-        /* Clip per-panel triggers */
-        const panels = gsap.utils.toArray('.proj-panel', archRef.current);
-        imgWraps.slice(0, -1).forEach((wrap, i) => {
-          gsap.fromTo(wrap,
-            { clipPath: 'inset(0 0 0% 0 round 32px)' },
-            {
-              clipPath: 'inset(0 0 100% 0 round 32px)',
-              ease: 'none',
-              scrollTrigger: {
-                trigger: panels[i + 1],
-                start:   'top bottom',
-                end:     'top top',
-                scrub:   1,
-              },
-            }
-          );
+        /* Toggle .is-pinned on .proj-right while the section is locked in
+           place. Out of this range the frame relaxes to 95vh + margin +
+           rounded corners (CSS transition handles the morph).             */
+        const pinST = ScrollTrigger.create({
+          trigger: archRef.current,
+          start:   'top top',
+          end:     'bottom bottom',
+          onEnter:      () => right.classList.add('is-pinned'),
+          onLeave:      () => right.classList.remove('is-pinned'),
+          onEnterBack:  () => right.classList.add('is-pinned'),
+          onLeaveBack:  () => right.classList.remove('is-pinned'),
         });
+
+        /* Per-panel trigger: as the user scrolls from "next panel top
+           reaches bottom of viewport" → "next panel top reaches top of
+           viewport", that wrap's blinds open progressively, covering the
+           previous layer. Stagger spreads the open across the scroll.    */
+        const panels = gsap.utils.toArray('.proj-panel', archRef.current);
+        for (let i = 1; i < imgWraps.length; i++) {
+          const blinds = blindSets[i];
+          const rects  = blinds.flatMap(b => [b.top, b.bot]);
+          gsap.to(rects, {
+            attr: {
+              y:      (idx) => { const b = blinds[Math.floor(idx / 2)]; return idx % 2 === 0 ? b.y - b.h : b.y; },
+              height: (idx) => { const b = blinds[Math.floor(idx / 2)]; return b.h + 0.01; },
+            },
+            ease: 'none',
+            stagger: { each: 0.02, from: 'end' },
+            scrollTrigger: {
+              trigger: panels[i],
+              start:   'top bottom',
+              end:     'top top',
+              scrub:   1,
+            },
+          });
+        }
 
 
         if (window._syncBodyHeight) window._syncBodyHeight();
@@ -1695,11 +1821,23 @@ function WorkSection({ onOpen }) {
           ))}
         </div>
 
-        {/* Right: stacked visuals, pinned by ScrollTrigger */}
+        {/* Right: stacked visuals, pinned by ScrollTrigger. Each layer's
+            image is wrapped in an SVG with a horizontal-blinds mask. JS
+            populates the rects + animates them on scroll.                 */}
         <div className="proj-right">
-          {SIDE_PROJECTS.map((p) => (
-            <div key={p.id} className="proj-img-wrap">
-              <ProjImage project={p} />
+          {SIDE_PROJECTS.map((p, i) => (
+            <div key={p.id} className="proj-img-wrap" data-i={i}>
+              <svg className="proj-blinds-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  <mask id={`pb-${p.id}`}>
+                    <rect x="0" y="0" width="100" height="100" fill="black" />
+                    <g className="blinds-g" />
+                  </mask>
+                </defs>
+                <foreignObject x="0" y="0" width="100" height="100" mask={`url(#pb-${p.id})`}>
+                  <ProjImage project={p} />
+                </foreignObject>
+              </svg>
             </div>
           ))}
         </div>
@@ -1880,7 +2018,10 @@ function SideShowcaseSection() {
       {/* Custom hover cursor — portalled to body to escape #smooth-content's
           transform so position:fixed stays viewport-locked */}
       {ReactDOM.createPortal(
-        <div ref={cursorRef} className="card-cursor" aria-hidden="true">Read case study</div>,
+        <div ref={cursorRef} className="card-cursor" aria-hidden="true">
+          <span className="cc-read">Read</span>
+          <span className="cc-cs">case study</span>
+        </div>,
         document.body
       )}
 
@@ -1918,9 +2059,10 @@ function SideShowcaseSection() {
 
 /* ── About section (forest-green block, photo + quote + principles) ──────── */
 const PRINCIPLES = [
-  { idx: '01', word: 'Holistic',    sub: 'People-first thinking'    },
+  { idx: '01', word: 'Holistic',    sub: 'People-first thinking'        },
   { idx: '02', word: 'Useful',      sub: 'Problem-led, not feature-led' },
-  { idx: '03', word: 'Sustainable', sub: 'Consistent, long-lasting' },
+  { idx: '03', word: 'Sustainable', sub: 'Designed to adapt'            },
+  { idx: '04', word: 'Scalable',    sub: 'Built to grow'                },
 ];
 
 function AboutSection() {
@@ -2314,6 +2456,41 @@ function Modal({ project, onClose }) {
 }
 
 /* ── App ─────────────────────────────────────────────────────────────────── */
+/* ── Cursor dot — 8px lima dot that lags slightly behind the pointer ─── */
+function CursorDot() {
+  const dotRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const dot = dotRef.current;
+    if (!dot) return;
+    /* Skip on touch devices (no pointer to follow) */
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    const xTo = gsap.quickTo(dot, 'x', { duration: 0.35, ease: 'power3' });
+    const yTo = gsap.quickTo(dot, 'y', { duration: 0.35, ease: 'power3' });
+
+    const onMove = (e) => { xTo(e.clientX); yTo(e.clientY); };
+    const onLeave = () => gsap.to(dot, { autoAlpha: 0, duration: 0.2 });
+    const onEnter = () => gsap.to(dot, { autoAlpha: 1, duration: 0.2 });
+
+    window.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseleave', onLeave);
+    document.addEventListener('mouseenter', onEnter);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseleave', onLeave);
+      document.removeEventListener('mouseenter', onEnter);
+    };
+  }, []);
+
+  /* Portalled to <body> so it escapes #smooth-content's transform context —
+     otherwise position:fixed would be scoped to the scrolled wrapper.     */
+  return ReactDOM.createPortal(
+    <div ref={dotRef} className="cursor-dot" aria-hidden="true" />,
+    document.body
+  );
+}
+
 function App() {
   const [active, setActive]       = useState(null);
   const [openProject, setOpenProject] = useState(null);
@@ -2464,6 +2641,7 @@ function App() {
 
   return (
     <>
+      <CursorDot />
       <Nav active={active} onNavigate={setActive} onCta={() => scrollTo('contact')} />
       <Hero onPrimary={() => scrollTo('contact')} onGhost={() => { setActive('Work'); scrollTo('work'); }} />
       <SideShowcaseSection />
