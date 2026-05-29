@@ -195,7 +195,7 @@ button { font-family: inherit; cursor: pointer; }
   overflow: hidden;
 }
 .nav-burger span {
-  display: block; width: 18px; height: 1.6px;
+  display: block; width: 18px; height: 2px;
   background: var(--color-dark);
   border-radius: 2px;
 }
@@ -204,6 +204,32 @@ button { font-family: inherit; cursor: pointer; }
   width: 0;
   pointer-events: none;
 }
+
+/* Language toggle — twin pill chips inside the right nav pill */
+.lang-toggle {
+  display: inline-flex; align-items: center;
+  background: var(--surface-mist);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  margin: 0 4px;
+  height: 36px;
+}
+.lang-toggle-btn {
+  font: 600 12px var(--font-sans);
+  letter-spacing: .04em; text-transform: uppercase;
+  background: transparent; border: none;
+  color: var(--color-mid);
+  padding: 0 14px; height: 30px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--t-base), color var(--t-base);
+}
+.lang-toggle-btn.is-active {
+  background: var(--color-white);
+  color: var(--color-dark);
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+.lang-toggle-btn:not(.is-active):hover { color: var(--color-dark); }
 
 /* Items wrap — width is driven by GSAP for cross-browser smoothness */
 .nav-items-wrap {
@@ -340,7 +366,7 @@ button { font-family: inherit; cursor: pointer; }
 .hero-lead { padding-top: 4px; }
 
 /* Status meta (eyebrow in left col) */
-.hero-meta { font: 500 13px var(--font-sans); letter-spacing: .04em; color: var(--color-gray); display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.hero-meta { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; }
 .hero-status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--color-lima); box-shadow: 0 0 0 4px rgba(184,243,0,.25); flex-shrink: 0; }
 
 /* Mobile */
@@ -352,13 +378,17 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ── Word-mask reveal (hero h1 + lead paragraph) ─────────────────────────── */
-.wm   { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; }
-.wm-b { display: block;        overflow: hidden; line-height: inherit; }
+/* padding-bottom + matching negative margin-bottom extends the clip area
+   below the line-box so descenders (p, q, g, y…) aren't cropped, without
+   shifting surrounding layout. Bump translateY values to 140% so the
+   "hidden" state still sits fully below this enlarged clip area.         */
+.wm   { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: inherit; padding-bottom: 0.3em; margin-bottom: -0.3em; }
+.wm-b { display: block;        overflow: hidden; line-height: inherit;                       padding-bottom: 0.3em; margin-bottom: -0.3em; }
 .wi   { display: inline-block; will-change: transform; }
 
 /* ── SplitType text reveal (Values section) ──────────────────────────────── */
 .text-reveal { font-kerning: none; }
-.text-reveal .line-wrapper { overflow: hidden; line-height: inherit; }
+.text-reveal .line-wrapper { overflow: hidden; line-height: inherit; padding-bottom: 0.3em; margin-bottom: -0.3em; }
 .text-reveal .line { will-change: transform; }
 
 /* ── Section ─────────────────────────────────────────────────────────────── */
@@ -524,12 +554,43 @@ button { font-family: inherit; cursor: pointer; }
 .bg-group { margin-bottom: 64px; }
 .bg-group-title { font: 600 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); margin-bottom: 4px; }
 
-.tl-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 32px; align-items: flex-start; padding: 20px 0; border-top: 1px solid var(--color-border); cursor: pointer; }
-@media (max-width: 600px) { .tl-row { grid-template-columns: 1fr auto; } .tl-year { display: none; } }
+.tl-row {
+  position: relative;
+  display: grid; grid-template-columns: 140px 1fr auto;
+  gap: 32px; align-items: flex-start;
+  padding: 20px 24px;
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--t-base), border-top-color var(--t-base);
+}
+.tl-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px; bottom: 12px;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-lima);
+  opacity: 0;
+  transition: opacity var(--t-base);
+}
+.tl-row:hover::before,
+.tl-row.is-open::before { opacity: 1; }
+.tl-row:hover,
+.tl-row.is-open {
+  background: var(--surface-mist);
+  border-top-color: transparent;
+}
+@media (max-width: 600px) { .tl-row { grid-template-columns: 1fr auto; padding: 20px 16px; } .tl-year { display: none; } }
 .tl-year { font: 500 11px var(--font-mono); color: var(--color-gray); padding-top: 5px; }
 .tl-title { font: 600 20px var(--font-sans); color: var(--color-dark); margin: 0 0 2px; }
 .tl-org { font-family: var(--font-serif); font-weight: 300; font-style: italic; font-size: 17px; color: var(--color-forest); }
 .tl-body { font: 400 15px var(--font-sans); line-height: 1.6; color: var(--color-mid); overflow: hidden; height: 0; opacity: 0; }
+.tl-section { margin-top: 18px; }
+.tl-section:first-child { margin-top: 4px; }
+.tl-section-title { font: 600 13px var(--font-sans); color: var(--color-dark); letter-spacing: -0.005em; margin: 0 0 6px; }
+.tl-section-body { margin: 0 0 8px; }
+.tl-section-body:last-child { margin-bottom: 0; }
 .tl-toggle { width: 32px; height: 32px; border-radius: var(--radius-pill); border: 1px solid var(--color-border); background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background var(--t-base), border-color var(--t-base); }
 .tl-toggle:hover { background: var(--color-lima); border-color: var(--color-lima); }
 .tl-toggle svg { transition: transform .3s ease; }
@@ -558,7 +619,7 @@ button { font-family: inherit; cursor: pointer; }
 .proj-panel-content { max-width: 480px; }
 .proj-panel-meta { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); margin-bottom: 16px; display: block; }
 .proj-panel-title { font: 600 clamp(24px,2.8vw,38px) var(--font-sans); letter-spacing: -0.02em; line-height: 1.15; color: var(--color-dark); margin: 0 0 20px; }
-.proj-panel-title em { font-family: var(--font-serif); font-weight: 300; font-style: italic; letter-spacing: 0; font-size: 1.05em; }
+.proj-panel-title em { font-family: var(--font-serif); font-weight: 300; font-style: italic; letter-spacing: 0; font-size: 1.05em; color: var(--color-forest); }
 /* Dark pill CTA — mirrors .nav-cta shape, dark colourway */
 .btn-cta-dark {
   background: var(--color-dark);
@@ -636,9 +697,10 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 300; font-style: italic;
   letter-spacing: 0;
   font-size: 1.05em;
+  color: var(--color-forest);
   margin: 0 0.08em;
 }
-.side-mq-dot { opacity: .35; margin: 0 0.35em; }
+.side-mq-dot { color: var(--color-lima); margin: 0 0.35em; }
 /* stage + track */
 .side-stage {
   position: absolute; inset: 0;
@@ -681,7 +743,7 @@ button { font-family: inherit; cursor: pointer; }
   background: rgba(15, 26, 16, 0.6);     /* --color-dark @ 60% */
   -webkit-backdrop-filter: blur(8px);
           backdrop-filter: blur(8px);
-  color: var(--color-white);
+  color: var(--color-lima);
   line-height: 1.5;
   white-space: nowrap;
   pointer-events: none;
@@ -739,6 +801,109 @@ body { overflow-y: scroll; }
 #smooth-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; pointer-events: none; }
 #smooth-wrapper > #smooth-content { pointer-events: auto; will-change: transform; }
 
+/* ── Side project modal — 90vw / 90vh carousel viewer ───────────────────── */
+.sp-modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(45, 106, 79, .55);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 5vh 5vw;
+}
+.sp-modal-box {
+  position: relative;
+  width: 90vw; height: 90vh;
+  background: var(--surface-page);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  display: grid; grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+}
+.sp-modal-header {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 28px 32px 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+.sp-modal-header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+}
+.sp-modal-meta {
+  font: 500 11px var(--font-mono); text-transform: uppercase;
+  letter-spacing: .1em; color: var(--color-gray);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.sp-modal-dot {
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--color-lima);
+}
+.sp-modal-title { font: 700 28px var(--font-sans); letter-spacing: -0.015em; line-height: 1.2; color: var(--color-dark); margin: 0 0 10px; }
+.sp-modal-desc  { font: 400 15px var(--font-sans); line-height: 1.6; color: var(--color-mid); margin: 0; }
+.sp-modal-actions { display: inline-flex; align-items: center; gap: 12px; }
+.sp-modal-close {
+  width: 36px; height: 36px; border-radius: 999px;
+  background: transparent; border: 1px solid var(--color-border);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background var(--t-base), border-color var(--t-base);
+}
+.sp-modal-close:hover { background: var(--surface-mist); border-color: var(--color-dark); }
+.sp-modal-close svg { width: 14px; height: 14px; }
+
+.sp-modal-body {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 80px;
+  overflow: hidden;
+}
+.sp-modal-slide {
+  position: relative;
+  width: 100%; height: 100%;
+  background: var(--surface-page);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.sp-modal-slide img,
+.sp-modal-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sp-modal-slide canvas { display: block; max-width: 100%; max-height: 100%; }
+.sp-modal-empty {
+  font: 500 12px var(--font-mono); text-transform: uppercase;
+  letter-spacing: .15em; color: var(--color-gray);
+}
+.sp-modal-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 999px;
+  background: var(--color-white); border: 1px solid var(--color-border);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 2;
+  transition: background var(--t-base), border-color var(--t-base), opacity var(--t-base);
+}
+.sp-modal-nav:hover:not(:disabled) { background: var(--color-dark); border-color: var(--color-dark); color: var(--color-white); }
+.sp-modal-nav:disabled { opacity: .35; cursor: default; }
+.sp-modal-nav.prev { left: 20px; }
+.sp-modal-nav.next { right: 20px; }
+.sp-modal-nav svg { width: 16px; height: 16px; }
+
+.sp-modal-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  border-top: 1px solid var(--color-border);
+  font: 500 11px var(--font-mono); text-transform: uppercase;
+  letter-spacing: .1em; color: var(--color-gray);
+}
+.sp-modal-footer .keys { display: inline-flex; align-items: center; gap: 8px; }
+
+@media (max-width: 768px) {
+  .sp-modal-overlay { padding: 16px; }
+  .sp-modal-box { width: 100%; height: 100%; border-radius: 12px; }
+  .sp-modal-header { padding: 20px 20px 16px; }
+  .sp-modal-actions { justify-content: flex-end; }
+  .sp-modal-body { padding: 20px 16px; }
+  .sp-modal-nav { width: 36px; height: 36px; }
+  .sp-modal-nav.prev { left: 6px; }
+  .sp-modal-nav.next { right: 6px; }
+  .sp-modal-footer { padding: 12px 20px; }
+}
+
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .footer { background: var(--color-forest); }
 .footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 120px var(--pad) 64px; }
@@ -766,6 +931,15 @@ body { overflow-y: scroll; }
 <!-- GSAP — must load before React so gsap/ScrollTrigger are global -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+<!-- PDF.js (Mozilla) — renders project PDFs page-by-page inside the modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/Observer.min.js"></script>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
@@ -773,7 +947,265 @@ body { overflow-y: scroll; }
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <script type="text/babel">
-const { useState, useEffect, useLayoutEffect, useRef, useCallback } = React;
+const { useState, useEffect, useLayoutEffect, useRef, useCallback, useContext, createContext } = React;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   i18n — light-weight translation system. Use `useT()` inside any component
+   to get the `t(key)` function. Keys are dot-paths into TRANSLATIONS[lang].
+   Adding a new string: drop a leaf into both `en` and `es` blocks below.
+   ───────────────────────────────────────────────────────────────────────── */
+const TRANSLATIONS = {
+  en: {
+    nav: { work: 'Work', about: 'About', downloadResume: 'Download resume', cta: "Let's talk" },
+
+    /* Hero */
+    heroMeta: 'Ricardo Martínez · Product Designer',
+    heroTabs: { developers: 'Developers', everyone: 'For everyone', recruiters: 'Recruiters' },
+    hero: {
+      developers: {
+        titleWords: ['Design', 'that', { em: 'speaks', color: 'var(--color-forest)' }, 'your', 'language'],
+        bodyWords:  ['I', 'think', 'in', 'components,', 'write', 'in', 'tokens,', 'and',
+                     'hand', 'off', 'specs', 'that', 'map', 'directly', 'to', 'your',
+                     'stack.', 'Less', 'interpretation,', 'fewer', 'surprises.'],
+        cta: 'See how I work',
+      },
+      everyone: {
+        titleWords: ['I', 'design', 'products', { em: 'people', color: 'var(--color-forest)' }, 'understand.'],
+        bodyWords:  ['Hey', 'there,', "I'm", 'a', 'product', 'designer', 'who', 'loves',
+                     'solving', 'problems', 'and', 'creating', 'meaningful', 'products',
+                     'with', 'a', 'holistic', 'approach.'],
+        cta: 'View work',
+      },
+      recruiters: {
+        titleWords: ['6', 'years', { em: 'shipping', color: 'var(--color-forest)' }, 'real', 'products'],
+        bodyWords:  ['Senior', 'product', 'designer,', 'available', 'in', '2026.', 'Led',
+                     'design', 'at', 'B2B', 'SaaS', 'startups,', 'built', 'systems',
+                     'from', 'scratch,', 'and', 'shipped', 'products', 'used', 'daily',
+                     'by', 'thousands.'],
+        cta: 'Download resume',
+      },
+    },
+
+    /* Section: Side projects */
+    sideSectionEyebrow: 'Side projects',
+    sideSectionTitle:   'Things I build in',
+    sideSectionTitleEm: 'free time.',
+
+    /* Section: Work marquee */
+    workMarquee:   "Things I've",
+    workMarqueeEm: 'shipped',
+    workCursor:    { read: 'Read', caseStudy: 'case study' },
+
+    /* Side projects content */
+    sideProjects: {
+      storytelling: {
+        meta: 'Side project',
+        keyword: 'Crafting',
+        title: 'presentations that persuade and stick',
+        desc:  'Exploring how narrative structure and visual design combine to create presentations that communicate with impact.',
+        cta:   'Read story',
+        tags:  ['Presentations', 'Narrative Design'],
+        modalTitleKeyword: 'Talk / Workshop',
+        modalTitleRest:    'Effective communication',
+        modalDesc: "My client ran a recurring event, four hours of back-to-back presentations several times a year. I saw potential to make it more dynamic, so I organised a session and prepared a talk for around 100 people on how to communicate with clarity through slides. One of the most out-of-my-comfort-zone things I've done — and one of the most rewarding.",
+      },
+      depot: {
+        meta: 'Side project',
+        keyword: 'Innovating',
+        title: 'the sale of construction materials',
+        desc:  'A fresh approach to an unsexy category — making it easier for professionals to find, compare, and order construction materials online.',
+        cta:   'Read story',
+        tags:  ['E-commerce', 'B2B'],
+        modalTitleKeyword: '',
+        modalTitleRest:    '',
+        modalDesc: '',
+      },
+    },
+
+    /* About + quote */
+    aboutEyebrow: '§ About',
+    aboutPhotoPill: 'Madrid, ES',
+    aboutQuoteHtml: "I believe the best products are built by putting <em>people first</em> and carefully balancing user needs, business goals and technical realities to create experiences that are <em>useful, consistent and sustainable</em> over time.",
+    aboutP1: "Driven by curiosity, I ask a lot of questions to deeply understand challenges and uncover opportunities. I hold myself to high standards and thrive where I can learn and grow alongside others.",
+    aboutP2Html: "I focus on the balance between user needs, business goals and development realities — making sure the products I design are <em>consistent</em>, useful and sustainable over time.",
+    aboutP3: "Outside of work I climb, run trails and learn from friends who do things very differently to me. It tends to make the work better too.",
+    aboutPrinciplesTitle: 'Principles',
+    principles: [
+      { idx: '01', word: 'Holistic',    sub: 'People-first thinking'        },
+      { idx: '02', word: 'Useful',      sub: 'Problem-led, not feature-led' },
+      { idx: '03', word: 'Sustainable', sub: 'Designed to adapt'            },
+      { idx: '04', word: 'Scalable',    sub: 'Built to grow'                },
+    ],
+
+    /* Background */
+    backgroundEyebrow: '§ Background',
+    backgroundTitle:   'A few stops',
+    backgroundTitleEm: 'along the way.',
+    careerLabel:    'Career',
+    educationLabel: 'Education',
+
+    /* Modal (side project carousel) */
+    keysHint:    '← → Arrow keys · ESC to close',
+    getInTouch:  'Get in touch',
+    noSlides:    'No slides yet',
+    loadingPdf:  'Loading PDF…',
+
+    /* Footer */
+    footer: {
+      eyebrow: "§ Let's talk",
+      headingHtml: 'Have something <em>complex</em> to ship?',
+      sub:     "I take on a few engagements at a time. Tell me about the problem — I'll reply within a working day.",
+      cta:     'Start a conversation',
+      location: 'Location',
+      madrid: 'Madrid, ES',
+      remote: 'Open to remote',
+      localTime: 'Local time',
+      findMe: 'Find me',
+      status: 'Status',
+      available: 'Available · 2026',
+      linkedin: 'LinkedIn',
+      resume: 'Resume PDF',
+      copyright: '© 2026 Ricardo Martínez',
+      tagline: 'Designed & built with care',
+    },
+  },
+
+  es: {
+    nav: { work: 'Trabajo', about: 'Sobre mí', downloadResume: 'Descargar CV', cta: 'Hablemos' },
+
+    heroMeta: 'Ricardo Martínez · Diseñador de producto',
+    heroTabs: { developers: 'Desarrolladores', everyone: 'Para todos', recruiters: 'Reclutadores' },
+    hero: {
+      developers: {
+        titleWords: ['Diseño', 'que', { em: 'habla', color: 'var(--color-forest)' }, 'tu', 'idioma'],
+        bodyWords:  ['Pienso', 'en', 'componentes,', 'escribo', 'en', 'tokens', 'y',
+                     'entrego', 'specs', 'que', 'mapean', 'directamente', 'a', 'tu',
+                     'stack.', 'Menos', 'interpretación,', 'menos', 'sorpresas.'],
+        cta: 'Cómo trabajo',
+      },
+      everyone: {
+        titleWords: ['Diseño', 'productos', 'que', 'la', { em: 'gente', color: 'var(--color-forest)' }, 'entiende.'],
+        bodyWords:  ['Hola,', 'soy', 'un', 'diseñador', 'de', 'producto', 'al', 'que',
+                     'le', 'apasiona', 'resolver', 'problemas', 'y', 'crear',
+                     'productos', 'con', 'sentido', 'y', 'visión', 'holística.'],
+        cta: 'Ver trabajos',
+      },
+      recruiters: {
+        titleWords: ['6', 'años', { em: 'enviando', color: 'var(--color-forest)' }, 'productos', 'reales'],
+        bodyWords:  ['Diseñador', 'de', 'producto', 'senior,', 'disponible', 'en', '2026.',
+                     'He', 'liderado', 'diseño', 'en', 'startups', 'B2B,', 'construido',
+                     'sistemas', 'desde', 'cero,', 'y', 'lanzado', 'productos', 'usados',
+                     'a', 'diario', 'por', 'miles', 'de', 'personas.'],
+        cta: 'Descargar CV',
+      },
+    },
+
+    sideSectionEyebrow: 'Proyectos paralelos',
+    sideSectionTitle:   'Cosas que creo en',
+    sideSectionTitleEm: 'mi tiempo libre.',
+
+    workMarquee:   'Lo que he',
+    workMarqueeEm: 'lanzado',
+    workCursor:    { read: 'Leer', caseStudy: 'caso de estudio' },
+
+    sideProjects: {
+      storytelling: {
+        meta: 'Proyecto paralelo',
+        keyword: 'Diseñando',
+        title: 'presentaciones que persuaden y se recuerdan',
+        desc:  'Explorando cómo la estructura narrativa y el diseño visual se combinan para crear presentaciones que comunican con impacto.',
+        cta:   'Leer historia',
+        tags:  ['Presentaciones', 'Diseño narrativo'],
+        modalTitleKeyword: 'Charla / Workshop',
+        modalTitleRest:    'Comunicación efectiva',
+        modalDesc: 'Mi cliente organizaba un evento recurrente: cuatro horas de presentaciones seguidas varias veces al año. Vi el potencial de hacerlo más dinámico, así que organicé una sesión y preparé una charla para unas 100 personas sobre cómo comunicar con claridad a través de slides. Una de las cosas más fuera de mi zona de confort que he hecho — y una de las más gratificantes.',
+      },
+      depot: {
+        meta: 'Proyecto paralelo',
+        keyword: 'Innovando',
+        title: 'la venta de materiales de construcción',
+        desc:  'Una mirada fresca a una categoría poco glamurosa — facilitando a los profesionales encontrar, comparar y pedir materiales de construcción online.',
+        cta:   'Leer historia',
+        tags:  ['E-commerce', 'B2B'],
+        modalTitleKeyword: '',
+        modalTitleRest:    '',
+        modalDesc: '',
+      },
+    },
+
+    aboutEyebrow: '§ Sobre mí',
+    aboutPhotoPill: 'Madrid, ES',
+    aboutQuoteHtml: 'Creo que los mejores productos se construyen poniendo a las <em>personas primero</em> y equilibrando cuidadosamente las necesidades del usuario, los objetivos de negocio y las realidades técnicas para crear experiencias <em>útiles, coherentes y sostenibles</em> en el tiempo.',
+    aboutP1: 'Movido por la curiosidad, hago muchas preguntas para entender a fondo los retos y descubrir oportunidades. Me exijo altos estándares y me crezco en entornos donde puedo aprender junto a otros.',
+    aboutP2Html: 'Me enfoco en el equilibrio entre necesidades del usuario, objetivos de negocio y realidades de desarrollo — asegurándome de que los productos que diseño sean <em>coherentes</em>, útiles y sostenibles en el tiempo.',
+    aboutP3: 'Fuera del trabajo escalo, corro por la montaña y aprendo de amigos que hacen cosas muy distintas a mí. Tiende a hacer mejor el trabajo también.',
+    aboutPrinciplesTitle: 'Principios',
+    principles: [
+      { idx: '01', word: 'Holístico',  sub: 'Centrado en las personas'           },
+      { idx: '02', word: 'Útil',       sub: 'Guiado por el problema, no la feature' },
+      { idx: '03', word: 'Sostenible', sub: 'Diseñado para adaptarse'            },
+      { idx: '04', word: 'Escalable',  sub: 'Construido para crecer'             },
+    ],
+
+    backgroundEyebrow: '§ Trayectoria',
+    backgroundTitle:   'Algunas paradas',
+    backgroundTitleEm: 'por el camino.',
+    careerLabel:    'Carrera',
+    educationLabel: 'Educación',
+
+    keysHint:    '← → Flechas · ESC para cerrar',
+    getInTouch:  'Contactar',
+    noSlides:    'Aún no hay slides',
+    loadingPdf:  'Cargando PDF…',
+
+    footer: {
+      eyebrow: '§ Hablemos',
+      headingHtml: '¿Tienes algo <em>complejo</em> que lanzar?',
+      sub:     'Acepto pocos proyectos a la vez. Cuéntame el problema — respondo en un día laborable.',
+      cta:     'Empezar una conversación',
+      location: 'Ubicación',
+      madrid: 'Madrid, ES',
+      remote: 'Abierto a remoto',
+      localTime: 'Hora local',
+      findMe: 'Encuéntrame',
+      status: 'Estado',
+      available: 'Disponible · 2026',
+      linkedin: 'LinkedIn',
+      resume: 'CV en PDF',
+      copyright: '© 2026 Ricardo Martínez',
+      tagline: 'Diseñado y construido con cariño',
+    },
+  },
+};
+
+const LanguageContext = createContext({ lang: 'en', setLang: () => {} });
+
+function LanguageProvider({ children }) {
+  const [lang, setLangState] = useState(() => {
+    try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; }
+  });
+  const setLang = useCallback((next) => {
+    setLangState(next);
+    try { localStorage.setItem('lang', next); } catch {}
+  }, []);
+  return (
+    <LanguageContext.Provider value={{ lang, setLang }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+/* useT() → { t, lang, setLang }
+   t('foo.bar.baz') walks the translation tree; falls back to EN, then to the
+   raw key if nothing matches.                                              */
+function useT() {
+  const { lang, setLang } = useContext(LanguageContext);
+  const t = useCallback((key) => {
+    const walk = (obj) => key.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : null), obj);
+    return walk(TRANSLATIONS[lang]) ?? walk(TRANSLATIONS.en) ?? key;
+  }, [lang]);
+  return { t, lang, setLang };
+}
 
 /* ── GSAP setup ──────────────────────────────────────────────────────────── */
 gsap.registerPlugin(ScrollTrigger);
@@ -861,13 +1293,35 @@ function Isologo() {
 }
 
 /* ── Nav (floating pills, hover-expand menu) ──────────────────────────────── */
+/* NAV_ITEMS — `labelKey` is the i18n path resolved at render time. */
 const NAV_ITEMS = [
-  { label: 'Work',            type: 'scroll',   target: 'work'  },
-  { label: 'About',           type: 'scroll',   target: 'about' },
-  { label: 'Download resume', type: 'download', href: 'resume.pdf' },
+  { labelKey: 'nav.work',           type: 'scroll',   target: 'work'  },
+  { labelKey: 'nav.about',          type: 'scroll',   target: 'about' },
+  { labelKey: 'nav.downloadResume', type: 'download', href: 'assets/Ricardo_Martinez_CV.pdf' },
 ];
 
+function LangToggle() {
+  const { lang, setLang } = useT();
+  return (
+    <div className="lang-toggle" role="group" aria-label="Language">
+      <button
+        className={`lang-toggle-btn${lang === 'es' ? ' is-active' : ''}`}
+        onClick={() => setLang('es')}
+        aria-pressed={lang === 'es'}>
+        ES
+      </button>
+      <button
+        className={`lang-toggle-btn${lang === 'en' ? ' is-active' : ''}`}
+        onClick={() => setLang('en')}
+        aria-pressed={lang === 'en'}>
+        EN
+      </button>
+    </div>
+  );
+}
+
 function Nav({ active, onNavigate, onCta }) {
+  const { t } = useT();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navRef     = useRef(null);
@@ -939,11 +1393,8 @@ function Nav({ active, onNavigate, onCta }) {
   };
 
   const handleItem = (item) => {
-    onNavigate(item.label);
-    if (item.type === 'download') {
-      // Placeholder: PDF not yet supplied — the link's `download` attr handles it.
-      return;
-    }
+    onNavigate(item.labelKey);
+    if (item.type === 'download') return;
     scrollToId(item.target);
     setMenuOpen(false);
   };
@@ -974,30 +1425,31 @@ function Nav({ active, onNavigate, onCta }) {
           <div ref={wrapRef} className="nav-items-wrap">
             <div ref={itemsRef} className="nav-items">
               {NAV_ITEMS.map((item, i) => {
-                const cls = `nav-item${active === item.label ? ' is-active' : ''}`;
+                const cls = `nav-item${active === item.labelKey ? ' is-active' : ''}`;
                 const style = { '--i': i };
                 if (item.type === 'download') {
                   return (
-                    <a key={item.label} className={cls} style={style}
-                       href={item.href} download
+                    <a key={item.labelKey} className={cls} style={style}
+                       href={item.href} target="_blank" rel="noopener noreferrer"
                        onClick={() => handleItem(item)}>
-                      <span>{item.label}</span>
+                      <span>{t(item.labelKey)}</span>
                     </a>
                   );
                 }
                 return (
-                  <a key={item.label} className={cls} style={style}
+                  <a key={item.labelKey} className={cls} style={style}
                      href={`#${item.target}`}
                      onClick={e => { e.preventDefault(); handleItem(item); }}>
-                    <span>{item.label}</span>
+                    <span>{t(item.labelKey)}</span>
                   </a>
                 );
               })}
             </div>
           </div>
         </div>
+        <LangToggle />
         <a className="nav-cta" href="mailto:ricardomartinezing1@gmail.com">
-          <span>Let's talk</span>
+          <span>{t('nav.cta')}</span>
           <span className="nav-cta-arrow"><ArrowRight /></span>
         </a>
       </div>
@@ -1158,36 +1610,12 @@ function _HeroCardOld({ variant, style }) {
 const N_BLINDS   = 8;
 const HERO_DEFAULT = 1; // "For everyone"
 
+/* Language-agnostic config (image, bg, action). Text (label, titleWords,
+   bodyWords, cta) is read from translations.hero[id] at render time.       */
 const HERO_TABS = [
-  {
-    id: 'developers', label: 'Developers',
-    heroBg: '#1C2B3A', image: 'assets/hero/developers.png',
-    titleWords: ['Design', 'that', { em: 'speaks' }, 'your', 'language'],
-    bodyWords:  ['I', 'think', 'in', 'components,', 'write', 'in', 'tokens,', 'and',
-                 'hand', 'off', 'specs', 'that', 'map', 'directly', 'to', 'your',
-                 'stack.', 'Less', 'interpretation,', 'fewer', 'surprises.'],
-    cta: 'See how I work', ctaAction: 'work',
-  },
-  {
-    id: 'everyone', label: 'For everyone',
-    heroBg: '#BFA98D', image: 'assets/hero/everyone-2.jpg',
-    titleWords: ['Designing', 'products', { em: 'people' }, 'understand'],
-    bodyWords:  ["I'm", 'a', 'senior', 'product', 'designer', 'with', '6+', 'years',
-                 'on', 'complex', 'B2B', 'tools.', 'Currently', 'at',
-                 { em: 'Icarus HS,' }, 'helping', 'teams', 'ship', 'clearer',
-                 'interfaces', 'with', 'a', 'holistic', 'approach.'],
-    cta: 'View work', ctaAction: 'work',
-  },
-  {
-    id: 'recruiters', label: 'Recruiters',
-    heroBg: '#B8C5CE', image: 'assets/hero/Recruiters-1.jpg',
-    titleWords: ['6', 'years', { em: 'shipping' }, 'real', 'products'],
-    bodyWords:  ['Senior', 'product', 'designer,', 'available', 'in', '2026.', 'Led',
-                 'design', 'at', 'B2B', 'SaaS', 'startups,', 'built', 'systems',
-                 'from', 'scratch,', 'and', 'shipped', 'products', 'used', 'daily',
-                 'by', 'thousands.'],
-    cta: 'Download resume', ctaAction: 'resume',
-  },
+  { id: 'developers', heroBg: '#1C2B3A', image: 'assets/hero/developers.png',   ctaAction: 'work'   },
+  { id: 'everyone',   heroBg: '#BFA98D', image: 'assets/hero/everyone-2.jpg',   ctaAction: 'work'   },
+  { id: 'recruiters', heroBg: '#B8C5CE', image: 'assets/hero/Recruiters-1.jpg', ctaAction: 'resume' },
 ];
 
 /* Renders a word array — supports strings and { em: '...' } objects */
@@ -1198,7 +1626,7 @@ function HeroWords({ words, cls }) {
         <span className={`wi ${cls}`}>
           {typeof w === 'string'
             ? w
-            : <em style={{ fontFamily: 'var(--font-serif)', fontWeight: 300 }}>{w.em}</em>}
+            : <em style={{ fontFamily: 'var(--font-serif)', fontWeight: 300, color: w.color }}>{w.em}</em>}
         </span>
       </span>{' '}
     </React.Fragment>
@@ -1337,6 +1765,7 @@ function runBlindsTransition(container, tab, onSwap) {
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 function Hero({ onPrimary, onGhost }) {
+  const { t } = useT();
   const [activeTab,  setActiveTab]  = useState(HERO_DEFAULT);  /* pill        */
   const [textTab,    setTextTab]    = useState(HERO_DEFAULT);  /* text content */
   const [imgTab,     setImgTab]     = useState(HERO_DEFAULT);  /* <img src>    */
@@ -1398,8 +1827,8 @@ function Hero({ onPrimary, onGhost }) {
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const heroWis = gsap.utils.toArray('.hero-wi', sectionRef.current);
         const leadWis = gsap.utils.toArray('.lead-wi', sectionRef.current);
-        gsap.set(heroWis, { y: '110%' });
-        gsap.set(leadWis, { y: '110%' });
+        gsap.set(heroWis, { y: '140%' });
+        gsap.set(leadWis, { y: '140%' });
         gsap.set(imgRef.current,   { autoAlpha: 0, y: 16 });
         gsap.set('[data-hi="tabs"]', { autoAlpha: 0, y: 10 });
         gsap.set('[data-hi="meta"]', { autoAlpha: 0, y: 8  });
@@ -1426,14 +1855,14 @@ function Hero({ onPrimary, onGhost }) {
 
     /* (1) Text exits — snappy, ~0.3s total */
     gsap.to(allWis, {
-      y: '110%', duration: 0.28, stagger: 0.008, ease: 'power2.in',
+      y: '140%', duration: 0.28, stagger: 0.008, ease: 'power2.in',
       onComplete: () => {
         /* (3) Swap TEXT only (not img — that swaps when blinds finish).  */
         setTextTab(idx);
         requestAnimationFrame(() => requestAnimationFrame(() => {
           const newHero = gsap.utils.toArray('.hero-wi', sectionRef.current);
           const newLead = gsap.utils.toArray('.lead-wi', sectionRef.current);
-          gsap.set([...newHero, ...newLead], { y: '110%' });
+          gsap.set([...newHero, ...newLead], { y: '140%' });
           gsap.to(newHero, { y: '0%', duration: 0.6, stagger: 0.045, ease: 'power3.out' });
           gsap.to(newLead, { y: '0%', duration: 0.45, stagger: 0.018, ease: 'power3.out',
             delay: 0.1,
@@ -1448,12 +1877,14 @@ function Hero({ onPrimary, onGhost }) {
     runBlindsTransition(imgRef.current, HERO_TABS[idx], () => setImgTab(idx));
   };
 
-  const tab    = HERO_TABS[textTab];   /* drives text, meta, CTA */
-  const imgRow = HERO_TABS[imgTab];    /* drives <img> + bg colour */
+  /* Merge static config with localised content */
+  const tab     = { ...HERO_TABS[textTab], ...t('hero.' + HERO_TABS[textTab].id), label: t('heroTabs.' + HERO_TABS[textTab].id) };
+  const imgRow  = HERO_TABS[imgTab];
 
   const handleCta = () => {
-    if (tab.ctaAction === 'resume') { /* user can wire download link here */ }
-    else onGhost && onGhost();
+    if (tab.ctaAction === 'resume') {
+      window.open('assets/Ricardo_Martinez_CV.pdf', '_blank', 'noopener,noreferrer');
+    } else onGhost && onGhost();
   };
 
   return (
@@ -1465,12 +1896,12 @@ function Hero({ onPrimary, onGhost }) {
 
         <div ref={tabsRef} data-hi="tabs" className="hero-tabs">
           <span ref={pillRef} className="hero-tab-pill" />
-          {HERO_TABS.map((t, i) => (
-            <button key={t.id}
+          {HERO_TABS.map((tabConf, i) => (
+            <button key={tabConf.id}
               ref={el => btnRefs.current[i] = el}
               className={`hero-tab-btn${activeTab === i ? ' active' : ''}`}
               onClick={() => handleTab(i)}>
-              {t.label}
+              {t('heroTabs.' + tabConf.id)}
             </button>
           ))}
         </div>
@@ -1482,7 +1913,7 @@ function Hero({ onPrimary, onGhost }) {
         <div>
           <div data-hi="meta" className="hero-meta">
             <span className="hero-status-dot" />
-            Ricardo Martínez · Product Designer / Available · 2026
+            {t('heroMeta')}
           </div>
           <h1 className="t-display" style={{ margin: 0 }}>
             <HeroWords words={tab.titleWords} cls="hero-wi" />
@@ -1613,6 +2044,12 @@ const SIDE_PROJECTS = [
     cover: 'assets/caratulas/cover-comunicacion-efectiva.mp4',
     cta: 'Read story',
     tags: ['Presentations', 'Narrative Design'],
+    year: '2025',
+    slides: [],
+    slidesPdf: 'assets/side-projects/comunicacion%20efectiva.pdf',
+    modalTitleKeyword: 'Talk / Workshop',
+    modalTitleRest: 'Effective communication',
+    modalDesc: "My client ran a recurring event, four hours of back-to-back presentations several times a year. I saw potential to make it more dynamic, so I organised a session and prepared a talk for around 100 people on how to communicate with clarity through slides. One of the most out-of-my-comfort-zone things I've done — and one of the most rewarding.",
   },
   {
     id: 'depot', name: 'Central Depot', mark: 'CD',
@@ -1624,6 +2061,8 @@ const SIDE_PROJECTS = [
     cover: 'assets/caratulas/central-depot-cover-1.mp4',
     cta: 'Read story',
     tags: ['E-commerce', 'B2B'],
+    year: '2024',
+    slides: [],
   },
 ];
 
@@ -1646,6 +2085,7 @@ function ProjImage({ project }) {
 }
 
 function WorkSection({ onOpen }) {
+  const { t } = useT();
   const archRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -1788,8 +2228,8 @@ function WorkSection({ onOpen }) {
       {/* ── Section header ────────────────────────────────────────────────── */}
       <section id="side" style={{ padding: '160px var(--pad) 48px', maxWidth: 'var(--max-w)', margin: '0 auto' }}>
         <div className="section-head gf">
-          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>Side projects</span>
-          <h2 className="t-display">Things I build <em>for myself.</em></h2>
+          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>{t('sideSectionEyebrow')}</span>
+          <h2 className="t-display">{t('sideSectionTitle')} <em style={{ color: 'var(--color-forest)' }}>{t('sideSectionTitleEm')}</em></h2>
         </div>
       </section>
 
@@ -1798,27 +2238,29 @@ function WorkSection({ onOpen }) {
 
         {/* Left: info panels, one per project (each 100vh) */}
         <div className="proj-left">
-          {SIDE_PROJECTS.map((p) => (
+          {SIDE_PROJECTS.map((p) => {
+            const i18n = t('sideProjects.' + p.id) || {};
+            return (
             <div key={p.id} className="proj-panel">
               <div className="proj-panel-content gf">
-                <span className="proj-panel-meta">{p.meta}</span>
+                <span className="proj-panel-meta">{i18n.meta || p.meta}</span>
                 <h3 className="proj-panel-title">
-                  {p.keyword && <><em>{p.keyword}</em>{' '}</>}{p.title}
+                  {i18n.keyword && <><em>{i18n.keyword}</em>{' '}</>}{i18n.title || p.title}
                 </h3>
-                <p className="proj-panel-desc">{p.desc}</p>
+                <p className="proj-panel-desc">{i18n.desc || p.desc}</p>
                 <div className="tags-row" style={{ marginTop: 0 }}>
-                  {(p.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
+                  {(i18n.tags || p.tags || []).map(tag => <span key={tag} className="tag">{tag}</span>)}
                 </div>
                 <div style={{ marginTop: 28 }}>
                   <button
                     className="btn-cta-dark"
                     onClick={() => onOpen && onOpen(p)}>
-                    {p.cta || 'Read story'} <ArrowRight />
+                    {i18n.cta || p.cta || 'Read story'} <ArrowRight />
                   </button>
                 </div>
               </div>
             </div>
-          ))}
+          );})}
         </div>
 
         {/* Right: stacked visuals, pinned by ScrollTrigger. Each layer's
@@ -1854,6 +2296,7 @@ function WorkSection({ onOpen }) {
 
 /* ── Side Showcase section ───────────────────────────────────────────────── */
 function SideShowcaseSection() {
+  const { t } = useT();
   const showcaseRef = useRef(null);
   const trackRef    = useRef(null);
   const cursorRef   = useRef(null);
@@ -2008,19 +2451,19 @@ function SideShowcaseSection() {
 
   const marqItems = Array.from({ length: MARQUEE_REPS }, (_, i) => (
     <span key={i} className="side-mq-item">
-      Things I've shipped <em>recently</em>
+      {t('workMarquee')} <em>{t('workMarqueeEm')}</em>
       <span className="side-mq-dot" aria-hidden="true">·</span>
     </span>
   ));
 
   return (
-    <section id="work" ref={showcaseRef} className="side-showcase" aria-label="Things I've shipped recently">
+    <section id="work" ref={showcaseRef} className="side-showcase" aria-label={`${t('workMarquee')} ${t('workMarqueeEm')}`}>
       {/* Custom hover cursor — portalled to body to escape #smooth-content's
           transform so position:fixed stays viewport-locked */}
       {ReactDOM.createPortal(
         <div ref={cursorRef} className="card-cursor" aria-hidden="true">
-          <span className="cc-read">Read</span>
-          <span className="cc-cs">case study</span>
+          <span className="cc-read">{t('workCursor.read')}</span>
+          <span className="cc-cs">{t('workCursor.caseStudy')}</span>
         </div>,
         document.body
       )}
@@ -2066,6 +2509,7 @@ const PRINCIPLES = [
 ];
 
 function AboutSection() {
+  const { t: tt } = useT();
   const ref = useRef(null);
 
   useLayoutEffect(() => {
@@ -2128,19 +2572,15 @@ function AboutSection() {
 
   return (
     <section id="about" ref={ref} className="about">
-      <span className="about-eyebrow gf">§ About</span>
+      <span className="about-eyebrow gf">{tt('aboutEyebrow')}</span>
 
       {/* ── Top row: portrait + H1 quote ──────────────────────────────────── */}
       <div className="about-row">
         <div className="about-photo gf">
-          <img src="assets/img-encuadrada-2.jpg" alt="Ricardo Martínez in the mountains" />
-          <span className="about-photo-pill">Madrid, ES</span>
+          <img src="assets/img-encuadrada-2.jpg" alt="Ricardo Martínez" />
+          <span className="about-photo-pill">{tt('aboutPhotoPill')}</span>
         </div>
-        <h1 className="about-quote">
-          I believe the best products are built by putting <em>people first</em> and
-          carefully balancing user needs, business goals and technical realities to
-          create experiences that are <em>useful, consistent and sustainable</em> over time.
-        </h1>
+        <h1 className="about-quote" dangerouslySetInnerHTML={{ __html: tt('aboutQuoteHtml') }} />
       </div>
 
       <hr className="about-divider" />
@@ -2148,9 +2588,9 @@ function AboutSection() {
       {/* ── Bottom row: principles + paragraphs ───────────────────────────── */}
       <div className="about-row">
         <div className="gf">
-          <span className="t-label about-principles-head">Principles</span>
+          <span className="t-label about-principles-head">{tt('aboutPrinciplesTitle')}</span>
           <ol className="about-principles-list">
-            {PRINCIPLES.map(p => (
+            {(tt('principles') || []).map(p => (
               <li key={p.idx} className="about-principle">
                 <span className="about-principle-idx">{p.idx}</span>
                 <span className="about-principle-word">{p.word}</span>
@@ -2160,20 +2600,9 @@ function AboutSection() {
           </ol>
         </div>
         <div className="about-paragraphs gf">
-          <p>
-            Driven by curiosity, I ask a lot of questions to deeply understand challenges
-            and uncover opportunities. I hold myself to high standards and thrive where I
-            can learn and grow alongside others.
-          </p>
-          <p>
-            I focus on the balance between user needs, business goals and development
-            realities — making sure the products I design are <em>consistent</em>, useful
-            and sustainable over time.
-          </p>
-          <p>
-            Outside of work I climb, run trails and learn from friends who do things very
-            differently to me. It tends to make the work better too.
-          </p>
+          <p>{tt('aboutP1')}</p>
+          <p dangerouslySetInnerHTML={{ __html: tt('aboutP2Html') }} />
+          <p>{tt('aboutP3')}</p>
         </div>
       </div>
     </section>
@@ -2181,7 +2610,7 @@ function AboutSection() {
 }
 
 /* ── Timeline row with GSAP accordion ───────────────────────────────────── */
-function TimelineRow({ year, title, org, text, defaultOpen = false }) {
+function TimelineRow({ year, title, org, text, sections, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen);
   const bodyRef = useRef(null);
   const isFirst = useRef(true);
@@ -2211,7 +2640,7 @@ function TimelineRow({ year, title, org, text, defaultOpen = false }) {
   }, [open]);
 
   return (
-    <div className="tl-row" onClick={() => setOpen(o => !o)}>
+    <div className={`tl-row${open ? ' is-open' : ''}`} onClick={() => setOpen(o => !o)}>
       <span className="tl-year">{year}</span>
       <div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
@@ -2219,7 +2648,16 @@ function TimelineRow({ year, title, org, text, defaultOpen = false }) {
           <span className="tl-org">{org}</span>
         </div>
         <div ref={bodyRef} className="tl-body">
-          <p style={{ margin: 0, paddingBottom: 4 }}>{text}</p>
+          {sections
+            ? sections.map((s, idx) => (
+                <div key={idx} className="tl-section">
+                  <p className="tl-section-title">{s.title}</p>
+                  {s.body.split('\n\n').map((para, j) => (
+                    <p key={j} className="tl-section-body">{para}</p>
+                  ))}
+                </div>
+              ))
+            : <p style={{ margin: 0, paddingBottom: 4 }}>{text}</p>}
         </div>
       </div>
       <button className={`tl-toggle${open ? ' open' : ''}`} aria-label="Toggle" onClick={e => e.stopPropagation()}>
@@ -2231,7 +2669,29 @@ function TimelineRow({ year, title, org, text, defaultOpen = false }) {
 
 /* ── Background section ──────────────────────────────────────────────────── */
 const CAREER = [
-  { role: 'Product Designer', org: 'Icarus HS', range: '2020 — Present', text: "Over five years I've evolved from junior UX designer to a versatile product designer with a strategic mindset. My first and current role — where I've learned immensely from my manager Óscar and the team." },
+  {
+    role: 'Mid-senior product designer',
+    org: 'Icarus HS',
+    range: '2020 — Present',
+    sections: [
+      {
+        title: 'The journey',
+        body: "I've spent 6 years at the same company, and that doesn't happen by accident.\n\nI joined straight out of university doing UX, pretty much finding my way as I went. Over time I came to understand that design doesn't start with wireframes — it starts much earlier: understanding the problem properly, asking the right questions, knowing when it's too soon to design anything at all. That naturally led me towards product design, with more involvement in definition and strategy.",
+      },
+      {
+        title: 'The role',
+        body: "I've worked on complex B2B products and on products built for everyday users. Depending on the project and the team, my role shifted: sometimes more hands-on, sometimes more strategic, always adapting to what the project needed at that moment.",
+      },
+      {
+        title: 'The team',
+        body: "I've also had the chance to lead a design team — mentoring others, shaping how we work, and advocating for design in front of stakeholders. It's been just as formative as the work itself.\n\nAt Icarus we have a strong product culture, and that shows in how decisions get made and in the real weight design carries within the company.",
+      },
+      {
+        title: 'What has shaped me most',
+        body: "Having the freedom to get things wrong. Óscar, my manager, gave me a level of trust from the very beginning that you don't find everywhere. Learning without fear changes how you grow — and it's something I'll always be grateful for.",
+      },
+    ],
+  },
 ];
 const EDUCATION = [
   { title: 'Advanced Product Design', org: 'Mr Marcell School', year: '2024', text: "While the technical knowledge was invaluable, what I value most wasn't in any slide or PDF. As the motto says, 'Always with cariño' — it's about focusing on the human factor." },
@@ -2241,21 +2701,22 @@ const EDUCATION = [
 ];
 
 function BackgroundSection() {
+  const { t } = useT();
   return (
     <div className="bg-section" id="background">
       <div className="bg-inner">
         <div className="gf">
-          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>§ Background</span>
-          <h2 className="t-h1" style={{ marginBottom: 64 }}>A few stops <em>along the way.</em></h2>
+          <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>{t('backgroundEyebrow')}</span>
+          <h2 className="t-h1" style={{ marginBottom: 64 }}>{t('backgroundTitle')} <em style={{ color: 'var(--color-forest)' }}>{t('backgroundTitleEm')}</em></h2>
         </div>
         <div className="bg-group gf">
-          <p className="bg-group-title">Career</p>
+          <p className="bg-group-title">{t('careerLabel')}</p>
           {CAREER.map((c, i) => (
-            <TimelineRow key={c.role} year={c.range} title={c.role} org={c.org} text={c.text} defaultOpen={i === 0} />
+            <TimelineRow key={c.role} year={c.range} title={c.role} org={c.org} text={c.text} sections={c.sections} />
           ))}
         </div>
         <div className="bg-group gf">
-          <p className="bg-group-title">Education</p>
+          <p className="bg-group-title">{t('educationLabel')}</p>
           {EDUCATION.map(e => (
             <TimelineRow key={e.title} year={e.year} title={e.title} org={e.org} text={e.text} />
           ))}
@@ -2297,6 +2758,7 @@ function TestimonialsSection() {
 
 /* ── Footer with magnetic CTA ────────────────────────────────────────────── */
 function Footer() {
+  const { t } = useT();
   const [time, setTime] = useState('');
   const btnRef = useRef(null);
 
@@ -2353,51 +2815,47 @@ function Footer() {
     <footer className="footer" id="contact">
       <div className="footer-inner">
         <div className="gf">
-          <span className="t-label t-label-dark" style={{ marginBottom: 24, display: 'block' }}>§ Let's talk</span>
-          <h2 className="t-h1 on-dark">Have something <em>complex</em> to ship?</h2>
+          <span className="t-label t-label-dark" style={{ marginBottom: 24, display: 'block' }}>{t('footer.eyebrow')}</span>
+          <h2 className="t-h1 on-dark" dangerouslySetInnerHTML={{ __html: t('footer.headingHtml') }} />
           <p className="t-lead lead-dark" style={{ marginTop: 12, maxWidth: '50ch' }}>
-            I take on a few engagements at a time. Tell me about the problem — I'll reply within a working day.
+            {t('footer.sub')}
           </p>
           <div className="footer-cta">
             <a ref={btnRef} className="btn btn-primary" href="mailto:ricardomartinezing1@gmail.com"
                style={{ display: 'inline-flex', willChange: 'transform' }}>
-              Start a conversation
-            </a>
-            <a className="la la-lima" href="mailto:ricardomartinezing1@gmail.com">
-              <span className="la-text">ricardomartinezing1@gmail.com</span>
-              <ArrowRight />
+              {t('footer.cta')}
             </a>
           </div>
         </div>
         <div className="footer-grid gf">
           <div>
-            <span className="footer-col-label">Location</span>
-            <p style={{ font: '400 16px var(--font-sans)', color: 'var(--color-white)', margin: '0 0 4px' }}>Madrid, ES</p>
-            <p style={{ font: '400 13px var(--font-sans)', color: 'rgba(245,245,240,.5)', margin: 0 }}>Open to remote</p>
+            <span className="footer-col-label">{t('footer.location')}</span>
+            <p style={{ font: '400 16px var(--font-sans)', color: 'var(--color-white)', margin: '0 0 4px' }}>{t('footer.madrid')}</p>
+            <p style={{ font: '400 13px var(--font-sans)', color: 'rgba(245,245,240,.5)', margin: 0 }}>{t('footer.remote')}</p>
           </div>
           <div>
-            <span className="footer-col-label">Local time</span>
+            <span className="footer-col-label">{t('footer.localTime')}</span>
             <p className="footer-clock">{time}</p>
             <p style={{ font: '400 12px var(--font-mono)', color: 'rgba(245,245,240,.4)', margin: '4px 0 0' }}>Europe/Madrid</p>
           </div>
           <div>
-            <span className="footer-col-label">Find me</span>
+            <span className="footer-col-label">{t('footer.findMe')}</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <a href="https://www.linkedin.com/in/ricardomartinezing/" className="footer-col-link">LinkedIn <ArrowRight /></a>
-              <a href="#" className="footer-col-link">Resume PDF <ArrowRight /></a>
+              <a href="https://www.linkedin.com/in/ricardo-marting/" target="_blank" rel="noopener noreferrer" className="footer-col-link">{t('footer.linkedin')} <ArrowRight /></a>
+              <a href="assets/Ricardo_Martinez_CV.pdf" target="_blank" rel="noopener noreferrer" className="footer-col-link">{t('footer.resume')} <ArrowRight /></a>
             </div>
           </div>
           <div>
-            <span className="footer-col-label">Status</span>
+            <span className="footer-col-label">{t('footer.status')}</span>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
               <span className="status-dot" />
-              <span style={{ font: '500 15px var(--font-sans)', color: 'var(--color-white)' }}>Available · 2026</span>
+              <span style={{ font: '500 15px var(--font-sans)', color: 'var(--color-white)' }}>{t('footer.available')}</span>
             </div>
           </div>
         </div>
         <div className="footer-bottom gf">
-          <span>© 2026 Ricardo Martínez</span>
-          <span>Designed & built with care</span>
+          <span>{t('footer.copyright')}</span>
+          <span>{t('footer.tagline')}</span>
         </div>
       </div>
     </footer>
@@ -2405,54 +2863,205 @@ function Footer() {
 }
 
 /* ── Project modal ───────────────────────────────────────────────────────── */
-function Modal({ project, onClose }) {
+function Modal({ project, index, onClose }) {
+  const { t } = useT();
+  const i18n = t('sideProjects.' + project.id) || {};
   const overlayRef = useRef(null);
   const boxRef = useRef(null);
+  const canvasRef = useRef(null);
+  const slideWrapRef = useRef(null);
+  const pdfDocRef = useRef(null);
+  const renderTaskRef = useRef(null);
+
+  const isPdf = !!(project.slidesPdf && window.pdfjsLib);
+  const slides    = project.slides || [];
+  const [pdfPages, setPdfPages] = useState(0);
+  const total     = isPdf ? pdfPages : slides.length;
+  const [slide, setSlide] = useState(0);
+  const [resizeTick, setResizeTick] = useState(0);
+
+  /* ── Load the PDF once when the modal mounts ── */
+  useEffect(() => {
+    if (!isPdf) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const pdf = await window.pdfjsLib.getDocument(project.slidesPdf).promise;
+        if (cancelled) return;
+        pdfDocRef.current = pdf;
+        setPdfPages(pdf.numPages);
+      } catch (e) {
+        console.error('PDF load failed:', e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (renderTaskRef.current) try { renderTaskRef.current.cancel(); } catch {}
+      if (pdfDocRef.current) try { pdfDocRef.current.destroy(); } catch {}
+      pdfDocRef.current = null;
+    };
+  }, [isPdf, project.slidesPdf]);
+
+  /* ── Render the current page whenever it changes / pdf is ready ── */
+  useEffect(() => {
+    if (!isPdf || !pdfDocRef.current || !canvasRef.current || pdfPages === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const page = await pdfDocRef.current.getPage(slide + 1);
+        if (cancelled) return;
+        const canvas    = canvasRef.current;
+        const wrap      = slideWrapRef.current;
+        if (!canvas || !wrap) return;
+        const cw = wrap.clientWidth  - 24;   /* padding for breathing room */
+        const ch = wrap.clientHeight - 24;
+        const base = page.getViewport({ scale: 1 });
+        const fit  = Math.min(cw / base.width, ch / base.height);
+        const dpr  = window.devicePixelRatio || 1;
+        const vp   = page.getViewport({ scale: fit * dpr });
+        canvas.width  = vp.width;
+        canvas.height = vp.height;
+        canvas.style.width  = (vp.width  / dpr) + 'px';
+        canvas.style.height = (vp.height / dpr) + 'px';
+        if (renderTaskRef.current) try { renderTaskRef.current.cancel(); } catch {}
+        const task = page.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+        renderTaskRef.current = task;
+        await task.promise;
+      } catch (e) {
+        if (e && e.name !== 'RenderingCancelledException') console.error(e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isPdf, slide, pdfPages, resizeTick]);
+
+  /* Re-render PDF page on window resize (debounced) */
+  useEffect(() => {
+    if (!isPdf) return;
+    let t;
+    const onResize = () => { clearTimeout(t); t = setTimeout(() => setResizeTick(n => n + 1), 200); };
+    window.addEventListener('resize', onResize);
+    return () => { window.removeEventListener('resize', onResize); clearTimeout(t); };
+  }, [isPdf]);
+
+  /* ── Uncovering modal animation (smoothed variant) ──
+     The modal slides up from below the viewport while the backdrop fades in.
+     Longer duration + expo.out for a more gliding feel.                    */
+  const EASE_IN  = 'expo.out';   /* slow finish — feels gliding */
+  const EASE_OUT = 'expo.in';    /* mirrors entry, accelerates out */
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(overlayRef.current, { autoAlpha: 0, duration: 0.2 });
-      gsap.from(boxRef.current, { autoAlpha: 0, y: 20, duration: 0.3, ease: 'power2.out' });
+      gsap.set(overlayRef.current, { autoAlpha: 0 });
+      gsap.set(boxRef.current,     { yPercent: 100 });
+      const tl = gsap.timeline();
+      tl.to(overlayRef.current, { autoAlpha: 1, duration: 0.7, ease: 'power2.out' }, 0);
+      tl.to(boxRef.current,     { yPercent: 0,  duration: 0.9, ease: EASE_IN     }, 0);
     });
     return () => ctx.revert();
   }, []);
 
   const close = useCallback(() => {
-    gsap.to(boxRef.current, { autoAlpha: 0, y: 12, duration: 0.2, ease: 'power2.in' });
-    gsap.to(overlayRef.current, { autoAlpha: 0, duration: 0.25, delay: 0.05, onComplete: onClose });
+    const tl = gsap.timeline({ onComplete: onClose });
+    tl.to(boxRef.current,     { yPercent: 100, duration: 0.75, ease: EASE_OUT     }, 0);
+    tl.to(overlayRef.current, { autoAlpha: 0,  duration: 0.6,  ease: 'power2.in'  }, 0.1);
   }, [onClose]);
 
-  useEffect(() => {
-    const h = (e) => e.key === 'Escape' && close();
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [close]);
+  const next = useCallback(() => setSlide(s => Math.min(s + 1, Math.max(total - 1, 0))), [total]);
+  const prev = useCallback(() => setSlide(s => Math.max(s - 1, 0)), []);
 
-  return (
-    <div ref={overlayRef} onClick={close}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(15,26,16,.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 80, padding: 24 }}>
-      <div ref={boxRef} onClick={e => e.stopPropagation()}
-        style={{ background: 'var(--color-white)', borderRadius: 12, padding: 32, maxWidth: 540, width: '100%', boxShadow: 'var(--shadow-lg)' }}>
-        <span className="t-label" style={{ marginBottom: 8, display: 'block' }}>{project.meta}</span>
-        <h3 style={{ font: '600 22px var(--font-sans)', margin: '0 0 8px' }}>{project.title}</h3>
-        {project.metrics && (
-          <div style={{ display: 'flex', gap: 16, margin: '12px 0', flexWrap: 'wrap' }}>
-            {project.metrics.map(m => (
-              <span key={m} style={{ font: '700 15px var(--font-sans)', color: 'var(--color-forest)', background: 'rgba(45,106,79,.08)', padding: '6px 12px', borderRadius: 6 }}>{m}</span>
-            ))}
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape')          close();
+      else if (e.key === 'ArrowRight') next();
+      else if (e.key === 'ArrowLeft')  prev();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [close, next, prev]);
+
+  const renderSlide = (s) => {
+    if (!s) return null;
+    if (typeof s === 'string') {
+      return /\.(mp4|webm|ogg)$/i.test(s)
+        ? <video src={s} autoPlay loop muted playsInline />
+        : <img src={s} alt="" />;
+    }
+    if (s.src) return /\.(mp4|webm|ogg)$/i.test(s.src)
+      ? <video src={s.src} autoPlay loop muted playsInline />
+      : <img src={s.src} alt={s.caption || ''} />;
+    return s;
+  };
+
+  const idxLabel = String(index || 1).padStart(2, '0');
+  const cur = String(total === 0 ? 1 : slide + 1).padStart(2, '0');
+  const tot = String(total).padStart(2, '0');
+
+  /* Portalled to <body> so position:fixed escapes #smooth-content's
+     transform context — otherwise the overlay gets scoped to the
+     transformed wrapper instead of the viewport.                       */
+  return ReactDOM.createPortal((
+    <div ref={overlayRef} className="sp-modal-overlay" onClick={close}>
+      <div ref={boxRef} className="sp-modal-box" onClick={e => e.stopPropagation()}>
+
+        {/* ── Header ── */}
+        <div className="sp-modal-header">
+          <div className="sp-modal-header-top">
+            <div className="sp-modal-meta">
+              <span className="sp-modal-dot" />
+              {i18n.meta || project.meta || 'Side project'} · {project.year || '—'}
+            </div>
+            <div className="sp-modal-actions">
+              <a className="btn btn-primary btn-sm" href="mailto:ricardomartinezing1@gmail.com">
+                {t('getInTouch')} <ArrowRight />
+              </a>
+              <button className="sp-modal-close" onClick={close} aria-label="Close">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <line x1="2" y1="2" x2="12" y2="12" />
+                  <line x1="12" y1="2" x2="2" y2="12" />
+                </svg>
+              </button>
+            </div>
           </div>
-        )}
-        <p style={{ font: '400 15px var(--font-sans)', color: 'var(--color-mid)', lineHeight: 1.6, margin: '0 0 16px' }}>{project.details || project.desc}</p>
-        <div className="tags-row" style={{ marginTop: 0, marginBottom: 24 }}>
-          {(project.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
+          <h2 className="sp-modal-title">
+            {(i18n.modalTitleKeyword || project.modalTitleKeyword)
+              ? <>{(i18n.modalTitleRest || project.modalTitleRest) ? (i18n.modalTitleRest || project.modalTitleRest) + ' ' : ''}<em style={{ fontFamily: 'var(--font-serif)', fontWeight: 300, fontStyle: 'italic', color: 'var(--color-forest)' }}>{i18n.modalTitleKeyword || project.modalTitleKeyword}</em></>
+              : <>{project.name}{(i18n.title || project.title) ? ' — ' + (i18n.title || project.title) : ''}</>}
+          </h2>
+          <p className="sp-modal-desc">{i18n.modalDesc || project.modalDesc || project.details || i18n.desc || project.desc}</p>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-          <button className="btn btn-ghost btn-sm" onClick={close}>Close</button>
-          <a className="btn btn-primary btn-sm" href="mailto:ricardomartinezing1@gmail.com">Get in touch</a>
+
+        {/* ── Body / carousel ── */}
+        <div className="sp-modal-body">
+          <button className="sp-modal-nav prev" onClick={prev} disabled={total === 0 || slide === 0} aria-label="Previous slide">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 3 L4 8 L10 13" />
+            </svg>
+          </button>
+          <div ref={slideWrapRef} className="sp-modal-slide">
+            {isPdf
+              ? (pdfPages === 0
+                  ? <span className="sp-modal-empty">{t('loadingPdf')}</span>
+                  : <canvas ref={canvasRef} />)
+              : (total === 0
+                  ? <span className="sp-modal-empty">{t('noSlides')}</span>
+                  : renderSlide(slides[slide]))}
+          </div>
+          <button className="sp-modal-nav next" onClick={next} disabled={total === 0 || slide >= total - 1} aria-label="Next slide">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 3 L12 8 L6 13" />
+            </svg>
+          </button>
         </div>
+
+        {/* ── Footer ── */}
+        <div className="sp-modal-footer">
+          <span>{cur} / {tot}</span>
+          <span className="keys">{t('keysHint')}</span>
+        </div>
+
       </div>
     </div>
-  );
+  ), document.body);
 }
 
 /* ── App ─────────────────────────────────────────────────────────────────── */
@@ -2648,14 +3257,23 @@ function App() {
       <WorkSection onOpen={setOpenProject} />
       <AboutSection />
       <BackgroundSection />
-      <TestimonialsSection />
       <Footer />
-      {openProject && <Modal project={openProject} onClose={() => setOpenProject(null)} />}
+      {openProject && (
+        <Modal
+          project={openProject}
+          index={SIDE_PROJECTS.findIndex(p => p.id === openProject.id) + 1}
+          onClose={() => setOpenProject(null)}
+        />
+      )}
     </>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <LanguageProvider>
+    <App />
+  </LanguageProvider>
+);
 </script>
 </body>
 </html>
