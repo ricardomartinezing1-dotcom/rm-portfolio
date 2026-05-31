@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/shell.css" />
 
 <style>
 /* ── Design Tokens ─────────────────────────────────────────────────────── */
@@ -865,6 +866,8 @@ body { overflow-y: scroll; }
 .sp-modal-slide img,
 .sp-modal-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
 .sp-modal-slide canvas { display: block; max-width: 100%; max-height: 100%; }
+.sp-modal-iframe { display: block; width: 100%; height: 100%; border: 0; background: transparent; }
+.sp-modal-body.is-embed { padding: 0; }
 .sp-modal-empty {
   font: 500 12px var(--font-mono); text-transform: uppercase;
   letter-spacing: .15em; color: var(--color-gray);
@@ -945,6 +948,9 @@ body { overflow-y: scroll; }
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Shared portfolio shell: nav, footer, language toggle, cursor dot -->
+<script type="text/babel" src="assets/js/shell.js"></script>
 
 <script type="text/babel">
 const { useState, useEffect, useLayoutEffect, useRef, useCallback, useContext, createContext } = React;
@@ -1046,6 +1052,7 @@ const TRANSLATIONS = {
 
     /* Modal (side project carousel) */
     keysHint:    '← → Arrow keys · ESC to close',
+    embedHint:   'Click inside · use arrows or click to advance',
     getInTouch:  'Get in touch',
     noSlides:    'No slides yet',
     loadingPdf:  'Loading PDF…',
@@ -1154,6 +1161,7 @@ const TRANSLATIONS = {
     educationLabel: 'Educación',
 
     keysHint:    '← → Flechas · ESC para cerrar',
+    embedHint:   'Haz clic dentro · usa flechas o clic para avanzar',
     getInTouch:  'Contactar',
     noSlides:    'Aún no hay slides',
     loadingPdf:  'Cargando PDF…',
@@ -2030,6 +2038,7 @@ const SELECTED_PROJECTS = [
     tags: ['Real Estate', 'Data Viz', 'Redesign'],
     details: 'Radar faced rapid-development debt: bulky IA, excessive data in sections, unclear infographics, and repeated layout problems. I led a systematic redesign restructuring information into Supply, Demand, and Market Indicators — making a complex tool feel calm and fast.',
     metrics: ['+720 valuations/day', '+20 countries'],
+    caseStudyHref: 'radar.html',
   },
 ];
 
@@ -2063,6 +2072,7 @@ const SIDE_PROJECTS = [
     tags: ['E-commerce', 'B2B'],
     year: '2024',
     slides: [],
+    slidesEmbed: 'https://embed.figma.com/proto/K051wYkNGzmZSyoR9HKwpr/Central-depot?node-id=0-2006&viewport=28%2C312%2C0.04&scaling=scale-down&content-scaling=fixed&starting-point-node-id=0%3A2006&page-id=0%3A1&embed-host=share',
   },
 ];
 
@@ -2476,24 +2486,28 @@ function SideShowcaseSection() {
       {/* Card stage — centered on top of marquee */}
       <div className="side-stage">
         <div ref={trackRef} className="side-track">
-          {SELECTED_PROJECTS.map((p) => (
-            <div key={p.id} className="side-slot">
-              <div className="side-card" style={{ background: p.bg }}>
-                {p.cover ? (
-                  <img className="side-card-cover" src={p.cover} alt={p.name} />
-                ) : (
-                  <div className="side-visual" style={{ color: p.fg }}>
-                    <span className="side-visual-mark">{p.mark}</span>
+          {SELECTED_PROJECTS.map((p) => {
+            const Card = p.caseStudyHref ? 'a' : 'div';
+            const cardProps = p.caseStudyHref ? { href: p.caseStudyHref } : {};
+            return (
+              <div key={p.id} className="side-slot">
+                <Card className="side-card" style={{ background: p.bg }} {...cardProps}>
+                  {p.cover ? (
+                    <img className="side-card-cover" src={p.cover} alt={p.name} />
+                  ) : (
+                    <div className="side-visual" style={{ color: p.fg }}>
+                      <span className="side-visual-mark">{p.mark}</span>
+                    </div>
+                  )}
+                  <div className="side-overlay">
+                    <span className="side-ov-label">{p.meta}</span>
+                    <h3 className="side-ov-title sc-title">{p.name}</h3>
+                    <p className="side-ov-desc sc-desc">{p.desc}</p>
                   </div>
-                )}
-                <div className="side-overlay">
-                  <span className="side-ov-label">{p.meta}</span>
-                  <h3 className="side-ov-title sc-title">{p.name}</h3>
-                  <p className="side-ov-desc sc-desc">{p.desc}</p>
-                </div>
+                </Card>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -2873,10 +2887,11 @@ function Modal({ project, index, onClose }) {
   const pdfDocRef = useRef(null);
   const renderTaskRef = useRef(null);
 
-  const isPdf = !!(project.slidesPdf && window.pdfjsLib);
-  const slides    = project.slides || [];
+  const isEmbed = !!project.slidesEmbed;
+  const isPdf   = !isEmbed && !!(project.slidesPdf && window.pdfjsLib);
+  const slides  = project.slides || [];
   const [pdfPages, setPdfPages] = useState(0);
-  const total     = isPdf ? pdfPages : slides.length;
+  const total   = isPdf ? pdfPages : slides.length;
   const [slide, setSlide] = useState(0);
   const [resizeTick, setResizeTick] = useState(0);
 
@@ -3031,32 +3046,48 @@ function Modal({ project, index, onClose }) {
         </div>
 
         {/* ── Body / carousel ── */}
-        <div className="sp-modal-body">
-          <button className="sp-modal-nav prev" onClick={prev} disabled={total === 0 || slide === 0} aria-label="Previous slide">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 3 L4 8 L10 13" />
-            </svg>
-          </button>
+        <div className={`sp-modal-body${isEmbed ? ' is-embed' : ''}`}>
+          {!isEmbed && (
+            <button className="sp-modal-nav prev" onClick={prev} disabled={total === 0 || slide === 0} aria-label="Previous slide">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 3 L4 8 L10 13" />
+              </svg>
+            </button>
+          )}
           <div ref={slideWrapRef} className="sp-modal-slide">
-            {isPdf
-              ? (pdfPages === 0
-                  ? <span className="sp-modal-empty">{t('loadingPdf')}</span>
-                  : <canvas ref={canvasRef} />)
-              : (total === 0
-                  ? <span className="sp-modal-empty">{t('noSlides')}</span>
-                  : renderSlide(slides[slide]))}
+            {isEmbed
+              ? <iframe
+                  src={project.slidesEmbed}
+                  className="sp-modal-iframe"
+                  title={project.name}
+                  allowFullScreen
+                  allow="fullscreen; clipboard-read; clipboard-write"
+                />
+              : isPdf
+                ? (pdfPages === 0
+                    ? <span className="sp-modal-empty">{t('loadingPdf')}</span>
+                    : <canvas ref={canvasRef} />)
+                : (total === 0
+                    ? <span className="sp-modal-empty">{t('noSlides')}</span>
+                    : renderSlide(slides[slide]))}
           </div>
-          <button className="sp-modal-nav next" onClick={next} disabled={total === 0 || slide >= total - 1} aria-label="Next slide">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 3 L12 8 L6 13" />
-            </svg>
-          </button>
+          {!isEmbed && (
+            <button className="sp-modal-nav next" onClick={next} disabled={total === 0 || slide >= total - 1} aria-label="Next slide">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 3 L12 8 L6 13" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* ── Footer ── */}
         <div className="sp-modal-footer">
-          <span>{cur} / {tot}</span>
-          <span className="keys">{t('keysHint')}</span>
+          {isEmbed
+            ? <span className="keys" style={{ width: '100%', textAlign: 'center' }}>{t('embedHint')}</span>
+            : <>
+                <span>{cur} / {tot}</span>
+                <span className="keys">{t('keysHint')}</span>
+              </>}
         </div>
 
       </div>
