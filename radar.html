@@ -51,7 +51,12 @@ body {
 }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; height: auto; }
-em { font-family: var(--font-serif); font-weight: 300; font-style: italic; color: var(--color-forest); }
+/* em inherits color by default; only the case-study sections paint it forest
+   (the footer needs its em to stay readable on the forest background).     */
+em { font-family: var(--font-serif); font-weight: 300; font-style: italic; }
+.cs-hero em, .cs-section em { color: var(--color-forest); }
+.footer em { color: var(--color-lima); font-style: italic; }
+.footer-inner { max-width: 1200px; }
 ::selection { background: var(--color-lima); color: var(--color-dark); }
 
 /* ── Typography ─────────────────────────────────────────────────────────── */
