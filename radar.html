@@ -5,299 +5,301 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Radar — Case study · Ricardo Martínez</title>
 <meta name="description" content="Redesigning the future of market research — a case study by Ricardo Martínez, Product Designer." />
-
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/case-study-tokens.css" />
 <link rel="stylesheet" href="assets/css/shell.css" />
-
-<style>
-/* ── Design tokens (matched with main portfolio) ─────────────────────────── */
-:root {
-  --color-lima:    #B8F300;
-  --color-forest:  #2D6A4F;
-  --color-dark:    #0F1A10;
-  --color-mid:     #3D5A40;
-  --color-neutral: #F5F5F0;
-  --color-mist:    #EEF3EB;
-  --color-sage:    #E2ECDF;
-  --color-gray:    #8A9B8E;
-  --color-border:  #D6E4D9;
-  --color-white:   #FFFFFF;
-  --surface-page:  var(--color-neutral);
-  --surface-mist:  var(--color-mist);
-
-  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-mono:  'JetBrains Mono', ui-monospace, Menlo, monospace;
-
-  --radius-sm:   4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 32px; --radius-pill: 999px;
-  --t-base: 200ms ease-out;
-
-  --max-w: 880px;
-  --pad: 80px;
-}
-
-/* ── Reset ──────────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  background: var(--color-neutral);
-  color: var(--color-dark);
-  font-family: var(--font-sans);
-  font-size: 16px; line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-a { color: inherit; text-decoration: none; }
-img { display: block; max-width: 100%; height: auto; }
-/* em inherits color by default; only the case-study sections paint it forest
-   (the footer needs its em to stay readable on the forest background).     */
-em { font-family: var(--font-serif); font-weight: 300; font-style: italic; }
-.cs-hero em, .cs-section em { color: var(--color-forest); }
-.footer em { color: var(--color-lima); font-style: italic; }
-.footer-inner { max-width: 1200px; }
-::selection { background: var(--color-lima); color: var(--color-dark); }
-
-/* ── Typography ─────────────────────────────────────────────────────────── */
-.t-display  { font: 700 clamp(56px, 9vw, 96px) var(--font-sans); letter-spacing: -0.025em; line-height: 1.0; margin: 0; }
-.t-h1       { font: 600 clamp(36px, 4.4vw, 52px) var(--font-sans); letter-spacing: -0.015em; line-height: 1.1; margin: 0; }
-.t-h2       { font: 600 clamp(26px, 3vw, 32px)  var(--font-sans); letter-spacing: -0.01em;  line-height: 1.2; margin: 0; }
-.t-h3       { font: 600 clamp(20px, 2.2vw, 24px) var(--font-sans); letter-spacing: -0.005em; line-height: 1.3; margin: 0; }
-.t-h4       { font: 600 18px var(--font-sans);  line-height: 1.35; margin: 0; }
-.t-h5       { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .12em; color: var(--color-gray); margin: 0; }
-.t-body     { font: 400 17px var(--font-sans); line-height: 1.7; color: var(--color-mid); margin: 0; }
-.t-lead     { font: 400 clamp(20px, 2.2vw, 24px) var(--font-sans); line-height: 1.45; color: var(--color-mid); margin: 0; }
-.t-label    { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .12em; color: var(--color-gray); display: inline-block; }
-
-/* Buttons */
-.btn { font: 600 15px var(--font-sans); letter-spacing: .01em; border: none; border-radius: var(--radius-pill); padding: 14px 28px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; will-change: transform; }
-.btn-primary { background: var(--color-lima); color: var(--color-dark); }
-
-/* ── Layout ─────────────────────────────────────────────────────────────── */
-.cs-wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 var(--pad); }
-
-/* ── Hero ───────────────────────────────────────────────────────────────── */
-.cs-hero { padding: clamp(160px, 22vh, 240px) 0 80px; /* extra top to clear the fixed nav */ }
-.cs-hero-eyebrow { margin-bottom: 24px; }
-.cs-hero-title   { margin-bottom: 28px; }
-.cs-hero-lead    { max-width: 640px; color: var(--color-mid); }
-
-/* ── Section ────────────────────────────────────────────────────────────── */
-.cs-section { padding: 80px 0; border-top: 1px solid var(--color-border); }
-.cs-section-eyebrow { margin-bottom: 32px; }
-.cs-section-title   { margin-bottom: 28px; max-width: 720px; }
-.cs-section-lead    { color: var(--color-mid); max-width: 640px; margin-bottom: 40px; }
-.cs-section h3.cs-h3-block { margin: 48px 0 12px; }
-.cs-section h4.cs-h4-block { margin: 40px 0 12px; }
-.cs-section p { font: 400 17px var(--font-sans); line-height: 1.7; color: var(--color-mid); margin: 0 0 18px; max-width: 720px; }
-.cs-section p strong { color: var(--color-dark); font-weight: 600; }
-
-/* ── Challenge eyebrow inside hero ─────────────────────────────────────── */
-.cs-challenge { margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--color-border); }
-.cs-challenge .t-h5 { margin-bottom: 12px; }
-.cs-challenge p { font: 400 17px var(--font-sans); line-height: 1.7; color: var(--color-mid); margin: 0; max-width: 640px; }
-
-/* ── Stats grid ─────────────────────────────────────────────────────────── */
-.cs-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; margin: 48px 0; padding: 40px 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
-.cs-stat-num { display: block; font: 600 clamp(48px, 6vw, 72px) var(--font-sans); letter-spacing: -0.02em; line-height: 1; color: var(--color-forest); margin-bottom: 8px; }
-.cs-stat-label { font: 500 13px var(--font-sans); color: var(--color-mid); }
-
-/* ── Problems list ──────────────────────────────────────────────────────── */
-.cs-problems { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
-.cs-problem { padding: 28px; background: var(--color-white); border-radius: var(--radius-lg); border: 1px solid var(--color-border); }
-.cs-problem h5 { font: 600 16px var(--font-sans); color: var(--color-dark); margin: 0 0 8px; }
-.cs-problem p { font: 400 15px var(--font-sans); line-height: 1.55; color: var(--color-mid); margin: 0; }
-
-/* ── Two-up goal cards ──────────────────────────────────────────────────── */
-.cs-goals { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-.cs-goal { padding: 32px; background: var(--color-sage); border-radius: var(--radius-lg); }
-.cs-goal h5 { font: 600 18px var(--font-sans); color: var(--color-dark); margin: 0 0 8px; }
-.cs-goal p { font: 400 15px var(--font-sans); line-height: 1.55; color: var(--color-mid); margin: 0; max-width: none; }
-
-/* ── Callout ────────────────────────────────────────────────────────────── */
-.cs-callout { margin: 32px 0; padding: 28px 32px; background: var(--color-mist); border-left: 3px solid var(--color-forest); border-radius: var(--radius-md); }
-.cs-callout p { margin: 0 0 8px; }
-.cs-callout p:last-child { margin-bottom: 0; }
-.cs-callout strong { color: var(--color-dark); }
-.cs-categories { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 40px; }
-.cs-category { padding: 20px 24px; background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: 500 16px var(--font-sans); color: var(--color-dark); }
-.cs-category strong { display: block; font-size: 13px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); font-weight: 500; margin-bottom: 6px; }
-
-/* ── Bottom section nav ─────────────────────────────────────────────────── */
-.cs-bottom-nav { margin-top: 96px; padding: 48px 0; border-top: 1px solid var(--color-border); }
-.cs-bottom-nav-label { display: block; margin-bottom: 20px; }
-.cs-bottom-nav-list { display: flex; flex-wrap: wrap; gap: 24px 40px; list-style: none; padding: 0; margin: 0; }
-.cs-bottom-nav-list a { font: 500 15px var(--font-sans); color: var(--color-mid); transition: color var(--t-base); }
-.cs-bottom-nav-list a:hover { color: var(--color-forest); }
-
-/* ── Smooth anchor scroll ───────────────────────────────────────────────── */
-html { scroll-behavior: smooth; }
-[id] { scroll-margin-top: 120px; /* clear the floating nav */ }
-
-/* ── Mobile ─────────────────────────────────────────────────────────────── */
-@media (max-width: 800px) {
-  :root { --pad: 24px; }
-  .t-display { font-size: clamp(44px, 12vw, 64px); }
-  .cs-hero { padding: 120px 0 56px; }
-  .cs-section { padding: 56px 0; }
-  .cs-stats { gap: 24px; }
-  .cs-categories { grid-template-columns: 1fr; }
-}
-</style>
+<link rel="stylesheet" href="assets/css/case-study.css" />
 </head>
 <body>
-<div id="top"></div>
 
-<!-- React mount for the shared nav (portalled to body) -->
+<div class="cs-progress" id="cs-progress"></div>
 <div id="shell-nav-root"></div>
 
-<!-- ── Case study content ─────────────────────────────────────────────── -->
-<header class="cs-hero">
-  <div class="cs-wrap">
-    <span class="t-label cs-hero-eyebrow">Worked during 2020</span>
-    <h1 class="t-display cs-hero-title">Radar</h1>
-    <p class="t-lead cs-hero-lead">Redesigning the future of <em>market research.</em></p>
-
-    <div class="cs-challenge">
-      <span class="t-h5">The challenge</span>
-      <p>Given Radar's evolving legal landscape and its need to adapt based on user feedback and data analysis, we were tasked with conducting a structural analysis and redesign of the application.</p>
+<!-- ── Hero ────────────────────────────────────────────────────────────── -->
+<section class="cs-hero">
+  <div class="container cs-hero-inner">
+    <div class="cs-hero-meta reveal">
+      <span class="label"><span class="label-dot"></span>Case study</span>
+      <span class="label">·</span>
+      <span class="label">Worked during 2020</span>
+      <span class="label">·</span>
+      <span class="label">Product Designer</span>
     </div>
-  </div>
-</header>
+    <h1 class="cs-hero-title reveal">Radar</h1>
+    <p class="cs-hero-sub reveal">Redesigning the future of <em>market research.</em></p>
 
-<section class="cs-section" id="context">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Context</span>
-    <h2 class="t-h2 cs-section-title">The company &amp; the <em>tool.</em></h2>
-    <p>Radar is a powerful tool developed by Tinsa, a leading property valuation company in Spain, with over 30 years of experience.</p>
-    <div class="cs-stats">
-      <div><span class="cs-stat-num">+720</span><span class="cs-stat-label">Valuations per day</span></div>
-      <div><span class="cs-stat-num">+20</span><span class="cs-stat-label">Countries around the world</span></div>
+    <div class="cs-hero-facts reveal">
+      <div class="cs-hero-fact">
+        <span class="label">Client</span>
+        <span class="cs-hero-fact-val">Tinsa — property valuation</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Scope</span>
+        <span class="cs-hero-fact-val">Structural analysis &amp; redesign</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Lenses</span>
+        <span class="cs-hero-fact-val">IA · Layout · Infographics</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Role</span>
+        <span class="cs-hero-fact-val">UX/UI · Research</span>
+      </div>
     </div>
-    <p>Radar is a useful tool for real estate professionals, investors, and anyone interested in Spain's housing market. It provides a privileged view of the market through refined data and infographics.</p>
-    <p>It works by selecting the town and housing type, drawing a polygon on the map, applying filters like room count, and generating an interactive market study in seconds.</p>
-    <h3 class="t-h3 cs-h3-block">Project context</h3>
-    <p>With a first analysis and feedback from our customers, we knew there were three perspectives we had to approach the redesign from: <strong>information architecture, layout, and infographics.</strong> The case study process is repeated from these three points.</p>
-  </div>
-</section>
 
-<section class="cs-section" id="initial-problems">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Initial problems</span>
-    <h2 class="t-h2 cs-section-title">What was <em>holding it back.</em></h2>
-    <p class="cs-section-lead">Five recurring issues kept surfacing across user feedback and internal analysis — each pointing to a deeper structural debt.</p>
-    <ul class="cs-problems">
-      <li class="cs-problem"><h5>Fast development</h5><p>The app had to be redone multiple times in a short period due to changes in legislation, leaving information architecture and usability problems behind.</p></li>
-      <li class="cs-problem"><h5>Growth of information</h5><p>Continuous data growth meant some sections contained an excessive amount of information, making it difficult to understand at a glance.</p></li>
-      <li class="cs-problem"><h5>Layout problems</h5><p>Rapid iterations introduced layout inconsistencies that piled up across screens, hurting the sense of structure.</p></li>
-      <li class="cs-problem"><h5>Bulky UX</h5><p>Without a heuristic approach, Radar had numerous small usability issues that added friction to common tasks.</p></li>
-      <li class="cs-problem"><h5>Unclear infographics</h5><p>Due to the increase in data, the existing infographic structure could no longer handle it cleanly.</p></li>
-    </ul>
-  </div>
-</section>
-
-<section class="cs-section" id="business-goals">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Business goals</span>
-    <h2 class="t-h2 cs-section-title">What success would <em>look like.</em></h2>
-    <div class="cs-goals">
-      <div class="cs-goal"><h5>Engaging new users</h5><p>Business is business — a good way to measure the success of our work is to attract new users who might be interested in our product.</p></div>
-      <div class="cs-goal"><h5>Make more frequent users</h5><p>Having more frequent users would also help us with research and usability tasks down the line.</p></div>
+    <div class="cs-hero-image reveal">
+      <div class="cs-figure-ph" style="width:100%;height:100%"><span>Radar app overview</span></div>
     </div>
   </div>
 </section>
 
-<section class="cs-section" id="analysis">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Analysis &amp; research</span>
-    <h2 class="t-h2 cs-section-title">Three perspectives on the <em>same product.</em></h2>
-    <p class="cs-section-lead">With a first analysis and feedback from our customers in hand, we set up the redesign around three threads: information architecture, layout, and infographics.</p>
-    <h3 class="t-h3 cs-h3-block">Information architecture</h3>
-    <p>To understand the problem, the first step was to conduct a thorough analysis of the app — what information was available, how it was presented, how a user navigated through it, and what the current hierarchy was. The result was a detailed sitemap that included every section with a written explanation.</p>
-    <p>Due to the external conditions of the project, we were only able to run a card sorting activity with real users. The three sources of insight feeding the architecture work were <strong>card sorting results</strong>, <strong>user feedback</strong>, and <strong>Hotjar data</strong>.</p>
-    <h4 class="t-h4 cs-h4-block">Card sorting</h4>
-    <p>It was necessary for the process to be an <strong>open card sorting</strong>: we needed to see how users organised the information independently of the current information blocks.</p>
-    <p>Each team member (PO, UX designer, analyst, developer) conducted a separate card sorting activity in parallel — the goal was to identify the biases inside our own team and compare them against what real users produced.</p>
-    <div class="cs-callout">
-      <p><strong>Hypothesis</strong></p>
-      <p>By analysing the app's information, we can group all sections into two main categories:</p>
-    </div>
-    <div class="cs-categories">
-      <div class="cs-category"><strong>Category 01</strong>Supply &amp; Demand</div>
-      <div class="cs-category"><strong>Category 02</strong>Market Indicators</div>
-    </div>
-    <p>The <strong>Supply &amp; Demand</strong> category would include sections on Valuation Table, Most Recent Properties for Sale, Distribution of Supply, Maximum / Median / Minimum Offer Prices, Real Estate Demand in the Area, and Latest Sold Properties.</p>
-    <p>The <strong>Market Indicators</strong> category would include Financial Information, Housing Price Trends, Real Estate Zoning Scoring, Price Forecast, Variation and Target Price Range, and Gross Return on Investment.</p>
-  </div>
-</section>
+<!-- ── Body ─────────────────────────────────────────────────────────────── -->
+<div class="cs-body">
+  <div class="container cs-layout">
 
-<section class="cs-section" id="proposal">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Proposal</span>
-    <h2 class="t-h2 cs-section-title">A calmer, more <em>scannable</em> Radar.</h2>
-    <p class="cs-section-lead">Section in progress — proposal artefacts and rationale coming soon.</p>
-  </div>
-</section>
-
-<section class="cs-section" id="mockups">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Mockups</span>
-    <h2 class="t-h2 cs-section-title">From sketches to <em>final screens.</em></h2>
-    <p class="cs-section-lead">Section in progress — high-fidelity mockups coming soon.</p>
-  </div>
-</section>
-
-<section class="cs-section" id="acquired-knowledge">
-  <div class="cs-wrap">
-    <span class="t-label cs-section-eyebrow">§ Acquired knowledge</span>
-    <h2 class="t-h2 cs-section-title">What I took with me from <em>Radar.</em></h2>
-    <p class="cs-section-lead">Section in progress — lessons and reflections coming soon.</p>
-
-    <nav class="cs-bottom-nav" aria-label="Jump to section">
-      <span class="t-label cs-bottom-nav-label">Jump to section</span>
-      <ul class="cs-bottom-nav-list">
-        <li><a href="#context">Context</a></li>
-        <li><a href="#initial-problems">Initial problems</a></li>
-        <li><a href="#business-goals">Business goals</a></li>
-        <li><a href="#analysis">Analysis</a></li>
-        <li><a href="#proposal">Proposal</a></li>
-        <li><a href="#mockups">Mockups</a></li>
-        <li><a href="#acquired-knowledge">Acquired knowledge</a></li>
-      </ul>
+    <!-- Sticky TOC -->
+    <nav class="cs-toc" aria-label="Sections">
+      <span class="label cs-toc-label">On this page</span>
+      <a class="cs-toc-link" href="#challenge">The challenge</a>
+      <a class="cs-toc-link" href="#tool">The tool</a>
+      <a class="cs-toc-link" href="#context">Context</a>
+      <a class="cs-toc-link" href="#problems">Initial problems</a>
+      <a class="cs-toc-link" href="#goals">Business goals</a>
+      <a class="cs-toc-link" href="#analysis">Analysis</a>
+      <a class="cs-toc-link" href="#proposal">Proposal</a>
+      <a class="cs-toc-link" href="#mockups">Mockups</a>
+      <a class="cs-toc-link" href="#knowledge">Acquired knowledge</a>
     </nav>
+
+    <main class="cs-content">
+
+      <!-- 01 The challenge -->
+      <section class="cs-section reveal" id="challenge">
+        <div class="label cs-section-label"><span class="label-dot"></span>The challenge</div>
+        <h2 class="h1 cs-section-title">A redesign driven by <em>law, data and feedback.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Given Radar's evolving legal landscape and its need to adapt based on user feedback and data analysis, we were tasked with conducting a structural analysis and redesign of the application.</p>
+        </div>
+        <div class="cs-gallery">
+          <figure class="cs-figure"><div class="cs-figure-ph"><span>Screen 01</span></div></figure>
+          <figure class="cs-figure"><div class="cs-figure-ph"><span>Screen 02</span></div></figure>
+          <figure class="cs-figure"><div class="cs-figure-ph"><span>Screen 03</span></div></figure>
+        </div>
+      </section>
+
+      <!-- 02 The tool -->
+      <section class="cs-section reveal" id="tool">
+        <div class="label cs-section-label"><span class="label-dot"></span>The company &amp; the tool</div>
+        <h2 class="h1 cs-section-title">Backed by <em>30 years</em> of property valuation.</h2>
+        <div class="cs-prose">
+          <p class="body">Radar is a powerful tool developed by <strong>Tinsa</strong>, a leading property valuation company in Spain, with over 30 years of experience.</p>
+        </div>
+
+        <div class="cs-stats">
+          <div class="cs-stat">
+            <div class="cs-stat-val">+720</div>
+            <div class="cs-stat-label">Valuations per day</div>
+          </div>
+          <div class="cs-stat">
+            <div class="cs-stat-val">+20</div>
+            <div class="cs-stat-label">Countries around the world</div>
+          </div>
+        </div>
+
+        <div class="cs-prose">
+          <p class="body">Radar is a useful tool for real estate professionals, investors, and anyone interested in Spain's housing market. It provides a privileged view of the market through refined data and infographics.</p>
+          <p class="body">It works by selecting the town and housing type, drawing a polygon on the map, applying filters like room count, and generating an interactive market study in seconds.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Tool interface</span></div>
+        </figure>
+      </section>
+
+      <!-- 03 Project context -->
+      <section class="cs-section reveal" id="context">
+        <div class="label cs-section-label"><span class="label-dot"></span>Project context</div>
+        <h2 class="h1 cs-section-title">Three lenses for the <em>redesign.</em></h2>
+        <div class="cs-prose">
+          <p class="body">After a first analysis and feedback from our customers, we knew there were three perspectives we had to approach the redesign from. The case study process is structured around each of these.</p>
+        </div>
+        <div class="cs-lenses">
+          <span class="cs-lens"><b>1</b> Information architecture</span>
+          <span class="cs-lens"><b>2</b> Layout</span>
+          <span class="cs-lens"><b>3</b> Infographics</span>
+        </div>
+      </section>
+
+      <!-- 04 Initial problems -->
+      <section class="cs-section reveal" id="problems">
+        <div class="label cs-section-label"><span class="label-dot"></span>Initial problems</div>
+        <h2 class="h1 cs-section-title">What was <em>holding the app back.</em></h2>
+        <div class="cs-problems">
+          <div class="cs-problem">
+            <span class="cs-problem-n">01</span>
+            <h4>Fast development</h4>
+            <p>The app had to be rebuilt multiple times in a short period due to legislative changes — leaving information architecture and usability debt behind.</p>
+          </div>
+          <div class="cs-problem">
+            <span class="cs-problem-n">02</span>
+            <h4>Growth of information</h4>
+            <p>Continuous data growth meant some sections contained excessive amounts of information, making it hard to extract meaning at a glance.</p>
+          </div>
+          <div class="cs-problem">
+            <span class="cs-problem-n">03</span>
+            <h4>Layout problems</h4>
+            <p>Rapid iterations introduced layout inconsistencies that accumulated across screens, breaking any sense of structure.</p>
+          </div>
+          <div class="cs-problem">
+            <span class="cs-problem-n">04</span>
+            <h4>Bulky UX</h4>
+            <p>Without a heuristic approach, Radar had accumulated numerous small usability issues that added friction to common tasks.</p>
+          </div>
+          <div class="cs-problem">
+            <span class="cs-problem-n">05</span>
+            <h4>Unclear infographics</h4>
+            <p>The data increase meant the existing infographic structure could no longer handle the load cleanly — visuals lost their clarity.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 Business goals -->
+      <section class="cs-section reveal" id="goals">
+        <div class="label cs-section-label"><span class="label-dot"></span>Business goals</div>
+        <h2 class="h1 cs-section-title">What success would <em>look like.</em></h2>
+        <div class="cs-goals">
+          <div class="cs-goal">
+            <div class="cs-goal-num">01</div>
+            <h4>Engage new users</h4>
+            <p>A good way to measure success is attracting new users who might be interested in what the product offers.</p>
+          </div>
+          <div class="cs-goal">
+            <div class="cs-goal-num">02</div>
+            <h4>Make users more frequent</h4>
+            <p>Higher usage frequency would also support research and usability efforts going forward.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 Analysis -->
+      <section class="cs-section reveal" id="analysis">
+        <div class="label cs-section-label"><span class="label-dot"></span>Analysis &amp; research</div>
+        <h2 class="h1 cs-section-title">Understanding the information <em>from the inside.</em></h2>
+        <div class="cs-prose">
+          <p class="body">To understand the problem, the first step was a thorough analysis of the app — what information was available, how it was presented, how users navigated it, and what the existing hierarchy was and why. The result was a detailed sitemap covering every section with an explanation.</p>
+          <p class="body">Due to project constraints, card sorting with real users was the only primary research we could run. Three sources informed the information architecture work: <strong>card sorting results</strong>, <strong>user feedback</strong>, and <strong>Hotjar data</strong>.</p>
+        </div>
+
+        <div class="cs-subhead">
+          <span class="label">Card sorting</span>
+          <span class="cs-subhead-rule"></span>
+        </div>
+        <div class="cs-prose">
+          <p class="body">The process needed to be an <strong>open card sort</strong> — we needed to see how users organised information independently of the existing blocks.</p>
+          <p class="body">Each team member (PO, UX designer, analyst, developer) ran a separate card sort, with the goal of surfacing internal biases and comparing them to what real users produced.</p>
+        </div>
+
+        <div class="cs-callout">
+          <span class="label">Hypothesis</span>
+          <h4>All sections can be grouped into two categories</h4>
+          <p>By analysing the app's information, we can organise every section under two main headings:</p>
+          <div class="cs-cats">
+            <div class="cs-cat">
+              <h5>Supply &amp; Demand</h5>
+              <ul>
+                <li>Valuation Table</li>
+                <li>Most Recent Properties for Sale</li>
+                <li>Distribution of Supply</li>
+                <li>Max / Median / Min Offer Prices</li>
+                <li>Real Estate Demand in the Area</li>
+                <li>Latest Sold Properties</li>
+              </ul>
+            </div>
+            <div class="cs-cat">
+              <h5>Market Indicators</h5>
+              <ul>
+                <li>Financial Information</li>
+                <li>Housing Price Trends</li>
+                <li>Real Estate Zoning Scoring</li>
+                <li>Price Forecast</li>
+                <li>Variation &amp; Target Price Range</li>
+                <li>Gross Return on Investment</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 Proposal -->
+      <section class="cs-section reveal" id="proposal">
+        <div class="label cs-section-label"><span class="label-dot"></span>New proposal</div>
+        <h2 class="h1 cs-section-title">A calmer, more <em>scannable</em> Radar.</h2>
+        <div class="cs-prose">
+          <p class="body">Section in progress — proposal artefacts and rationale coming soon.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>New proposal screens</span></div>
+        </figure>
+      </section>
+
+      <!-- 08 Mockups -->
+      <section class="cs-section reveal" id="mockups">
+        <div class="label cs-section-label"><span class="label-dot"></span>Mockups</div>
+        <h2 class="h1 cs-section-title">From sketches to <em>final screens.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Section in progress — high-fidelity mockups coming soon.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Final mockups</span></div>
+        </figure>
+      </section>
+
+      <!-- 09 Acquired knowledge -->
+      <section class="cs-section reveal" id="knowledge">
+        <div class="label cs-section-label"><span class="label-dot"></span>Acquired knowledge</div>
+        <h2 class="h1 cs-section-title">What Radar <em>taught me.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Section in progress — learnings and reflections coming soon.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Case study end strip ─────────────────────────────────────────────── -->
+<section class="cs-end">
+  <div class="cs-end-inner">
+    <span class="label">What's next?</span>
+    <h2>Let's build something <em>useful</em> together.</h2>
+    <div class="cs-end-actions">
+      <a class="btn btn-primary" href="mailto:ricardomartinezing1@gmail.com">Let's talk →</a>
+      <a class="btn btn-ghost-on-dark" href="index.html#work">← Back to all work</a>
+    </div>
+    <div class="cs-end-bottom">
+      <span>© 2026 Ricardo Martínez</span>
+      <span>Radar · Tinsa by Accumin</span>
+    </div>
   </div>
 </section>
 
-<!-- React mount for the shared footer -->
 <div id="shell-footer-root"></div>
 
-<!-- ── Scripts ──────────────────────────────────────────────────────────── -->
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 <script type="text/babel" src="assets/js/shell.js"></script>
-
 <script type="text/babel">
-  /* Mount the shared Nav + CursorDot at the top of the page and the shared
-     Footer at the bottom. Each root has its own LanguageProvider — they
-     stay in sync via the custom 'portfolio-lang-changed' event.            */
   const { LanguageProvider, Nav, Footer, CursorDot } = window.PortfolioShell;
-
   ReactDOM.createRoot(document.getElementById('shell-nav-root')).render(
-    <LanguageProvider>
-      <CursorDot />
-      <Nav homeHref="index.html" />
-    </LanguageProvider>
+    <LanguageProvider><CursorDot /><Nav homeHref="index.html" /></LanguageProvider>
   );
-
   ReactDOM.createRoot(document.getElementById('shell-footer-root')).render(
-    <LanguageProvider>
-      <Footer />
-    </LanguageProvider>
+    <LanguageProvider><Footer /></LanguageProvider>
   );
 </script>
-
+<script src="assets/js/case-study.js"></script>
 </body>
 </html>

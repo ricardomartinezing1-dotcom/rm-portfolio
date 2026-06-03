@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vega — Case study · Ricardo Martínez</title>
+<meta name="description" content="Redesigning Tinsa's field appraisal app to make surveyors faster, not busier. Case study by Ricardo Martínez." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="assets/css/case-study-tokens.css" />
+<link rel="stylesheet" href="assets/css/shell.css" />
+<link rel="stylesheet" href="assets/css/case-study.css" />
+</head>
+<body>
+
+<div class="cs-progress" id="cs-progress"></div>
+<div id="shell-nav-root"></div>
+
+<!-- ── Hero ────────────────────────────────────────────────────────────── -->
+<section class="cs-hero">
+  <div class="container cs-hero-inner">
+    <div class="cs-hero-meta reveal">
+      <span class="label"><span class="label-dot"></span>Case study</span>
+      <span class="label">·</span>
+      <span class="label">Tinsa by Accumin</span>
+      <span class="label">·</span>
+      <span class="label">Product Designer</span>
+    </div>
+    <h1 class="cs-hero-title reveal">Vega</h1>
+    <p class="cs-hero-sub reveal">Field appraisals <em>faster, not heavier.</em></p>
+
+    <div class="cs-hero-facts reveal">
+      <div class="cs-hero-fact">
+        <span class="label">Role</span>
+        <span class="cs-hero-fact-val">Product Designer · end-to-end</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Platform</span>
+        <span class="cs-hero-fact-val">iOS + Android · Flutter</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Type</span>
+        <span class="cs-hero-fact-val">Internal B2B tool</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Status</span>
+        <span class="cs-hero-fact-val">Phase 1 done · Phase 2 in progress</span>
+      </div>
+    </div>
+
+    <div class="cs-hero-image reveal">
+      <div class="cs-figure-ph" style="width:100%;height:100%"><span>Before / after · assignments list</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Body ─────────────────────────────────────────────────────────────── -->
+<div class="cs-body">
+  <div class="container cs-layout">
+
+    <!-- Sticky TOC -->
+    <nav class="cs-toc" aria-label="Sections">
+      <span class="label cs-toc-label">On this page</span>
+      <a class="cs-toc-link" href="#context">Context</a>
+      <a class="cs-toc-link" href="#stakes">Why it mattered</a>
+      <a class="cs-toc-link" href="#constraints">Constraints</a>
+      <a class="cs-toc-link" href="#role">My role</a>
+      <a class="cs-toc-link" href="#decisions">Decisions</a>
+      <a class="cs-toc-link" href="#solution">The solution</a>
+      <a class="cs-toc-link" href="#evolution">Evolution</a>
+      <a class="cs-toc-link" href="#impact">Impact</a>
+      <a class="cs-toc-link" href="#reflection">Reflection</a>
+    </nav>
+
+    <main class="cs-content">
+
+      <!-- 01 Context -->
+      <section class="cs-section reveal" id="context">
+        <div class="label cs-section-label"><span class="label-dot"></span>01 · Context &amp; problem</div>
+        <h2 class="h1 cs-section-title">A tool that was <em>useful but painful.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Vega already had a place in surveyors' daily routines — the habit didn't need creating from scratch. But the experience was penalising the very thing the app existed to do: help people work faster.</p>
+          <p class="body">The research made it clear. The app was seen as <strong>useful but problematic</strong>: slow loading times, errors and crashes, an interface that was hard to use and poorly suited to real field conditions. A revealing symptom was that it <strong>didn't update in real time</strong>, which broke the surveyor's trust in what they saw on screen. The result: some were turning to external tools to cover needs the app wasn't handling well.</p>
+          <p class="body">We didn't start from hunches. The problem was grounded in real research: functional analysis of the app, stakeholder interviews across business, ops and technology, <strong>6 surveyors interviewed</strong>, <strong>one observed field visit</strong>, and a user survey.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Old app · friction points</span></div>
+        </figure>
+      </section>
+
+      <!-- 02 Why it mattered -->
+      <section class="cs-section reveal" id="stakes">
+        <div class="label cs-section-label"><span class="label-dot"></span>02 · Why it mattered</div>
+        <h2 class="h1 cs-section-title">In appraisals, time <em>is the business.</em></h2>
+        <div class="cs-prose">
+          <p class="body">The faster a visit and its data capture, the more assignments a surveyor can take on. A slow and fragile tool wasn't just an inconvenience — it was a direct drag on the whole network's productivity.</p>
+        </div>
+        <div class="cs-cards">
+          <div class="cs-card">
+            <span class="cs-card-icon">USR</span>
+            <div><h4>For the user</h4><p>Less friction and less time lost on tasks that add no value, in a mobile job with time pressure and sometimes no signal.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">BIZ</span>
+            <div><h4>For Tinsa</h4><p>An internal tool that was dragging the network's efficiency and losing ground to alternatives that surveyors were using on the side.</p></div>
+          </div>
+        </div>
+        <div class="cs-prose">
+          <p class="body">The migration to <strong>Flutter</strong> — designed to unify the two apps into one — was the lever that opened the window. The opportunity wasn't to rewrite the app, but to redesign it: use the fact that we were touching everything to fix what was really hurting.</p>
+        </div>
+        <blockquote class="cs-pull">Help surveyors organise and manage their assignments quickly and efficiently, cutting time spent on tasks that add no value.</blockquote>
+      </section>
+
+      <!-- 03 Constraints -->
+      <section class="cs-section reveal" id="constraints">
+        <div class="label cs-section-label"><span class="label-dot"></span>03 · Constraints &amp; starting point</div>
+        <h2 class="h1 cs-section-title">The rules of the game that <em>shaped the design.</em></h2>
+        <div class="cs-cards">
+          <div class="cs-card">
+            <span class="cs-card-icon">TEC</span>
+            <div><h4>Technical &amp; architecture</h4><p>Front built in Flutter with Material Design; business logic lived in Tinsa's backend, connected to other systems (Pickup, Valentino, antecedents…). Real-time updates were an inherited technical problem, not a UI quirk.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">ORG</span>
+            <div><h4>Organisational</h4><p>Development was split between Tinsa's backend lead and an external front-end team. Designing without aligning both first meant risking proposals that couldn't be built.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">€/T</span>
+            <div><h4>Budget &amp; timeline</h4><p>Limited scope. Not everything the research flagged as valuable could fit in the project.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">USR</span>
+            <div><h4>User profile</h4><p>The surveyor network averages <strong>over 45 years old</strong> and <strong>over 90% work individually</strong>. The design baseline had to respect that real profile.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Role -->
+      <section class="cs-section reveal" id="role">
+        <div class="label cs-section-label"><span class="label-dot"></span>04 · My role &amp; collaboration</div>
+        <h2 class="h1 cs-section-title">No decision was <em>made alone.</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>Three-way prioritisation.</strong> Decisions weren't negotiated only with the PO: business had significant weight. My job was to advise and push — with research evidence upfront — what mattered most: things that were <em>blocking</em> app use or <em>generating high friction</em>. Usually the three parties reached agreement.</p>
+          <p class="body"><strong>Technical validation before designing.</strong> We set up a process for every feature that prevented designing in a vacuum:</p>
+        </div>
+        <div class="cs-steps">
+          <div class="cs-step">
+            <span class="cs-step-num">1</span>
+            <p>Technical meeting with backend (Tinsa) and frontend (external) to understand real constraints.</p>
+          </div>
+          <div class="cs-step">
+            <span class="cs-step-num">2</span>
+            <p>Quick sketch to check feasibility.</p>
+          </div>
+          <div class="cs-step">
+            <span class="cs-step-num">3</span>
+            <p>Only then, high-fidelity mockups.</p>
+          </div>
+        </div>
+        <div class="cs-prose">
+          <p class="body"><strong>Domain knowledge.</strong> The knowledge lead was essential for defining the app's logic and edge cases — rules an external designer can't invent and that condition every appraisal flow.</p>
+        </div>
+      </section>
+
+      <!-- 05 Decisions -->
+      <section class="cs-section reveal" id="decisions">
+        <div class="label cs-section-label"><span class="label-dot"></span>05 · Exploration, decisions &amp; trade-offs</div>
+        <h2 class="h1 cs-section-title">Balancing user, business <em>and feasibility.</em></h2>
+
+        <div class="cs-decision">
+          <span class="cs-decision-tag">Decision 01</span>
+          <h4>Invalidate the "more data" hypothesis</h4>
+          <p>Business believed value would come from letting surveyors fill in valuation data from the app. Research showed the opposite: surveyors want to spend the <em>least time possible</em> on a visit. The path wasn't asking for more input — it was automating and reducing effort.</p>
+          <p class="trade"><b>Impact:</b> reoriented the entire product strategy towards automation and friction reduction.</p>
+        </div>
+
+        <div class="cs-decision">
+          <span class="cs-decision-tag">Decision 02</span>
+          <h4>Design for the "classic individual" profile</h4>
+          <p>Research identified four profiles (tech-savvy/classic × individual/group). With such different profiles, designing for one risked penalising the rest. Agreed with business: <strong>prioritised the classic individual</strong> because they represented the network's reality — average age 45+, 90%+ solo workers.</p>
+          <p class="trade"><b>Trade-off:</b> group and tech-savvy features (batches, routes) moved to the back of the queue.</p>
+        </div>
+
+        <div class="cs-decision">
+          <span class="cs-decision-tag">Decision 03</span>
+          <h4>Evolve the information architecture, not rebuild it</h4>
+          <p>Mapping the information revealed that part of the existing IA wasn't used or wasn't useful. Instead of a radical restructure, <strong>we refined what existed</strong> using research evidence, removing what added nothing.</p>
+          <p class="trade"><b>Why:</b> given the timeline and budget, a full restructure carried more risk than value.</p>
+        </div>
+
+        <div class="cs-prose">
+          <p class="body"><strong>Conscious trade-offs.</strong> We'd have liked to go deeper on navigation to get an even cleaner interface, but there was no time or budget. And features the research flagged as needed — <strong>batch management</strong> and <strong>incident reporting</strong> — were cut by prioritisation and cost. Not oversights: deliberate scope decisions.</p>
+        </div>
+      </section>
+
+      <!-- 06 Solution -->
+      <section class="cs-section reveal" id="solution">
+        <div class="label cs-section-label"><span class="label-dot"></span>06 · The solution</div>
+        <h2 class="h1 cs-section-title">Starting from <em>the foundations.</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>First, a UI Kit.</strong> I built a UI Kit based on the new corporate aesthetic (Accumin) and Material Design. Having the visual system solved before redesigning screens gave the rest of the work coherence and speed.</p>
+          <p class="body"><strong>Then, a screen-by-screen redesign</strong> — applying fundamental UX principles, restructuring information hierarchy, and making every view simultaneously more pleasant and more useful.</p>
+        </div>
+
+        <div class="cs-callout">
+          <span class="label">The two hardest design challenges</span>
+          <h4>Remove, not add</h4>
+          <p><strong>The assignments list:</strong> each card carried too much information. The hard work was cutting — keeping only what was essential to read status and priority at a glance.</p>
+          <p><strong>The assignment detail:</strong> it concentrates a lot of sensitive, critical information. The challenge was ordering it so the important parts were accessible without noise.</p>
+        </div>
+
+        <div class="cs-prose">
+          <p class="body"><strong>Tangible changes:</strong> new interface with refreshed hierarchy and iconography, a new navigation model, a noticeably faster app, and — critical for trust — improved <strong>real-time updates</strong>, one of the most frustrating inherited failures.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Before / after · assignment detail · UI Kit</span></div>
+        </figure>
+      </section>
+
+      <!-- 07 Evolution -->
+      <section class="cs-section reveal" id="evolution">
+        <div class="label cs-section-label"><span class="label-dot"></span>07 · Evolution of the solution</div>
+        <h2 class="h1 cs-section-title">The case of the <em>"Visit Mode".</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>Adoption of the change.</strong> User feedback on the impact was positive, though some found the initial transition hard: relearning how to navigate a tool they used daily creates an adjustment curve. A useful reminder that, in internal tools, the cost of change for the user is also a design variable.</p>
+          <p class="body">Business and knowledge proposed being able to advance valuation work from the mobile. I applied what research had taught us: <strong>I went back to ask users</strong>, who didn't see it as a priority. I shared that evidence with the team. Even so, given its value for business, the decision was made to proceed.</p>
+          <p class="body">My job then was to design it as quickly and linearly as possible, building on capabilities the app already had (like geo-referencing). Today Visit Mode is in production and its adoption isn't bad.</p>
+        </div>
+        <blockquote class="cs-pull">Bring the evidence, defend it — and when business decides otherwise for legitimate reasons, commit and execute as well as possible.</blockquote>
+      </section>
+
+      <!-- 08 Impact -->
+      <section class="cs-section reveal" id="impact">
+        <div class="label cs-section-label"><span class="label-dot"></span>08 · Impact &amp; learnings</div>
+        <h2 class="h1 cs-section-title">Once reliable and useful, <em>surveyors came back.</em></h2>
+        <div class="cs-metrics">
+          <div class="cs-metric">
+            <div class="cs-metric-val">−25%</div>
+            <div class="cs-metric-label">Data capture time — the core task is now faster.</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-val">+15%</div>
+            <div class="cs-metric-label">Volume of data captured — faster and more productive.</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-val">+35%</div>
+            <div class="cs-metric-label">App usage time — surveyors centralise work they used to do elsewhere.</div>
+          </div>
+        </div>
+        <div class="cs-callout">
+          <span class="label">Reading note</span>
+          <h4>+35% usage doesn't contradict saving time</h4>
+          <p>Each task is faster (−25%) and more productive (+15%); the +35% reflects <strong>greater adoption</strong>, not more effort. Measured the other way it'd be a vanity metric; in this order, it's a signal that the app earned its place.</p>
+        </div>
+        <div class="cs-takeaways">
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>Validating technical feasibility <em>before</em> falling in love with a solution saves redesigns and frustration.</p>
+          </div>
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>In internal tools, the cost of change for the user is part of the design, not a side effect.</p>
+          </div>
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>Defending the evidence and knowing when to commit when business decides otherwise is part of the craft.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 Reflection -->
+      <section class="cs-section reveal" id="reflection">
+        <div class="label cs-section-label"><span class="label-dot"></span>09 · Reflection</div>
+        <h2 class="h1 cs-section-title">Finding <em>the intersection.</em></h2>
+        <div class="cs-prose">
+          <p class="body">If I ran the project again, I'd fight to reserve time and budget for deeper work on navigation: it was the lever for an even cleaner interface and it was left half-finished because of scope. Batch management and incident reporting also remained pending — pieces with clear value that each needed their own discovery.</p>
+          <p class="body">What I take away is the confirmation that good Product Design isn't about imposing the "best" solution — it's about finding where the real user need, the business objective, and what the team can actually build intersect. And defending the evidence with judgement inside that intersection.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Case study end strip ─────────────────────────────────────────────── -->
+<section class="cs-end">
+  <div class="cs-end-inner">
+    <span class="label">What's next?</span>
+    <h2>Let's build something <em>useful</em> together.</h2>
+    <div class="cs-end-actions">
+      <a class="btn btn-primary" href="mailto:ricardomartinezing1@gmail.com">Let's talk →</a>
+      <a class="btn btn-ghost-on-dark" href="index.html#work">← Back to all work</a>
+    </div>
+    <div class="cs-end-bottom">
+      <span>© 2026 Ricardo Martínez</span>
+      <span>Vega · Tinsa by Accumin</span>
+    </div>
+  </div>
+</section>
+
+<div id="shell-footer-root"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script type="text/babel" src="assets/js/shell.js"></script>
+<script type="text/babel">
+  const { LanguageProvider, Nav, Footer, CursorDot } = window.PortfolioShell;
+  ReactDOM.createRoot(document.getElementById('shell-nav-root')).render(
+    <LanguageProvider><CursorDot /><Nav homeHref="index.html" /></LanguageProvider>
+  );
+  ReactDOM.createRoot(document.getElementById('shell-footer-root')).render(
+    <LanguageProvider><Footer /></LanguageProvider>
+  );
+</script>
+<script src="assets/js/case-study.js"></script>
+</body>
+</html>
