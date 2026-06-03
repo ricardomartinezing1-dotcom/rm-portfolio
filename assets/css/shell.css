@@ -188,8 +188,23 @@
 
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .footer { background: var(--color-forest); }
-.footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 120px var(--pad) 64px; }
+/* --pad / --max-w fall back to case-study tokens (--margin-side / --max-width)
+   so the footer is self-contained on any page that loads shell.css.        */
+.footer-inner {
+  max-width: var(--max-w, var(--max-width, 1200px));
+  margin: 0 auto;
+  padding: 120px var(--pad, var(--margin-side, 80px)) 64px;
+}
 @media (max-width: 800px) { .footer-inner { padding: 64px 24px 48px; } }
+/* Footer-scoped type helpers — case-study pages don't define the index's
+   inline .t-* classes, so the footer brings its own. Scoped to .footer to
+   avoid clashing with the home page's global definitions.                  */
+.footer .t-label { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--color-gray); display: inline-block; }
+.footer .t-h1    { font: 600 clamp(36px,4.4vw,52px) var(--font-sans); letter-spacing: -0.015em; line-height: 1.1; margin: 0; }
+.footer .t-lead  { font: 400 19px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0; }
+.footer .t-h1 em { font-family: var(--font-serif); font-weight: 300; font-style: italic; }
+.footer .btn { font: 600 15px var(--font-sans); border: none; border-radius: var(--radius-pill); padding: 14px 28px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap; }
+.footer .btn-primary { background: var(--color-lima); color: var(--color-dark); }
 .footer-cta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 32px; }
 .footer-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 40px; margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,.12); }
 .footer-col-label { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: rgba(245,245,240,.55); margin-bottom: 12px; display: block; }
