@@ -353,9 +353,13 @@
     };
 
     const goHome = (e) => {
-      e.preventDefault();
-      const top = document.getElementById('top');
-      if (top) scrollToId('top'); else window.location.href = homeHref;
+      /* On the home page (the only one with #smooth-content) smooth-scroll to
+         the top. Anywhere else, let the anchor navigate to homeHref.         */
+      const onHome = !!document.getElementById('smooth-content');
+      if (onHome) {
+        e.preventDefault();
+        scrollToId('top');
+      }
     };
 
     return ReactDOM.createPortal(

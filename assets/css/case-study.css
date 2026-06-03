@@ -90,7 +90,7 @@ img { display: block; max-width: 100%; }
 .cs-hero-image img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ── Body layout: sticky TOC + content ──────────────────────────────────── */
-.cs-body { padding: var(--space-16) 0 0; }
+.cs-body { padding: var(--space-16) 0; }
 .cs-layout { display: grid; grid-template-columns: 220px 1fr; gap: var(--space-12); align-items: start; }
 @media (max-width: 1000px) { .cs-layout { grid-template-columns: 1fr; } }
 
