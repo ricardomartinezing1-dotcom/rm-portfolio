@@ -908,6 +908,44 @@ body { overflow-y: scroll; }
   .sp-modal-footer { padding: 12px 20px; }
 }
 
+/* ── AI section — gradient card that rises and pins to full viewport ─────── */
+.ai-wrap { position: relative; height: 200vh; }
+.ai-stage {
+  position: relative; height: 100vh; overflow: hidden;
+  will-change: transform; z-index: 2;
+}
+.ai-card {
+  position: absolute; inset: 0;
+  /* brand gradient — forest → green → lima, with a soft lima glow */
+  background:
+    radial-gradient(115% 90% at 78% 62%, rgba(184,243,0,0.55), transparent 55%),
+    linear-gradient(150deg, #1C5238 0%, #2D6A4F 28%, #57A66C 62%, #9FD84A 100%);
+  color: var(--color-white);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: clamp(40px,7vh,96px) var(--pad);
+  will-change: transform, border-radius;
+}
+.ai-title {
+  font: 700 clamp(48px,7.5vw,108px) var(--font-sans);
+  letter-spacing: -0.03em; line-height: 0.95; margin: 0; max-width: 14ch;
+}
+.ai-title em {
+  display: block; font-family: var(--font-serif);
+  font-weight: 300; font-style: italic; letter-spacing: 0;
+}
+.ai-texts {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(24px,4vw,72px); max-width: 760px;
+  align-self: flex-end; margin-left: auto;
+}
+.ai-text { font: 400 15px var(--font-sans); line-height: 1.65; color: rgba(255,255,255,0.88); margin: 0; }
+@media (max-width: 768px) {
+  .ai-wrap { height: auto; }
+  .ai-stage { height: auto; overflow: visible; }
+  .ai-card { position: relative; inset: auto; min-height: 100vh; padding: 96px 24px 48px; gap: 48px; border-radius: 0 !important; transform: none !important; }
+  .ai-texts { grid-template-columns: 1fr; margin-left: 0; max-width: none; }
+}
+
 /* ── Footer ──────────────────────────────────────────────────────────────── */
 .footer { background: var(--color-forest); }
 .footer-inner { max-width: var(--max-w); margin: 0 auto; padding: 120px var(--pad) 64px; }
@@ -3133,6 +3171,95 @@ function CursorDot() {
   );
 }
 
+/* ── AI section ───────────────────────────────────────────────────────────
+   A gradient card that rises from below, pins to the viewport (manual ticker
+   pin — same technique as WorkSection, since the smooth-scroll transform
+   breaks native sticky), flattens its top corners as it fills the screen,
+   and reveals its text on scrub.                                            */
+function AISection() {
+  const wrapRef  = useRef(null);
+  const stageRef = useRef(null);
+  const cardRef  = useRef(null);
+  const titleRef = useRef(null);
+  const t1Ref    = useRef(null);
+  const t2Ref    = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 769px) and (prefers-reduced-motion: no-preference)', () => {
+        const vh = window.innerHeight;
+
+        const getWrapTop = () => {
+          let top = 0, el = wrapRef.current;
+          while (el) { top += el.offsetTop; el = el.offsetParent; }
+          return top;
+        };
+        let wrapTop = getWrapTop();
+        let wrapH   = wrapRef.current.offsetHeight;
+
+        const onResize = () => {
+          wrapTop = getWrapTop();
+          wrapH   = wrapRef.current.offsetHeight;
+          if (window._syncBodyHeight) window._syncBodyHeight();
+        };
+        window.addEventListener('resize', onResize);
+        document.fonts.ready.then(onResize);
+
+        /* Manual pin: keep the stage locked to the viewport while the wrap
+           scrolls through its second 100vh. */
+        const tick = () => {
+          const cy   = window._smoothY ? window._smoothY() : window.scrollY;
+          const pinY = Math.max(0, Math.min(cy - wrapTop, wrapH - vh));
+          gsap.set(stageRef.current, { y: pinY, force3D: true });
+        };
+        gsap.ticker.add(tick);
+
+        /* Scrubbed timeline: card rises + corners flatten, then text reveals. */
+        gsap.set(cardRef.current, { yPercent: 100, borderTopLeftRadius: 48, borderTopRightRadius: 48 });
+        gsap.set([titleRef.current, t1Ref.current, t2Ref.current], { autoAlpha: 0, y: 40 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: wrapRef.current,
+            start: 'top top',
+            end:   'bottom bottom',
+            scrub: 1,
+          },
+        });
+        tl.to(cardRef.current, { yPercent: 0, ease: 'none', duration: 0.5 }, 0)
+          .to(cardRef.current, { borderTopLeftRadius: 0, borderTopRightRadius: 0, ease: 'none', duration: 0.5 }, 0)
+          .to(titleRef.current, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.42)
+          .to(t1Ref.current,   { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.55)
+          .to(t2Ref.current,   { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.62);
+
+        if (window._syncBodyHeight) window._syncBodyHeight();
+
+        return () => {
+          gsap.ticker.remove(tick);
+          window.removeEventListener('resize', onResize);
+          gsap.set(stageRef.current, { clearProps: 'transform' });
+        };
+      });
+    }, wrapRef);
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={wrapRef} className="ai-wrap" aria-label="Where AI fits in how I work">
+      <div ref={stageRef} className="ai-stage">
+        <div ref={cardRef} className="ai-card">
+          <h2 ref={titleRef} className="ai-title">Where AI fits in <em>how I work.</em></h2>
+          <div className="ai-texts">
+            <p ref={t1Ref} className="ai-text">I treat AI as a fast, tireless collaborator — never a replacement for judgment. Early on it helps me widen the search space: drafting variations, pressure-testing copy and turning rough research notes into patterns I can actually read.</p>
+            <p ref={t2Ref} className="ai-text">Mid-project it speeds up the unglamorous work — realistic placeholder content, interview summaries, quick flows so I can react to something concrete instead of a blank canvas. What it never does is decide. The taste, the trade-offs and the responsibility for what ships stay with me.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const [active, setActive]       = useState(null);
   const [openProject, setOpenProject] = useState(null);
@@ -3290,6 +3417,7 @@ function App() {
       <WorkSection onOpen={setOpenProject} />
       <AboutSection />
       <BackgroundSection />
+      <AISection />
       <Footer />
       {openProject && (
         <Modal
