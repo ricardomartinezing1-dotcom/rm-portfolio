@@ -550,7 +550,13 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ── Background / Timeline ───────────────────────────────────────────────── */
-.bg-section { background: var(--color-white); padding: 96px var(--pad); }
+.bg-section {
+  background: var(--color-white);
+  padding: 96px var(--pad);
+  transform-origin: top center;
+  will-change: transform;
+  overflow: hidden; /* border-radius clips correctly */
+}
 @media (max-width: 800px) { .bg-section { padding: 64px 24px; } }
 .bg-inner { max-width: var(--max-w); margin: 0 auto; }
 .bg-group { margin-bottom: 64px; }
@@ -909,40 +915,98 @@ body { overflow-y: scroll; }
 }
 
 /* ── AI section — gradient card that rises and pins to full viewport ─────── */
-.ai-wrap { position: relative; height: 200vh; }
+.ai-wrap { position: relative; height: 200vh; margin-top: -200vh; z-index: 5; }
 .ai-stage {
   position: relative; height: 100vh; overflow: hidden;
+  /* No background here — the ai-card provides the visual background.
+     Keeping this transparent allows bg-section to show through during
+     the margin-top:-200vh overlap phase. */
   will-change: transform; z-index: 2;
+}
+/* CSS fallback if WebGL is unavailable */
+.ai-stage--fallback {
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 40%, rgba(28,82,56,0.28), transparent 55%),
+    radial-gradient(ellipse 60% 80% at 75% 65%, rgba(45,106,79,0.22), transparent 50%),
+    radial-gradient(ellipse 40% 40% at 55% 80%, rgba(184,243,0,0.12), transparent 45%),
+    var(--color-neutral);
+  animation: aiGradientDrift 14s ease-in-out infinite alternate;
+}
+@keyframes aiGradientDrift {
+  from { filter: hue-rotate(0deg);  }
+  to   { filter: hue-rotate(12deg); }
+}
+.ai-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; display: block;
+  /* z-index 0: the canvas IS the background — an opaque forest-green water
+     surface. White text sits on top (z-index 1). pointer-events:none so the
+     section still receives mouse events (forwarded to the ripple sim). */
+  z-index: 0; pointer-events: none;
 }
 .ai-card {
   position: absolute; inset: 0;
-  /* brand gradient — forest → green → lima, with a soft lima glow */
+  /* Light neutral base. On desktop the WebGL water canvas (z-index:0) covers
+     this; it's the fallback for mobile / no-WebGL. */
   background:
-    radial-gradient(115% 90% at 78% 62%, rgba(184,243,0,0.55), transparent 55%),
-    linear-gradient(150deg, #1C5238 0%, #2D6A4F 28%, #57A66C 62%, #9FD84A 100%);
-  color: var(--color-white);
-  display: flex; flex-direction: column; justify-content: space-between;
+    radial-gradient(ellipse 90% 65% at 18% 28%, rgba(45,106,79,0.12), transparent 55%),
+    radial-gradient(ellipse 45% 50% at 60% 85%, rgba(184,243,0,0.12), transparent 50%),
+    linear-gradient(135deg, #F5F5F0, #ECEEE8 55%, #E4E8E0);
+  overflow: hidden;                  /* clips canvas to card's border-radius */
+  color: var(--color-dark);
+  /* 12-col editorial grid: title top-left (7 cols), texts bottom-right (8 cols) */
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 0 clamp(16px,2vw,28px);
   padding: clamp(40px,7vh,96px) var(--pad);
   will-change: transform, border-radius;
 }
 .ai-title {
-  font: 700 clamp(48px,7.5vw,108px) var(--font-sans);
-  letter-spacing: -0.03em; line-height: 0.95; margin: 0; max-width: 14ch;
+  grid-column: 1 / 8;
+  grid-row: 1;
+  align-self: end;
+  font: 700 clamp(44px,6.4vw,72px) var(--font-sans);
+  letter-spacing: -0.02em; line-height: 1.05; margin: 0;
+  position: relative; z-index: 1;
+  color: var(--color-dark);
 }
 .ai-title em {
-  display: block; font-family: var(--font-serif);
+  font-family: var(--font-serif);
   font-weight: 300; font-style: italic; letter-spacing: 0;
+  color: var(--color-forest);
 }
 .ai-texts {
+  grid-column: 5 / 13;
+  grid-row: 2;
+  align-self: end;
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: clamp(24px,4vw,72px); max-width: 760px;
-  align-self: flex-end; margin-left: auto;
+  gap: clamp(24px,3vw,48px);
+  padding-bottom: 0;
+  position: relative; z-index: 1;
 }
-.ai-text { font: 400 15px var(--font-sans); line-height: 1.65; color: rgba(255,255,255,0.88); margin: 0; }
+.ai-text { font: 400 15px var(--font-sans); line-height: 1.65; color: var(--color-mid); margin: 0; }
+/* Fallback gradient when WebGL is unavailable (class toggled by JS) */
+.ai-card--fallback {
+  background:
+    radial-gradient(ellipse 80% 55% at 25% 38%, rgba(28,82,56,0.22), transparent 50%),
+    radial-gradient(ellipse 55% 75% at 78% 68%, rgba(45,106,79,0.18), transparent 48%),
+    radial-gradient(ellipse 35% 35% at 58% 82%, rgba(184,243,0,0.10), transparent 45%),
+    var(--color-neutral) !important;
+  animation: aiGradientDrift 14s ease-in-out infinite alternate;
+}
 @media (max-width: 768px) {
   .ai-wrap { height: auto; }
   .ai-stage { height: auto; overflow: visible; }
+  .ai-canvas { display: none; }   /* skip WebGL on small screens — static gradient instead */
   .ai-card { position: relative; inset: auto; min-height: 100vh; padding: 96px 24px 48px; gap: 48px; border-radius: 0 !important; transform: none !important; }
+  .ai-card {
+    background:
+      radial-gradient(ellipse 80% 55% at 25% 38%, rgba(28,82,56,0.20), transparent 50%),
+      radial-gradient(ellipse 55% 75% at 78% 68%, rgba(45,106,79,0.16), transparent 48%),
+      var(--color-neutral);
+    animation: aiGradientDrift 14s ease-in-out infinite alternate;
+  }
   .ai-texts { grid-template-columns: 1fr; margin-left: 0; max-width: none; }
 }
 
@@ -2756,8 +2820,38 @@ const EDUCATION = [
 
 function BackgroundSection() {
   const { t } = useT();
+  const cardRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 769px) and (prefers-reduced-motion: no-preference)', () => {
+        /* Pin the card when its bottom reaches the viewport bottom, then
+           scrub scale + top border-radius as the AI card rises over it.   */
+        gsap.set(cardRef.current, { transformOrigin: 'top center' });
+        gsap.to(cardRef.current, {
+          scale: 0.9,
+          borderTopLeftRadius: 48,
+          borderTopRightRadius: 48,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: 'bottom bottom',
+            end: () => '+=' + window.innerHeight,
+            pin: true,
+            pinSpacing: true,
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        if (window._syncBodyHeight) window._syncBodyHeight();
+      });
+    }, cardRef);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="bg-section" id="background">
+    <div ref={cardRef} className="bg-section" id="background">
       <div className="bg-inner">
         <div className="gf">
           <span className="t-label" style={{ marginBottom: 12, display: 'block' }}>{t('backgroundEyebrow')}</span>
@@ -3177,12 +3271,13 @@ function CursorDot() {
    breaks native sticky), flattens its top corners as it fills the screen,
    and reveals its text on scrub.                                            */
 function AISection() {
-  const wrapRef  = useRef(null);
-  const stageRef = useRef(null);
-  const cardRef  = useRef(null);
-  const titleRef = useRef(null);
-  const t1Ref    = useRef(null);
-  const t2Ref    = useRef(null);
+  const wrapRef   = useRef(null);
+  const stageRef  = useRef(null);
+  const cardRef   = useRef(null);
+  const titleRef  = useRef(null);
+  const t1Ref     = useRef(null);
+  const t2Ref     = useRef(null);
+  const canvasRef = useRef(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -3216,7 +3311,7 @@ function AISection() {
         gsap.ticker.add(tick);
 
         /* Scrubbed timeline: card rises + corners flatten, then text reveals. */
-        gsap.set(cardRef.current, { yPercent: 100, borderTopLeftRadius: 48, borderTopRightRadius: 48 });
+        gsap.set(cardRef.current, { yPercent: 100, borderTopLeftRadius: 80, borderTopRightRadius: 80 });
         gsap.set([titleRef.current, t1Ref.current, t2Ref.current], { autoAlpha: 0, y: 40 });
 
         const tl = gsap.timeline({
@@ -3228,7 +3323,7 @@ function AISection() {
           },
         });
         tl.to(cardRef.current, { yPercent: 0, ease: 'none', duration: 0.5 }, 0)
-          .to(cardRef.current, { borderTopLeftRadius: 0, borderTopRightRadius: 0, ease: 'none', duration: 0.5 }, 0)
+          .to(cardRef.current, { borderTopLeftRadius: 32, borderTopRightRadius: 32, ease: 'none', duration: 0.5 }, 0)
           .to(titleRef.current, { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.42)
           .to(t1Ref.current,   { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.55)
           .to(t2Ref.current,   { autoAlpha: 1, y: 0, ease: 'power2.out', duration: 0.25 }, 0.62);
@@ -3245,10 +3340,36 @@ function AISection() {
     return () => ctx.revert();
   }, []);
 
+  // Fluid simulation — initialise after mount, clean up on unmount
+  useEffect(() => {
+    const isMobileView = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobileView) return;               // canvas hidden on mobile — skip WebGL
+    if (!canvasRef.current || !stageRef.current) return;
+
+    let fluid = null;
+    try {
+      if (typeof window.initAIFluid === 'function') {
+        fluid = window.initAIFluid(canvasRef.current, stageRef.current);
+      }
+      // If fluid-sim.js didn't load or returned nothing, the static CSS gradient
+      // on .ai-card is already visible — no extra fallback class needed.
+    } catch (e) {
+      console.warn('[portfolio] fluid-sim failed to start:', e);
+    }
+    return () => {
+      try {
+        if (fluid && typeof fluid.destroy === 'function') fluid.destroy();
+        else if (window.destroyAIFluid) window.destroyAIFluid();
+      } catch (_) {}
+    };
+  }, []);
+
   return (
     <section ref={wrapRef} className="ai-wrap" aria-label="Where AI fits in how I work">
       <div ref={stageRef} className="ai-stage">
         <div ref={cardRef} className="ai-card">
+          {/* WebGL fluid canvas — inside card so border-radius clips it correctly */}
+          <canvas ref={canvasRef} className="ai-canvas" aria-hidden="true" />
           <h2 ref={titleRef} className="ai-title">Where AI fits in <em>how I work.</em></h2>
           <div className="ai-texts">
             <p ref={t1Ref} className="ai-text">I treat AI as a fast, tireless collaborator — never a replacement for judgment. Early on it helps me widen the search space: drafting variations, pressure-testing copy and turning rough research notes into patterns I can actually read.</p>
@@ -3436,5 +3557,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </LanguageProvider>
 );
 </script>
+
+<!-- Fluid simulation for the AI section (loaded after React so WebGL context
+     is available when the component's useEffect fires) -->
+<script src="assets/js/fluid-sim.js"></script>
 </body>
 </html>
