@@ -963,18 +963,29 @@ body { overflow-y: scroll; }
   will-change: transform, border-radius;
 }
 .ai-title {
-  grid-column: 1 / 8;
+  grid-column: 1 / -1;               /* full width so line 1 can fill it */
   grid-row: 1;
   align-self: end;
-  font: 700 clamp(44px,6.4vw,72px) var(--font-sans);
-  letter-spacing: -0.02em; line-height: 1.05; margin: 0;
-  position: relative; z-index: 1;
+  margin: 0; position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: flex-start;
+  min-width: 0;                      /* pin width to the grid track, ignore overflow */
+  /* --ai-fs is computed in JS (fit-to-width); clamp is the pre-JS fallback */
+  font-size: var(--ai-fs, clamp(44px, 9vw, 132px));
+  line-height: 0.95;
   color: var(--color-dark);
 }
-.ai-title em {
-  font-family: var(--font-serif);
-  font-weight: 300; font-style: italic; letter-spacing: 0;
-  color: var(--color-forest);
+.ai-line { display: block; white-space: nowrap; }
+.ai-line-1 {
+  font-family: var(--font-sans); font-weight: 700; letter-spacing: -0.02em;
+}
+.ai-line-2 {
+  font-family: var(--font-serif); font-weight: 300; font-style: italic;
+  letter-spacing: 0; color: var(--color-forest);
+}
+.ai-ai {
+  background: linear-gradient(228deg, #364A2C -39.76%, #02734A -13.52%, #B8F300 110.32%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
 .ai-texts {
   grid-column: 5 / 13;
@@ -2120,6 +2131,7 @@ const SELECTED_PROJECTS = [
     cover: 'assets/caratulas/Caratula-homecheck-1.jpg',
     tags: ['B2C', 'PropTech', 'Real Estate'],
     details: 'A partial inspection report designed to give homebuyers clarity during the appraisal stage — turning an opaque, professional-only step into something actionable for end users.',
+    caseStudyHref: 'homecheck.html',
   },
   {
     id: 'vega', name: 'Vega Research', mark: 'V',
@@ -3340,6 +3352,42 @@ function AISection() {
     return () => ctx.revert();
   }, []);
 
+  // Fit line 1 ("Where AI fits in") to the full available width on one line;
+  // line 2 ("my process") inherits the same size. Runs on mount, font-load and
+  // resize. Dispatches an event so the WebGL heading texture rebuilds in sync.
+  useEffect(() => {
+    const fitTitle = () => {
+      const el = titleRef.current;
+      if (!el) return;
+      const l1 = el.querySelector('.ai-line-1');
+      const avail = el.clientWidth;
+      if (!l1 || !avail) return;
+      // Measure with canvas (no DOM reflow → can't blow out the grid)
+      const cs  = getComputedStyle(l1);
+      const c   = fitTitle._c || (fitTitle._c = document.createElement('canvas'));
+      const cx  = c.getContext('2d');
+      const ref = 100;
+      cx.font = (cs.fontWeight || '700') + ' ' + ref + 'px ' + cs.fontFamily;
+      if ('letterSpacing' in cx) {
+        const curFs = parseFloat(cs.fontSize) || ref;
+        const lsPx  = (parseFloat(cs.letterSpacing) || 0) * (ref / curFs);
+        cx.letterSpacing = lsPx + 'px';
+      }
+      const wRef = cx.measureText(l1.textContent).width;
+      if (!wRef) return;
+      let size = ref * (avail / wRef) * 0.99;            // 1% safety margin
+      size = Math.min(size, 220);                        // sane cap for ultrawide
+      el.style.setProperty('--ai-fs', size.toFixed(2) + 'px');
+      window.dispatchEvent(new Event('ai:titlefit'));
+    };
+    fitTitle();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle);
+    const ro = new ResizeObserver(fitTitle);
+    if (cardRef.current) ro.observe(cardRef.current);
+    window.addEventListener('resize', fitTitle);
+    return () => { ro.disconnect(); window.removeEventListener('resize', fitTitle); };
+  }, []);
+
   // Fluid simulation — initialise after mount, clean up on unmount
   useEffect(() => {
     const isMobileView = window.matchMedia('(max-width: 768px)').matches;
@@ -3365,12 +3413,15 @@ function AISection() {
   }, []);
 
   return (
-    <section ref={wrapRef} className="ai-wrap" aria-label="Where AI fits in how I work">
+    <section ref={wrapRef} className="ai-wrap" aria-label="Where AI fits in my process">
       <div ref={stageRef} className="ai-stage">
         <div ref={cardRef} className="ai-card">
           {/* WebGL fluid canvas — inside card so border-radius clips it correctly */}
           <canvas ref={canvasRef} className="ai-canvas" aria-hidden="true" />
-          <h2 ref={titleRef} className="ai-title">Where AI fits in <em>how I work.</em></h2>
+          <h2 ref={titleRef} className="ai-title">
+            <span className="ai-line ai-line-1">Where <span className="ai-ai">AI</span> fits in</span>
+            <span className="ai-line ai-line-2">my process</span>
+          </h2>
           <div className="ai-texts">
             <p ref={t1Ref} className="ai-text">I treat AI as a fast, tireless collaborator — never a replacement for judgment. Early on it helps me widen the search space: drafting variations, pressure-testing copy and turning rough research notes into patterns I can actually read.</p>
             <p ref={t2Ref} className="ai-text">Mid-project it speeds up the unglamorous work — realistic placeholder content, interview summaries, quick flows so I can react to something concrete instead of a blank canvas. What it never does is decide. The taste, the trade-offs and the responsibility for what ships stay with me.</p>

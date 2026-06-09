@@ -140,7 +140,7 @@ function Ripple(canvas, section){
   var FTYPE, FILT;
   var frame = 0;
   var active=false, raf=null;
-  var io, ro;
+  var io, ro, onFit=null, fitRaf=0;
   var card  = canvas.closest('.ai-card');
   var title = card ? card.querySelector('.ai-title') : null;
   var titleHidden=false;
@@ -226,47 +226,71 @@ function Ripple(canvas, section){
     ctx.fillStyle = rg;
     ctx.fillRect(0,0,w,h);
 
-    // Heading text, positioned to match the (now-hidden) HTML title
+    // Heading text — two lines, mirroring the (now-hidden) HTML title.
+    //   line 1: "Where AI fits in" — Inter, "AI" filled with a gradient
+    //   line 2: "my process"       — Fraunces italic, forest green
     if(card && title){
       var cardR = card.getBoundingClientRect();
-      var tR    = title.getBoundingClientRect();
       var rect  = canvas.getBoundingClientRect();
       var dpr   = w / rect.width;
-
-      var cs   = getComputedStyle(title);
-      var emEl = title.querySelector('em');
-      var emcs = emEl ? getComputedStyle(emEl) : cs;
-
-      var baseText='', emText='';
-      title.childNodes.forEach(function(node){
-        if(node===emEl) emText = node.textContent;
-        else            baseText += node.textContent;
-      });
-
-      var x    = (tR.left - cardR.left) * dpr;
-      var yMid = (tR.top - cardR.top + tR.height/2) * dpr;
+      var l1 = title.querySelector('.ai-line-1');
+      var l2 = title.querySelector('.ai-line-2');
 
       ctx.textBaseline = 'middle';
-      if('letterSpacing' in ctx) ctx.letterSpacing = (parseFloat(cs.letterSpacing)*dpr || 0) + 'px';
 
-      // base segment (dark, sans bold)
-      ctx.font = cs.fontWeight + ' ' + (parseFloat(cs.fontSize)*dpr) + 'px ' + cs.fontFamily;
-      ctx.fillStyle = '#1A1A1A';
-      ctx.fillText(baseText, x, yMid);
-      var baseW = ctx.measureText(baseText).width;
+      // ── line 1 ──
+      if(l1){
+        var cs1   = getComputedStyle(l1);
+        var size1 = parseFloat(cs1.fontSize) * dpr;
+        var ls1   = (parseFloat(cs1.letterSpacing) || 0) * dpr;
+        var r1    = l1.getBoundingClientRect();
+        var x1    = (r1.left - cardR.left) * dpr;
+        var y1    = (r1.top - cardR.top + r1.height/2) * dpr;
 
-      // em segment (forest green, serif italic)
-      if(emText){
-        if('letterSpacing' in ctx) ctx.letterSpacing = '0px';
-        ctx.font = emcs.fontStyle + ' ' + emcs.fontWeight + ' ' + (parseFloat(emcs.fontSize)*dpr) + 'px ' + emcs.fontFamily;
-        ctx.fillStyle = '#2D6A4F';
-        ctx.fillText(emText, x + baseW, yMid);
+        ctx.font = '700 ' + size1 + 'px ' + cs1.fontFamily;
+        if('letterSpacing' in ctx) ctx.letterSpacing = ls1 + 'px';
+
+        var pre = 'Where ', mid = 'AI', post = ' fits in';
+        // "Where "
+        ctx.fillStyle = '#1A1A1A';
+        ctx.fillText(pre, x1, y1);
+        var preW = ctx.measureText(pre).width + ls1;
+        // "AI" with the brand gradient (≈228deg: top-right → bottom-left)
+        var aiX = x1 + preW;
+        var aiW = ctx.measureText(mid).width;
+        var grad = ctx.createLinearGradient(aiX + aiW, y1 - size1*0.5, aiX, y1 + size1*0.5);
+        grad.addColorStop(0.00, '#364A2C');
+        grad.addColorStop(0.14, '#02734A');
+        grad.addColorStop(1.00, '#B8F300');
+        ctx.fillStyle = grad;
+        ctx.fillText(mid, aiX, y1);
+        var midW = ctx.measureText(mid).width + ls1;
+        // " fits in"
+        ctx.fillStyle = '#1A1A1A';
+        ctx.fillText(post, aiX + midW, y1);
       }
 
-      // hide the HTML heading glyphs (canvas shows the heading now)
+      // ── line 2 ──
+      if(l2){
+        var cs2   = getComputedStyle(l2);
+        var size2 = parseFloat(cs2.fontSize) * dpr;
+        var r2    = l2.getBoundingClientRect();
+        var x2    = (r2.left - cardR.left) * dpr;
+        var y2    = (r2.top - cardR.top + r2.height/2) * dpr;
+        if('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+        ctx.font = (cs2.fontStyle || 'italic') + ' ' + (cs2.fontWeight || '300') + ' ' + size2 + 'px ' + cs2.fontFamily;
+        ctx.fillStyle = '#2D6A4F';
+        ctx.fillText(l2.textContent, x2, y2);
+      }
+
+      // hide the HTML heading glyphs (canvas shows the heading now).
+      // line 2 and .ai-ai have their own explicit colours, so transparent must
+      // be set on them directly — inheriting from the title isn't enough.
       if(!titleHidden){
         title.style.color = 'transparent';
-        if(emEl) emEl.style.color = 'transparent';
+        var aiEl = title.querySelector('.ai-ai');
+        if(aiEl){ aiEl.style.background = 'none'; aiEl.style.webkitTextFillColor = 'transparent'; }
+        if(l2) l2.style.color = 'transparent';
         titleHidden = true;
       }
     }
@@ -364,6 +388,13 @@ function Ripple(canvas, section){
     }, {threshold:0});
     io.observe(section);
 
+    // Rebuild the heading texture when the title is re-fitted (resize / fonts)
+    onFit = function(){
+      if(!gl || fitRaf) return;
+      fitRaf = requestAnimationFrame(function(){ fitRaf = 0; if(gl) buildContent(); });
+    };
+    window.addEventListener('ai:titlefit', onFit);
+
     resize();
     if(!rtA) allocRTs();
     if(!contentTex) buildContent();
@@ -385,9 +416,14 @@ function Ripple(canvas, section){
     section.removeEventListener('mousemove', onMove);
     section.removeEventListener('mouseleave',onLeave);
     section.removeEventListener('touchmove', onTouch);
+    if(onFit){ window.removeEventListener('ai:titlefit', onFit); onFit=null; }
+    if(fitRaf){ cancelAnimationFrame(fitRaf); fitRaf=0; }
     if(title && titleHidden){
       title.style.color='';
-      var emEl=title.querySelector('em'); if(emEl) emEl.style.color='';
+      var aiEl=title.querySelector('.ai-ai');
+      if(aiEl){ aiEl.style.background=''; aiEl.style.webkitTextFillColor=''; }
+      var l2El=title.querySelector('.ai-line-2');
+      if(l2El) l2El.style.color='';
       titleHidden=false;
     }
     if(gl){ var e=gl.getExtension('WEBGL_lose_context'); if(e) e.loseContext(); gl=null; }
