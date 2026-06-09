@@ -361,24 +361,31 @@ function Ripple(canvas, section){
     if(gl){ allocRTs(); buildContent(); }
   }
 
-  /* ── pointer ── */
+  /* ── pointer ──
+     Listeners live on `window` (not the stage) because the AI stage is
+     pointer-events:none so it doesn't block the section beneath it during
+     the rising-card overlap. We gate ripples to when the cursor is actually
+     over the canvas; otherwise the ambient wander keeps running. */
   function onMove(e){
     var r = canvas.getBoundingClientRect();
+    if(e.clientX < r.left || e.clientX > r.right ||
+       e.clientY < r.top  || e.clientY > r.bottom){
+      userActiveUntil = 0;        // cursor off the card → let ambient wander run
+      return;
+    }
     var dpr = canvas.width / r.width;
     mouse.x = (e.clientX - r.left) * dpr;
     mouse.y = (r.height - (e.clientY - r.top)) * dpr;   // flip Y
     userActiveUntil = performance.now() + 1500;          // pause wander
   }
-  function onLeave(){ /* keep last pos so ripples settle; wander resumes */ userActiveUntil = 0; }
   function onTouch(e){ if(e.touches[0]) onMove(e.touches[0]); }
 
   /* ── public ── */
   this.start = function(){
     if(!initGL()){ console.warn('[ripple] init failed – CSS forest bg stays'); return; }
 
-    section.addEventListener('mousemove', onMove,  {passive:true});
-    section.addEventListener('mouseleave',onLeave, {passive:true});
-    section.addEventListener('touchmove', onTouch, {passive:true});
+    window.addEventListener('mousemove', onMove,  {passive:true});
+    window.addEventListener('touchmove', onTouch, {passive:true});
 
     ro = new ResizeObserver(resize); ro.observe(canvas);
     io = new IntersectionObserver(function(en){
@@ -413,9 +420,8 @@ function Ripple(canvas, section){
     if(raf){ cancelAnimationFrame(raf); raf=null; }
     if(io) io.disconnect();
     if(ro) ro.disconnect();
-    section.removeEventListener('mousemove', onMove);
-    section.removeEventListener('mouseleave',onLeave);
-    section.removeEventListener('touchmove', onTouch);
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('touchmove', onTouch);
     if(onFit){ window.removeEventListener('ai:titlefit', onFit); onFit=null; }
     if(fitRaf){ cancelAnimationFrame(fitRaf); fitRaf=0; }
     if(title && titleHidden){

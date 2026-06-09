@@ -294,10 +294,12 @@
   ];
 
   function Nav({ active = null, onNavigate = () => {}, homeHref = 'index.html' }) {
-    const { t } = useT();
+    const { t, lang } = useT();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const navRef = useRef(null), wrapRef = useRef(null), itemsRef = useRef(null), burgerRef = useRef(null);
+    const mobileRef = useRef(null), mobileFirst = useRef(true);
 
     useLayoutEffect(() => {
       const ctx = gsap.context(() => {
@@ -347,10 +349,65 @@
 
     const handleItem = (item) => {
       onNavigate(item.labelKey);
+      setMenuOpen(false);
+      setMobileOpen(false);
       if (item.type === 'download') return;
       scrollToId(item.target);
-      setMenuOpen(false);
     };
+
+    /* The burger opens the fullscreen overlay on mobile, the inline menu on desktop. */
+    const onBurger = () => {
+      if (window.matchMedia('(max-width: 768px)').matches) setMobileOpen(true);
+      else setMenuOpen(o => !o);
+    };
+
+    /* GSAP open/close animation for the fullscreen mobile menu. */
+    useEffect(() => {
+      const panel = mobileRef.current;
+      if (!panel) return;
+      const links = panel.querySelectorAll('.nav-m-link');
+      const foot  = panel.querySelector('.nav-m-foot');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (mobileFirst.current) {
+        mobileFirst.current = false;
+        gsap.set(panel, { yPercent: -100, autoAlpha: 0 });
+        return;
+      }
+
+      gsap.killTweensOf([panel, foot]);
+      gsap.killTweensOf(links);
+
+      if (mobileOpen) {
+        document.documentElement.style.overflow = 'hidden';
+        if (reduce) {
+          gsap.set(panel, { yPercent: 0, autoAlpha: 1 });
+          gsap.set([...links, foot], { autoAlpha: 1, y: 0 });
+          return;
+        }
+        gsap.timeline()
+          .set(panel, { autoAlpha: 1 })
+          .fromTo(panel, { yPercent: -100 }, { yPercent: 0, duration: 0.55, ease: 'power3.out' })
+          .fromTo(links, { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.45, stagger: 0.08, ease: 'power2.out' }, '-=0.25')
+          .fromTo(foot,  { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, '-=0.20');
+      } else {
+        document.documentElement.style.overflow = '';
+        if (reduce) { gsap.set(panel, { yPercent: -100, autoAlpha: 0 }); return; }
+        gsap.to(panel, { yPercent: -100, autoAlpha: 0, duration: 0.4, ease: 'power3.inOut' });
+      }
+    }, [mobileOpen]);
+
+    /* Close on Escape or when the viewport grows back to desktop; restore scroll. */
+    useEffect(() => {
+      if (!mobileOpen) return;
+      const onKey = e => { if (e.key === 'Escape') setMobileOpen(false); };
+      const onResize = () => { if (!window.matchMedia('(max-width: 768px)').matches) setMobileOpen(false); };
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('resize', onResize);
+      return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('resize', onResize); };
+    }, [mobileOpen]);
+
+    useEffect(() => () => { document.documentElement.style.overflow = ''; }, []);
 
     const goHome = (e) => {
       /* On the home page (the only one with #smooth-content) smooth-scroll to
@@ -363,6 +420,7 @@
     };
 
     return ReactDOM.createPortal(
+      <React.Fragment>
       <nav ref={navRef} className={`nav${scrolled ? ' is-scrolled' : ''}`} aria-label="Primary">
         <a className="nav-pill nav-logo" href={homeHref} onClick={goHome}>
           <span className="nav-logo-mark"><Isologo /></span>
@@ -375,7 +433,7 @@
                onMouseEnter={() => setMenuOpen(true)}
                onMouseLeave={() => setMenuOpen(false)}>
             <button ref={burgerRef} className="nav-burger" aria-label="Open menu"
-                    onClick={() => setMenuOpen(o => !o)}>
+                    onClick={onBurger}>
               <span /><span />
             </button>
             <div ref={wrapRef} className="nav-items-wrap">
@@ -409,7 +467,56 @@
             <span className="nav-cta-arrow"><ArrowRight /></span>
           </a>
         </div>
-      </nav>,
+      </nav>
+
+      {/* Fullscreen mobile menu overlay (GSAP-animated) */}
+      <div ref={mobileRef} className={`nav-mobile${mobileOpen ? ' is-open' : ''}`}
+           role="dialog" aria-modal="true" aria-label="Menu" aria-hidden={!mobileOpen}>
+        <div className="nav-mobile-top">
+          <span className="nav-mobile-logo">
+            <span className="nav-logo-mark"><Isologo /></span>
+            <span className="nav-brand-text">Ricardo<em>Martínez</em></span>
+            <span className="nav-dot" />
+          </span>
+          <button className="nav-mobile-close" aria-label="Close menu"
+                  onClick={() => setMobileOpen(false)}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="nav-mobile-links">
+          {NAV_ITEMS.map((item) => {
+            const cls = `nav-m-link${active === item.labelKey ? ' is-active' : ''}`;
+            const label = item.labelKey === 'nav.downloadResume'
+              ? (lang === 'es' ? 'CV' : 'Resume')
+              : t(item.labelKey);
+            if (item.type === 'download') {
+              return (
+                <a key={item.labelKey} className={cls} href={item.href}
+                   target="_blank" rel="noopener noreferrer"
+                   onClick={() => handleItem(item)}>{label}</a>
+              );
+            }
+            return (
+              <a key={item.labelKey} className={cls}
+                 href={`${document.getElementById(item.target) ? '' : homeHref}#${item.target}`}
+                 onClick={e => { e.preventDefault(); handleItem(item); }}>{label}</a>
+            );
+          })}
+        </div>
+
+        <div className="nav-m-foot">
+          <LangToggle />
+          <a className="nav-cta" href="mailto:ricardomartinezing1@gmail.com"
+             onClick={() => setMobileOpen(false)}>
+            <span>{t('nav.cta')}</span>
+            <span className="nav-cta-arrow"><ArrowRight /></span>
+          </a>
+        </div>
+      </div>
+      </React.Fragment>,
       document.body
     );
   }
