@@ -286,11 +286,18 @@
     );
   }
 
+  /* ── Résumé / CV (language-dependent) ────────────────────────────────── */
+  function cvHref(lang) {
+    return lang === 'es'
+      ? 'assets/Curriculum/Ricardo-Martinez-CV-ES.pdf'
+      : 'assets/Curriculum/Ricardo-Martinez-CV-EN.pdf';
+  }
+
   /* ── Nav ─────────────────────────────────────────────────────────────── */
   const NAV_ITEMS = [
     { labelKey: 'nav.work',           type: 'scroll',   target: 'work'  },
     { labelKey: 'nav.about',          type: 'scroll',   target: 'about' },
-    { labelKey: 'nav.downloadResume', type: 'download', href: 'assets/Ricardo_Martinez_CV.pdf' },
+    { labelKey: 'nav.downloadResume', type: 'download' },   // href resolved by language
   ];
 
   function Nav({ active = null, onNavigate = () => {}, homeHref = 'index.html' }) {
@@ -343,7 +350,9 @@
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       } else {
-        window.location.href = `${homeHref}#${id}`;
+        const dest = `${homeHref}#${id}`;
+        if (window.pageTransition) window.pageTransition.navigate(dest);
+        else window.location.href = dest;
       }
     };
 
@@ -444,7 +453,7 @@
                   if (item.type === 'download') {
                     return (
                       <a key={item.labelKey} className={cls} style={style}
-                         href={item.href} target="_blank" rel="noopener noreferrer"
+                         href={cvHref(lang)} target="_blank" rel="noopener noreferrer"
                          onClick={() => handleItem(item)}>
                         <span>{t(item.labelKey)}</span>
                       </a>
@@ -494,7 +503,7 @@
               : t(item.labelKey);
             if (item.type === 'download') {
               return (
-                <a key={item.labelKey} className={cls} href={item.href}
+                <a key={item.labelKey} className={cls} href={cvHref(lang)}
                    target="_blank" rel="noopener noreferrer"
                    onClick={() => handleItem(item)}>{label}</a>
               );
@@ -523,7 +532,7 @@
 
   /* ── Footer ──────────────────────────────────────────────────────────── */
   function Footer() {
-    const { t } = useT();
+    const { t, lang } = useT();
     const [time, setTime] = useState('');
     const btnRef = useRef(null);
 
@@ -593,7 +602,7 @@
               <span className="footer-col-label">{t('footer.findMe')}</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <a href="https://www.linkedin.com/in/ricardo-marting/" target="_blank" rel="noopener noreferrer" className="footer-col-link">{t('footer.linkedin')} <ArrowRight /></a>
-                <a href="assets/Ricardo_Martinez_CV.pdf" target="_blank" rel="noopener noreferrer" className="footer-col-link">{t('footer.resume')} <ArrowRight /></a>
+                <a href={cvHref(lang)} target="_blank" rel="noopener noreferrer" className="footer-col-link">{t('footer.resume')} <ArrowRight /></a>
               </div>
             </div>
             <div>
@@ -653,5 +662,6 @@
     NAV_ITEMS,
     Footer,
     CursorDot,
+    cvHref,
   };
 })();

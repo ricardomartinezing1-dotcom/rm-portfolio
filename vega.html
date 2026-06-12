@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Vega — Case study · Ricardo Martínez</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<!-- Page-transition guard: paint a solid cover before first paint when we
+     arrive via the grid-shutter transition (flag set by page-transition.js) -->
+<script>(function(){try{if(sessionStorage.getItem('pt:active')==='1')document.documentElement.classList.add('pt-in');}catch(e){}})();</script>
+<style>html.pt-in body::before{content:'';position:fixed;inset:0;background:#2D6A4F;z-index:9999;}</style>
+
 <meta name="description" content="Redesigning Tinsa's field appraisal app to make surveyors faster, not busier. Case study by Ricardo Martínez." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -287,6 +292,7 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="assets/js/page-transition.js"></script>
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
