@@ -40,4 +40,38 @@
   };
   window.addEventListener('scroll', setActive, { passive: true });
   setActive();
+
+  /* Lightbox — any <img class="cs-zoom"> opens in a fullscreen modal */
+  const zoomables = [...document.querySelectorAll('.cs-zoom')];
+  if (zoomables.length) {
+    const box = document.createElement('div');
+    box.className = 'cs-lightbox';
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML =
+      '<button class="cs-lightbox-close" aria-label="Close">' +
+      '<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+      '</button><img class="cs-lightbox-img" alt="" />';
+    document.body.appendChild(box);
+    const lbImg = box.querySelector('.cs-lightbox-img');
+
+    const open = (src, alt) => {
+      lbImg.src = src;
+      lbImg.alt = alt || '';
+      box.classList.add('is-open');
+      box.setAttribute('aria-hidden', 'false');
+      document.documentElement.style.overflow = 'hidden';
+    };
+    const close = () => {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.documentElement.style.overflow = '';
+    };
+
+    zoomables.forEach(img => {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
+    });
+    box.addEventListener('click', e => { if (e.target === box || e.target.closest('.cs-lightbox-close')) close(); });
+    window.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  }
 })();

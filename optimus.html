@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Optimus — Case study · Ricardo Martínez</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<!-- Page-transition guard: paint a solid cover before first paint when we
+     arrive via the grid-shutter transition (flag set by page-transition.js) -->
+<script>(function(){try{if(sessionStorage.getItem('pt:active')==='1')document.documentElement.classList.add('pt-in');}catch(e){}})();</script>
+<style>html.pt-in body::before{content:'';position:fixed;inset:0;background:#2D6A4F;z-index:9999;}</style>
+
+<meta name="description" content="Designing and sustaining Tinsa's property-valuation tool for four years — adding complex casuistry to a critical, regulated system without breaking it. Case study by Ricardo Martínez." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="assets/css/case-study-tokens.css" />
+<link rel="stylesheet" href="assets/css/shell.css" />
+<link rel="stylesheet" href="assets/css/case-study.css" />
+</head>
+<body>
+
+<div class="cs-progress" id="cs-progress"></div>
+<div id="shell-nav-root"></div>
+
+<!-- ── Hero ────────────────────────────────────────────────────────────── -->
+<section class="cs-hero">
+  <div class="container cs-hero-inner">
+    <div class="cs-hero-meta reveal">
+      <span class="label"><span class="label-dot"></span>Case study</span>
+      <span class="label">·</span>
+      <span class="label">Tinsa by Accumin</span>
+      <span class="label">·</span>
+      <span class="label">Lead Designer</span>
+    </div>
+    <h1 class="cs-hero-title reveal">Optimus</h1>
+    <p class="cs-hero-sub reveal">Keeping a critical tool <em>alive and compliant.</em></p>
+
+    <div class="cs-hero-facts reveal">
+      <div class="cs-hero-fact">
+        <span class="label">Role</span>
+        <span class="cs-hero-fact-val">Lead Designer · inherited 2022</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Platform</span>
+        <span class="cs-hero-fact-val">Desktop application</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Type</span>
+        <span class="cs-hero-fact-val">Internal B2B · regulated (ECO)</span>
+      </div>
+      <div class="cs-hero-fact">
+        <span class="label">Status</span>
+        <span class="cs-hero-fact-val">Ongoing · ~4 years</span>
+      </div>
+    </div>
+
+    <div class="cs-hero-image reveal">
+      <div class="cs-figure-ph" style="width:100%;height:100%"><span>Optimus main screen — the density and complexity of the tool</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Body ─────────────────────────────────────────────────────────────── -->
+<div class="cs-body">
+  <div class="container cs-layout">
+
+    <!-- Sticky TOC -->
+    <nav class="cs-toc" aria-label="Sections">
+      <span class="label cs-toc-label">On this page</span>
+      <a class="cs-toc-link" href="#context">The beast</a>
+      <a class="cs-toc-link" href="#stakes">Why it mattered</a>
+      <a class="cs-toc-link" href="#constraints">Constraints</a>
+      <a class="cs-toc-link" href="#role">My role</a>
+      <a class="cs-toc-link" href="#premises">Case A · Premises</a>
+      <a class="cs-toc-link" href="#state">Case B · By state</a>
+      <a class="cs-toc-link" href="#uikit">Case C · UI kit</a>
+      <a class="cs-toc-link" href="#impact">Impact</a>
+      <a class="cs-toc-link" href="#reflection">Reflection</a>
+    </nav>
+
+    <main class="cs-content">
+
+      <!-- 00 Format note -->
+      <section class="cs-section reveal">
+        <div class="cs-callout">
+          <span class="label">How to read this</span>
+          <h4>Stewardship, not a single challenge → solution arc</h4>
+          <p>Optimus is a living, massive product with no real "end". I joined when it was already in motion and have sustained and evolved it as lead designer. So I tell it as <strong>stewardship + three representative cases</strong> that show the kind of problems I solve within it.</p>
+        </div>
+      </section>
+
+      <!-- 01 Context -->
+      <section class="cs-section reveal" id="context">
+        <div class="label cs-section-label"><span class="label-dot"></span>01 · Context — the beast</div>
+        <h2 class="h1 cs-section-title">A hyper-complex, <em>fragile system.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Optimus is the desktop application used to produce property valuations at Tinsa. And the world of valuation is wild: a single tool has to account for homes, industrial warehouses, parking spaces, commercial premises… an enormous range of cases. On top of that sits the regulatory layer: the full <strong>ECO methodology</strong>, every admissible valuation method, and constant oversight from the <strong>Bank of Spain</strong>.</p>
+          <p class="body">The result is a hyper-complex, fragile system: because of its size and how interconnected it is, touching one area can easily break others. I joined in 2022, when it had already been in development for four or five years. I didn't start it — my challenge was to step into a running machine, understand it, and evolve it <strong>without stopping it</strong>.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Property types Optimus covers · its layers (casuistry + regulation + interface)</span></div>
+        </figure>
+      </section>
+
+      <!-- 02 Why it mattered -->
+      <section class="cs-section reveal" id="stakes">
+        <div class="label cs-section-label"><span class="label-dot"></span>02 · Why it mattered</div>
+        <h2 class="h1 cs-section-title">Competing against <em>inertia.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Optimus wasn't competing against a market rival: it was competing against inertia. The tool it was replacing was very old, very large legacy software that many appraisers had used for <strong>twenty years</strong>. Replacing that muscle memory is one of the hardest adoption challenges there is.</p>
+        </div>
+        <div class="cs-cards">
+          <div class="cs-card">
+            <span class="cs-card-icon">BIZ</span>
+            <div><h4>For Tinsa</h4><p>A modern, maintainable tool that, above all, passes the Bank of Spain's regulatory scrutiny.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">USR</span>
+            <div><h4>For the appraiser</h4><p>A better way to work — as long as the change didn't penalize two decades of habit.</p></div>
+          </div>
+        </div>
+        <blockquote class="cs-pull">What was at stake wasn't a screen; it was the operational continuity and regulatory compliance of the entire valuation business.</blockquote>
+      </section>
+
+      <!-- 03 Constraints -->
+      <section class="cs-section reveal" id="constraints">
+        <div class="label cs-section-label"><span class="label-dot"></span>03 · Constraints &amp; starting point</div>
+        <h2 class="h1 cs-section-title">The permanent rules <em>of the game.</em></h2>
+        <div class="cs-cards">
+          <div class="cs-card">
+            <span class="cs-card-icon">FRG</span>
+            <div><h4>Fragility through complexity</h4><p>Every change requires tightly scoping the work and understanding what it affects — it's easy to break something downstream.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">REG</span>
+            <div><h4>Regulation</h4><p>Designs don't just have to be usable: they have to comply. Usability is built <em>on top of</em> a framework that isn't negotiable.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">INH</span>
+            <div><h4>Inherited, in-flight</h4><p>I joined with no blank slate, facing a very steep learning curve, advancing through small, tightly scoped tasks.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">1×</span>
+            <div><h4>Sole designer</h4><p>The only design person on the tool: no design system, no one to lean on to build one.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">USR</span>
+            <div><h4>Veteran users</h4><p>A base accustomed for years to the previous software, which turns every change into a real adoption cost.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Role -->
+      <section class="cs-section reveal" id="role">
+        <div class="label cs-section-label"><span class="label-dot"></span>04 · My role &amp; collaboration</div>
+        <h2 class="h1 cs-section-title">From mentored <em>to lead.</em></h2>
+        <div class="cs-prose">
+          <p class="body">I started out mentored by the lead designer already in place; as he moved on, I became the <strong>lead designer</strong> of the application. Given the learning curve, the method was to move forward gradually, with very tightly scoped tasks. The work rests on close, constant collaboration:</p>
+        </div>
+        <div class="cs-steps">
+          <div class="cs-step">
+            <span class="cs-step-num">1</span>
+            <p><strong>Domain-knowledge area:</strong> side by side, always. They're the domain authority — they tell me whether a design meets appraisers' real needs and the regulations. Over time I began helping them map the implications of new casuistry and define requirements.</p>
+          </div>
+          <div class="cs-step">
+            <span class="cs-step-num">2</span>
+            <p><strong>Engineering:</strong> feasibility validation of every proposal, and alignment with their existing component library.</p>
+          </div>
+          <div class="cs-step">
+            <span class="cs-step-num">3</span>
+            <p><strong>Product Owner:</strong> to prioritize and push each task through.</p>
+          </div>
+        </div>
+        <div class="cs-prose">
+          <p class="body">My contribution, beyond the screens, was to <strong>translate</strong> a brutally hard domain into a coherent visual language, and to raise the product's craft.</p>
+        </div>
+      </section>
+
+      <!-- 05 Vignette A -->
+      <section class="cs-section reveal" id="premises">
+        <div class="label cs-section-label"><span class="label-dot"></span>05 · Case A — Commercial premises</div>
+        <h2 class="h1 cs-section-title">Adding a property type <em>that didn't exist.</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>The challenge.</strong> Adding commercial premises as a valuable property type to a system that didn't account for them. The hardest part wasn't drawing screens: it was studying the entire casuistry and analyzing which parts of the application would be affected and which wouldn't. That mapping alone took a long time, and landing everything else depended on it.</p>
+        </div>
+        <div class="cs-decision">
+          <span class="cs-decision-tag">Decision 01</span>
+          <h4>Registering a premises, with its three types</h4>
+          <p>Modelling the process knowing there are <strong>three differentiated types of premises</strong>, and that the floor/height they sit on enables one class or another.</p>
+        </div>
+        <div class="cs-decision">
+          <span class="cs-decision-tag">Decision 02</span>
+          <h4>Fitting it into the interface</h4>
+          <p>Its interaction with other property types — for example a valuation that combines a home and a premises: what the primary use is, when it's possible, and in which cases it isn't allowed.</p>
+          <p class="trade"><b>Collaboration:</b> continuous alignment with the domain team on every case and on how to bring it into the interface while respecting the way Optimus conceives a valuation.</p>
+        </div>
+        <div class="cs-prose">
+          <p class="body"><strong>Why I'm proud of it.</strong> For learning from an expert team on such a complex topic, and for translating that complexity into a <em>simple</em> result: a user understanding clearly what they need to do to value a commercial premises. In a system like this, simplicity is the hard-won achievement.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>Registering a premises · the three types · home + premises in one valuation</span></div>
+        </figure>
+      </section>
+
+      <!-- 06 Vignette B -->
+      <section class="cs-section reveal" id="state">
+        <div class="label cs-section-label"><span class="label-dot"></span>06 · Case B — Valuations by state</div>
+        <h2 class="h1 cs-section-title">One dropdown that <em>reconfigures everything.</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>The challenge.</strong> Allowing the same home to be valued according to its state radically changes <em>how</em> the valuation works. <strong>In project</strong>, there's often no site visit; <strong>under construction</strong>, there's a visit but you can't access the interior because the property doesn't yet exist as such. That forces a reconfiguration of the flow itself, not just the content.</p>
+          <p class="body"><strong>The interface &amp; data challenge.</strong> Many fields had to be swapped for new ones, fitting new forms into slots that already existed. A simple <strong>state dropdown</strong> (completed / under construction / in project) caused large parts of the interface to change in a cascade.</p>
+        </div>
+        <div class="cs-callout">
+          <span class="label">The hardest part</span>
+          <h4>Human orchestration, as demanding as the technical work</h4>
+          <p>Getting <strong>business</strong> (which also had opinions), <strong>the domain team</strong>, <strong>engineering</strong> and the <strong>design perspective</strong> to agree.</p>
+        </div>
+        <div class="cs-prose">
+          <p class="body"><strong>The trade-off.</strong> An interface that reconfigures itself by state implies a learning curve for the user; we managed it to keep that curve as small as possible, and I think it ended up well resolved.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>The same flow across the three states · the "dropdown that reconfigures the interface"</span></div>
+        </figure>
+      </section>
+
+      <!-- 07 Vignette C -->
+      <section class="cs-section reveal" id="uikit">
+        <div class="label cs-section-label"><span class="label-dot"></span>07 · Case C — A visual system from scratch</div>
+        <h2 class="h1 cs-section-title">A UI kit that became <em>a shared system.</em></h2>
+        <div class="cs-prose">
+          <p class="body"><strong>The challenge.</strong> There was no design system. The previous designer reused whole screens manually. As the only designer, without a reusable foundation I was going to be far too slow.</p>
+          <p class="body"><strong>The decision.</strong> To build, on my own, a simple but solid <strong>UI kit</strong>, applying best practices and aligned with the component library engineering already had. The underlying intent: to raise the product's bar, not just replicate what existed.</p>
+        </div>
+        <div class="cs-callout">
+          <span class="label">The scope it gained</span>
+          <h4>One visual system across three applications</h4>
+          <p>What started as a tool to move faster became a system shared across <strong>Optimus</strong>, <strong>Pickup</strong> (the appraiser's job-management tool) and <strong>Jazz</strong> (the review department's tool). I anchored it in Optimus, which had the best interface, and reused it in the other two — which I also design.</p>
+        </div>
+        <div class="cs-prose">
+          <p class="body"><strong>Why it counts.</strong> It's a different kind of contribution: not solving a case, but <strong>craft and systemic ownership</strong>. It sped up design, brought coherence across products, and raised the visual standard in a sustained way.</p>
+        </div>
+        <figure class="cs-figure" style="margin-top:var(--space-6)">
+          <div class="cs-figure-ph"><span>UI kit (components, tokens) · the same system applied across Optimus, Pickup and Jazz</span></div>
+        </figure>
+      </section>
+
+      <!-- 08 Impact -->
+      <section class="cs-section reveal" id="impact">
+        <div class="label cs-section-label"><span class="label-dot"></span>08 · Impact &amp; learnings</div>
+        <h2 class="h1 cs-section-title">Impact that <em>compounds.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Because this is a living product, impact is cumulative and measured in several ways:</p>
+        </div>
+        <div class="cs-cards">
+          <div class="cs-card">
+            <span class="cs-card-icon">REG</span>
+            <div><h4>Audits passed</h4><p>In a regulated tool, passing the Bank of Spain's audits is itself a success metric.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">MIG</span>
+            <div><h4>Legacy migration</h4><p>With no external competitor, the challenge was to displace inertia: let users choose and watch adoption, then business progressively blocked actions in the old software so they could only be done in Optimus.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">ADO</span>
+            <div><h4>Share of transactions</h4><p>Adoption and share of valuations run in Optimus vs. Tinsa's total. It won't reach 100% — very specific casuistry stays manual — but the trend is the reference point.</p></div>
+          </div>
+          <div class="cs-card">
+            <span class="cs-card-icon">FBK</span>
+            <div><h4>User feedback</h4><p>Behavioral analytics on specific flows (Hotjar) and feedback collection — positive.</p></div>
+          </div>
+        </div>
+        <div class="cs-takeaways">
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>In a fragile, complex system the craft lies in <em>tightly scoping the work and validating constantly</em>. Prudence is a design skill.</p>
+          </div>
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>Humility and translation are senior competencies: learning from domain experts and turning complexity into something simple is most of the value I bring here.</p>
+          </div>
+          <div class="cs-takeaway">
+            <span class="cs-takeaway-mark">✦</span>
+            <p>Raising craft compounds over time. A dedicated visual system paid off in speed and coherence for years.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 Reflection -->
+      <section class="cs-section reveal" id="reflection">
+        <div class="label cs-section-label"><span class="label-dot"></span>09 · Reflection</div>
+        <h2 class="h1 cs-section-title">Success isn't a launch — <em>it's sustained health.</em></h2>
+        <div class="cs-prose">
+          <p class="body">Designing Optimus taught me that, in products like this, success isn't a launch, it's sustained health: the tool continuing to grow, comply, and gain adoption year after year without breaking. It's a less flashy kind of work than a redesign from scratch, but closer to what mature product design actually demands.</p>
+          <p class="body">What I take away is the value of surrounding yourself with people who know far more than you about an impossible domain, having the humility to learn from them and the discipline to translate all of it into something a user understands at first glance. And, looking back, I'd have invested in the visual system even earlier: the sooner that foundation exists, the faster and more coherent everything that follows becomes.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="shell-footer-root"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="assets/js/page-transition.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+<script type="text/babel" src="assets/js/shell.js"></script>
+<script type="text/babel">
+  const { LanguageProvider, Nav, Footer, CursorDot } = window.PortfolioShell;
+  ReactDOM.createRoot(document.getElementById('shell-nav-root')).render(
+    <LanguageProvider><CursorDot /><Nav homeHref="index.html" /></LanguageProvider>
+  );
+  ReactDOM.createRoot(document.getElementById('shell-footer-root')).render(
+    <LanguageProvider><Footer /></LanguageProvider>
+  );
+</script>
+<script src="assets/js/case-study.js"></script>
+</body>
+</html>
